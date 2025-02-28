@@ -1,188 +1,188 @@
-"id","name","category_id/id","code","sequence","struct_id/id","condition_select","amount_select","amount_python_compute"
-"l10n_mx_hr_payroll.hr_salary_rule_dpa_groceries","Despensa","hr_payroll.ALW","DPA","1001","l10n_mx_hr_payroll.structure_mx_special_groceries","none","code","
+id,name,category_id/id,code,reporting_category,sequence,struct_id/id,condition_select,amount_select,amount_python_compute
+l10n_mx_hr_payroll.hr_salary_rule_dpa_groceries,Despensa,hr_payroll.ALW,DPA,,1001,l10n_mx_hr_payroll.structure_mx_special_groceries,none,code,"
 result = 700"
-"l10n_mx_hr_payroll.hr_salary_rule_talw_groceries","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_special_groceries","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_tded_groceries","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_special_groceries","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_slyn_groceries","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_special_groceries","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_p004_christmas_bonus","Aguinaldo","hr_payroll.ALW","P004","1001","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = contract.wage * 0.10"
-"l10n_mx_hr_payroll.hr_salary_rule_p009_christmas_bonus","Vacaciones","hr_payroll.ALW","P009","1002","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = contract.wage * 0.10"
-"l10n_mx_hr_payroll.hr_salary_rule_p010_christmas_bonus","Prima Vacacional","hr_payroll.ALW","P010","1010","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = 873"
-"l10n_mx_hr_payroll.hr_salary_rule_p207_christmas_bonus","Liquidacion de Fondo de Ahorro","hr_payroll.ALW","P207","1100","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = contract.wage * 0.10"
-"l10n_mx_hr_payroll.hr_salary_rule_talw_christmas_bonus","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_auxisr_christmas_bonus","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5001","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_talw_groceries,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_special_groceries,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_tded_groceries,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_special_groceries,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_slyn_groceries,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_special_groceries,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_p004_christmas_bonus,Aguinaldo,hr_payroll.ALW,P004,,1001,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = contract.wage * 0.10
+l10n_mx_hr_payroll.hr_salary_rule_p009_christmas_bonus,Vacaciones,hr_payroll.ALW,P009,,1002,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = contract.wage * 0.10
+l10n_mx_hr_payroll.hr_salary_rule_p010_christmas_bonus,Prima Vacacional,hr_payroll.ALW,P010,,1010,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = 873
+l10n_mx_hr_payroll.hr_salary_rule_p207_christmas_bonus,Liquidacion de Fondo de Ahorro,hr_payroll.ALW,P207,,1100,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = contract.wage * 0.10
+l10n_mx_hr_payroll.hr_salary_rule_talw_christmas_bonus,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_auxisr_christmas_bonus,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5001,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_d001_christmas_bonus","ISR","hr_payroll.DED","D001","5100","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = contract.wage * 0.10"
-"l10n_mx_hr_payroll.hr_salary_rule_tded_christmas_bonus","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_slyn_christmas_bonus","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_special_christmas_bonus","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_p215_liquidaciones_de_savings_fund","Intereses Fondo de Ahorro","hr_payroll.ALW","P215","1001","l10n_mx_hr_payroll.structure_mx_special_savings_fund","none","code","result = contract.wage * 0.10 * 7"
-"l10n_mx_hr_payroll.hr_salary_rule_p216_liquidaciones_de_savings_fund","Liquidacion de Fondo de Ahorro","hr_payroll.ALW","P216","1100","l10n_mx_hr_payroll.structure_mx_special_savings_fund","none","code","result = contract.wage * 0.10"
-"l10n_mx_hr_payroll.hr_salary_rule_p217_liquidaciones_de_savings_fund","Liquidacion Fondo de Ahorro","hr_payroll.ALW","P217","1100","l10n_mx_hr_payroll.structure_mx_special_savings_fund","none","code","result = contract.wage * 0.10 * 6"
-"l10n_mx_hr_payroll.hr_salary_rule_talw_liquidaciones_de_savings_fund","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_special_savings_fund","none","code","
+l10n_mx_hr_payroll.hr_salary_rule_d001_christmas_bonus,ISR,hr_payroll.DED,D001,,5100,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = contract.wage * 0.10
+l10n_mx_hr_payroll.hr_salary_rule_tded_christmas_bonus,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_slyn_christmas_bonus,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_special_christmas_bonus,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_p215_liquidaciones_de_savings_fund,Intereses Fondo de Ahorro,hr_payroll.ALW,P215,,1001,l10n_mx_hr_payroll.structure_mx_special_savings_fund,none,code,result = contract.wage * 0.10 * 7
+l10n_mx_hr_payroll.hr_salary_rule_p216_liquidaciones_de_savings_fund,Liquidacion de Fondo de Ahorro,hr_payroll.ALW,P216,,1100,l10n_mx_hr_payroll.structure_mx_special_savings_fund,none,code,result = contract.wage * 0.10
+l10n_mx_hr_payroll.hr_salary_rule_p217_liquidaciones_de_savings_fund,Liquidacion Fondo de Ahorro,hr_payroll.ALW,P217,,1100,l10n_mx_hr_payroll.structure_mx_special_savings_fund,none,code,result = contract.wage * 0.10 * 6
+l10n_mx_hr_payroll.hr_salary_rule_talw_liquidaciones_de_savings_fund,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_special_savings_fund,none,code,"
 result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_tded_liquidaciones_de_savings_fund","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_special_savings_fund","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_slyn_liquidaciones_de_savings_fund","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_special_savings_fund","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_slyn_settlement","Total de Salario","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_p004_settlement","Aguinaldo","hr_payroll.ALW","P004","1001","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = 1313.10"
-"l10n_mx_hr_payroll.hr_salary_rule_p009_settlement","Vacaciones","hr_payroll.ALW","P009","1002","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = 3492.46"
-"l10n_mx_hr_payroll.hr_salary_rule_p010_settlement","Prima Vacacional","hr_payroll.ALW","P010","1100","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = 873"
-"l10n_mx_hr_payroll.hr_salary_rule_p207_settlement","Gatificación","hr_payroll.ALW","P207","1100","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = 12153.32"
-"l10n_mx_hr_payroll.hr_salary_rule_p216_settlement","Liquidacion de Fondo de Ahorro","hr_payroll.ALW","P216","2001","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = 600.89"
-"l10n_mx_hr_payroll.hr_salary_rule_p217_settlement","Liquidacion de Fondo de Ahorro","hr_payroll.ALW","P217","2002","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = 600.89"
-"l10n_mx_hr_payroll.hr_salary_rule_talw_settlement","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_auxisr_settlement","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5001","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_tded_liquidaciones_de_savings_fund,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_special_savings_fund,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_slyn_liquidaciones_de_savings_fund,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_special_savings_fund,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_slyn_settlement,Total de Salario,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_p004_settlement,Aguinaldo,hr_payroll.ALW,P004,,1001,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = 1313.10
+l10n_mx_hr_payroll.hr_salary_rule_p009_settlement,Vacaciones,hr_payroll.ALW,P009,,1002,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = 3492.46
+l10n_mx_hr_payroll.hr_salary_rule_p010_settlement,Prima Vacacional,hr_payroll.ALW,P010,,1100,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = 873
+l10n_mx_hr_payroll.hr_salary_rule_p207_settlement,Gatificación,hr_payroll.ALW,P207,,1100,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = 12153.32
+l10n_mx_hr_payroll.hr_salary_rule_p216_settlement,Liquidacion de Fondo de Ahorro,hr_payroll.ALW,P216,,2001,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = 600.89
+l10n_mx_hr_payroll.hr_salary_rule_p217_settlement,Liquidacion de Fondo de Ahorro,hr_payroll.ALW,P217,,2002,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = 600.89
+l10n_mx_hr_payroll.hr_salary_rule_talw_settlement,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_auxisr_settlement,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5001,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_d001_settlement","ISR","hr_payroll.DED","D001","5150","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = AUXISR"
-"l10n_mx_hr_payroll.hr_salary_rule_tded_settlement","Total de Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_tsly_settlement","Total Salario","hr_payroll.NET","TSLY","10000","l10n_mx_hr_payroll.structure_mx_special_settlement","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_1000","Salario","hr_payroll.ALW","P001","1000","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = contract.wage*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_1010","Séptimo dia","hr_payroll.ALW","P002","1001","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = contract.wage"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_BP_1015","Bono de puntualidad","hr_payroll.ALW","P016","1015","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = contract.wage * 0.455"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_1200","Comisiones","hr_payroll.ALW","P021","1200","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = contract.wage * 0.455"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_1300","Despensa","hr_payroll.ALW","P014","1300","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = inputs.FOODP.amount if inputs.FOODP else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_PA_1400","Premio de asistencia","hr_payroll.ALW","P015","1300","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = contract.wage * 0.455"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_extratime_double","Tiempo Extra Doble","hr_payroll.ALW","P003","1350","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = contract.wage * inputs.DET.amount"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_extratime_triple","Tiempo Extra Triple","hr_payroll.ALW","P005","1350","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = contract.wage * inputs.DET.amount"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_3500","Prestamo Personal Empresa","l10n_mx_hr_payroll.OTALW","PPE","3500","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = inputs.PPE.amount if inputs.PPE else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_4999","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_SAE_5109","Auxiliar Subsidio al empledo","hr_payroll.DED","AUXSAE","5109","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","sbc = 100.00
+l10n_mx_hr_payroll.hr_salary_rule_d001_settlement,ISR,hr_payroll.DED,D001,,5150,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = AUXISR
+l10n_mx_hr_payroll.hr_salary_rule_tded_settlement,Total de Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_tsly_settlement,Total Salario,hr_payroll.NET,TSLY,,10000,l10n_mx_hr_payroll.structure_mx_special_settlement,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_weekly_1000,Salario,hr_payroll.ALW,P001,basic,1000,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = contract.wage*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_weekly_1010,Séptimo dia,hr_payroll.ALW,P002,,1001,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = contract.wage
+l10n_mx_hr_payroll.hr_salary_rule_weekly_BP_1015,Bono de puntualidad,hr_payroll.ALW,P016,,1015,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = contract.wage * 0.455
+l10n_mx_hr_payroll.hr_salary_rule_weekly_1200,Comisiones,hr_payroll.ALW,P021,,1200,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = contract.wage * 0.455
+l10n_mx_hr_payroll.hr_salary_rule_weekly_1300,Despensa,hr_payroll.ALW,P014,,1300,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = inputs.FOODP.amount if inputs.FOODP else 0
+l10n_mx_hr_payroll.hr_salary_rule_weekly_PA_1400,Premio de asistencia,hr_payroll.ALW,P015,,1300,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = contract.wage * 0.455
+l10n_mx_hr_payroll.hr_salary_rule_weekly_extratime_double,Tiempo Extra Doble,hr_payroll.ALW,P003,,1350,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = contract.wage * inputs.DET.amount
+l10n_mx_hr_payroll.hr_salary_rule_weekly_extratime_triple,Tiempo Extra Triple,hr_payroll.ALW,P005,,1350,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = contract.wage * inputs.DET.amount
+l10n_mx_hr_payroll.hr_salary_rule_weekly_3500,Prestamo Personal Empresa,l10n_mx_hr_payroll.OTALW,PPE,,3500,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = inputs.PPE.amount if inputs.PPE else 0
+l10n_mx_hr_payroll.hr_salary_rule_weekly_4999,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_weekly_SAE_5109,Auxiliar Subsidio al empledo,hr_payroll.DED,AUXSAE,,5109,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,"sbc = 100.00
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_AISR_5110","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5110","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_weekly_AISR_5110,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5110,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_SAE","Subsidio al empledo","l10n_mx_hr_payroll.OTPAY","D041","5150","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","sbc = TALW
+l10n_mx_hr_payroll.hr_salary_rule_weekly_SAE,Subsidio al empledo,l10n_mx_hr_payroll.OTPAY,D041,,5150,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,"sbc = TALW
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_ISR_5150","ISR","hr_payroll.DED","D045","5150","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = AUXISR - D041"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_5200","IMSS","hr_payroll.DED","D052","5200","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('employee')"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_5300","Prestamo Infonavit","hr_payroll.DED","D015","5300","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = inputs.IVIT.amount if inputs.IVIT else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_5400","Prestamo Fonacot","hr_payroll.DED","FCOT","5400","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = inputs.FCOT.amount if inputs.FCOT else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_5401","Pension Alimenticia","hr_payroll.DED","ALM","5400","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","type = contract.env['hr.payroll.alimony'].search([('employee_id','=', payslip.employee_id),('state','=', 'approved' )],limit=1).amount_type
+l10n_mx_hr_payroll.hr_salary_rule_weekly_ISR_5150,ISR,hr_payroll.DED,D045,,5150,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = AUXISR - D041
+l10n_mx_hr_payroll.hr_salary_rule_weekly_5200,IMSS,hr_payroll.DED,D052,,5200,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('employee')
+l10n_mx_hr_payroll.hr_salary_rule_weekly_5300,Prestamo Infonavit,hr_payroll.DED,D015,,5300,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = inputs.IVIT.amount if inputs.IVIT else 0
+l10n_mx_hr_payroll.hr_salary_rule_weekly_5400,Prestamo Fonacot,hr_payroll.DED,FCOT,,5400,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = inputs.FCOT.amount if inputs.FCOT else 0
+l10n_mx_hr_payroll.hr_salary_rule_weekly_5401,Pension Alimenticia,hr_payroll.DED,ALM,,5400,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,"type = contract.env['hr.payroll.alimony'].search([('employee_id','=', payslip.employee_id),('state','=', 'approved' )],limit=1).amount_type
 result = TALW * ( inputs.AL.amount / 100 ) if type == 'percent' else inputs.AL.amount"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_5500","Prestamo Personal Empresa ( Cuota )","l10n_mx_hr_payroll.OTDED","PPEC","5500","l10n_mx_hr_payroll.structure_mx_employee_weekly","python","code","result = inputs.PPEC.amount if inputs.PPEC else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_9999","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_10000","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_company_infonavit","Invonavit Compañia","l10n_mx_hr_payroll.CAT_IMSS_C","IVITCOM","20100","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('infonavit')"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_20100","Company IMSS","l10n_mx_hr_payroll.CAT_IMSS_C","SSCOM","20100","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('company')"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_30000","Impuesto sobre la nomina","l10n_mx_hr_payroll.CAT_ISN","ISN","30000","l10n_mx_hr_payroll.structure_mx_employee_weekly","none","code","result = categories.ALW * 0.02"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_bonus","Aguinaldo","hr_payroll.ALW","AGD","3001","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","result = 1"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_idfa","Intereses del Fondo de Ahorrro","hr_payroll.ALW","IDFA","3100","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","result = 1"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_4999","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_SAE_5109","Auxiliar Subsidio al empledo","hr_payroll.DED","AUXSAE","5109","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","sbc = 100.00
+l10n_mx_hr_payroll.hr_salary_rule_weekly_5500,Prestamo Personal Empresa ( Cuota ),l10n_mx_hr_payroll.OTDED,PPEC,,5500,l10n_mx_hr_payroll.structure_mx_employee_weekly,python,code,result = inputs.PPEC.amount if inputs.PPEC else 0
+l10n_mx_hr_payroll.hr_salary_rule_weekly_9999,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_weekly_10000,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_weekly_company_infonavit,Invonavit Compañia,l10n_mx_hr_payroll.CAT_IMSS_C,IVITCOM,,20100,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('infonavit')
+l10n_mx_hr_payroll.hr_salary_rule_weekly_20100,Company IMSS,l10n_mx_hr_payroll.CAT_IMSS_C,SSCOM,,20100,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('company')
+l10n_mx_hr_payroll.hr_salary_rule_weekly_30000,Impuesto sobre la nomina,l10n_mx_hr_payroll.CAT_ISN,ISN,,30000,l10n_mx_hr_payroll.structure_mx_employee_weekly,none,code,result = categories.ALW * 0.02
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_bonus,Aguinaldo,hr_payroll.ALW,AGD,,3001,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,result = 1
+l10n_mx_hr_payroll.hr_salary_rule_weekly_idfa,Intereses del Fondo de Ahorrro,hr_payroll.ALW,IDFA,,3100,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,result = 1
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_4999,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_SAE_5109,Auxiliar Subsidio al empledo,hr_payroll.DED,AUXSAE,,5109,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,"sbc = 100.00
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_AISR_5110","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5110","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_AISR_5110,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5110,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_SAE","Subsidio al empledo","l10n_mx_hr_payroll.OTPAY","D041","5150","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","sbc = TALW
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_SAE,Subsidio al empledo,l10n_mx_hr_payroll.OTPAY,D041,,5150,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,"sbc = TALW
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_isr_5150","ISR","hr_payroll.DED","D045","5150","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","result = AUXISR - D041"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_9999","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_10000","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_employee_weekly_special","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_1000","Salario","hr_payroll.ALW","P001","1000","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = contract.wage*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_1010","Setimo dia","hr_payroll.ALW","P002","1001","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = contract.wage"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_BP_1015","Bono de puntualidad","hr_payroll.ALW","P016","1015","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = contract.wage * 0.455"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_1200","Comisiones","hr_payroll.ALW","P021","1200","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = contract.wage * 0.455"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_1300","Despensa","hr_payroll.ALW","P014","1300","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = inputs.FOODP.amount if inputs.FOODP else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_PA_1400","Premio de asistencia","hr_payroll.ALW","P015","1300","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = contract.wage * 0.455"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_extratime_double","Tiempo Extra Doble","hr_payroll.ALW","P003","1350","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = contract.wage * inputs.DET.amount"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_extratime_triple","Tiempo Extra Triple","hr_payroll.ALW","P005","1350","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = contract.wage * inputs.DET.amount"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_3500","Prestamo Personal Empresa","l10n_mx_hr_payroll.OTALW","PPE","3500","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = inputs.PPE.amount if inputs.PPE else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_4999","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_SAE_5109","Auxiliar Subsidio al empledo","hr_payroll.DED","AUXSAE","5109","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","sbc = 100.00
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_isr_5150,ISR,hr_payroll.DED,D045,,5150,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,result = AUXISR - D041
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_9999,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_weekly_sp_10000,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_employee_weekly_special,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_1000,Salario,hr_payroll.ALW,P001,basic,1000,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = contract.wage*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_1010,Setimo dia,hr_payroll.ALW,P002,,1001,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = contract.wage
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_BP_1015,Bono de puntualidad,hr_payroll.ALW,P016,,1015,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = contract.wage * 0.455
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_1200,Comisiones,hr_payroll.ALW,P021,,1200,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = contract.wage * 0.455
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_1300,Despensa,hr_payroll.ALW,P014,,1300,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = inputs.FOODP.amount if inputs.FOODP else 0
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_PA_1400,Premio de asistencia,hr_payroll.ALW,P015,,1300,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = contract.wage * 0.455
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_extratime_double,Tiempo Extra Doble,hr_payroll.ALW,P003,,1350,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = contract.wage * inputs.DET.amount
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_extratime_triple,Tiempo Extra Triple,hr_payroll.ALW,P005,,1350,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = contract.wage * inputs.DET.amount
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_3500,Prestamo Personal Empresa,l10n_mx_hr_payroll.OTALW,PPE,,3500,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = inputs.PPE.amount if inputs.PPE else 0
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_4999,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_SAE_5109,Auxiliar Subsidio al empledo,hr_payroll.DED,AUXSAE,,5109,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,"sbc = 100.00
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_AISR_5110","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5110","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_AISR_5110,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5110,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_SAE","Subsidio al empledo","l10n_mx_hr_payroll.OTPAY","D041","5150","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","sbc = TALW
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_SAE,Subsidio al empledo,l10n_mx_hr_payroll.OTPAY,D041,,5150,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,"sbc = TALW
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_ISR_5150","ISR","hr_payroll.DED","D045","5150","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = AUXISR - D041"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_5200","IMSS","hr_payroll.DED","D052","5200","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('employee')"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_5300","Prestamo Infonavit","hr_payroll.DED","D015","5300","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = inputs.IVIT.amount if inputs.IVIT else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_5400","Prestamo Fonacot","hr_payroll.DED","FCOT","5400","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = inputs.FCOT.amount if inputs.FCOT else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_5401","Pension Alimenticia","hr_payroll.DED","ALM","5400","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","type = contract.env['hr.payroll.alimony'].search([('employee_id','=', payslip.employee_id),('state','=', 'approved' )],limit=1).amount_type
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_ISR_5150,ISR,hr_payroll.DED,D045,,5150,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = AUXISR - D041
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_5200,IMSS,hr_payroll.DED,D052,,5200,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('employee')
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_5300,Prestamo Infonavit,hr_payroll.DED,D015,,5300,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = inputs.IVIT.amount if inputs.IVIT else 0
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_5400,Prestamo Fonacot,hr_payroll.DED,FCOT,,5400,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = inputs.FCOT.amount if inputs.FCOT else 0
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_5401,Pension Alimenticia,hr_payroll.DED,ALM,,5400,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,"type = contract.env['hr.payroll.alimony'].search([('employee_id','=', payslip.employee_id),('state','=', 'approved' )],limit=1).amount_type
 result = TALW * ( inputs.AL.amount / 100 ) if type == 'percent' else inputs.AL.amount"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_5500","Prestamo Personal Empresa ( Cuota )","l10n_mx_hr_payroll.OTDED","PPEC","5500","l10n_mx_hr_payroll.structure_mx_employee_biweekly","python","code","result = inputs.PPEC.amount if inputs.PPEC else 0"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_9999","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_10000","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_company_infonavit","Invonavit Compañia","l10n_mx_hr_payroll.CAT_IMSS_C","IVITCOM","20100","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('infonavit')"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_20100","Company IMSS","l10n_mx_hr_payroll.CAT_IMSS_C","SSCOM","20100","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('company')"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_30000","Impuesto sobre la nomina","l10n_mx_hr_payroll.CAT_ISN","ISN","30000","l10n_mx_hr_payroll.structure_mx_employee_biweekly","none","code","result = 100 * 7 * 0.02"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_bonus","Aguinaldo","hr_payroll.ALW","AGD","3001","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","result = 1"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_idfa","Intereses del Fondo de Ahorrro","hr_payroll.ALW","IDFA","3100","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","result = 1"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_4999","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_SAE_5109","Auxiliar Subsidio al empledo","hr_payroll.DED","AUXSAE","5109","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","sbc = 100.00
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_5500,Prestamo Personal Empresa ( Cuota ),l10n_mx_hr_payroll.OTDED,PPEC,,5500,l10n_mx_hr_payroll.structure_mx_employee_biweekly,python,code,result = inputs.PPEC.amount if inputs.PPEC else 0
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_9999,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_10000,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_company_infonavit,Invonavit Compañia,l10n_mx_hr_payroll.CAT_IMSS_C,IVITCOM,,20100,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('infonavit')
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_20100,Company IMSS,l10n_mx_hr_payroll.CAT_IMSS_C,SSCOM,,20100,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = contract.env['hr.payslip'].browse(payslip.id).calculate_imss('company')
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_30000,Impuesto sobre la nomina,l10n_mx_hr_payroll.CAT_ISN,ISN,,30000,l10n_mx_hr_payroll.structure_mx_employee_biweekly,none,code,result = 100 * 7 * 0.02
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_bonus,Aguinaldo,hr_payroll.ALW,AGD,,3001,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,result = 1
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_idfa,Intereses del Fondo de Ahorrro,hr_payroll.ALW,IDFA,,3100,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,result = 1
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_4999,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_SAE_5109,Auxiliar Subsidio al empledo,hr_payroll.DED,AUXSAE,,5109,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,"sbc = 100.00
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_AISR_5110","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5110","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_AISR_5110,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5110,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_SAE","Subsidio al empledo","l10n_mx_hr_payroll.OTPAY","D041","5150","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","sbc = TALW
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_SAE,Subsidio al empledo,l10n_mx_hr_payroll.OTPAY,D041,,5150,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,"sbc = TALW
 result = contract.env['hr.payroll.es.line'].search([('line_id','=', 2),('inf_sup','>=', sbc ),('lim_sup','<=', sbc )],limit=1).fix_fee"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_isr_5150","ISR","hr_payroll.DED","D045","5150","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","result = AUXISR - D041"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_9999","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_10000","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_employee_biweekly_special","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_ptu_1000","Profit sharing","hr_payroll.ALW","P011","1000","l10n_mx_hr_payroll.structure_mx_ptu","python","code","result = (( inputs.ATSPTU.amount / inputs.TWDPTU.amount ) * inputs.WDPTU.amount) + (5)"
-"l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_4999","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_ptu","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_AISR_5110","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5110","l10n_mx_hr_payroll.structure_mx_ptu","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_isr_5150,ISR,hr_payroll.DED,D045,,5150,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,result = AUXISR - D041
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_9999,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_biweekly_sp_10000,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_employee_biweekly_special,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_ptu_1000,Profit sharing,hr_payroll.ALW,P011,,1000,l10n_mx_hr_payroll.structure_mx_ptu,python,code,result = (( inputs.ATSPTU.amount / inputs.TWDPTU.amount ) * inputs.WDPTU.amount) + (5)
+l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_4999,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_ptu,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_AISR_5110,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5110,l10n_mx_hr_payroll.structure_mx_ptu,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_isr_5150","ISR","hr_payroll.DED","D045","5150","l10n_mx_hr_payroll.structure_mx_ptu","none","code","result = AUXISR"
-"l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_9999","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_ptu","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_10000","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_ptu","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_bonus_1000","Bonus","hr_payroll.ALW","P011","1000","l10n_mx_hr_payroll.structure_mx_bonus","python","code","result = (( inputs.ATSPTU.amount / inputs.TWDPTU.amount ) * inputs.WDPTU.amount) + (5)"
-"l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_4999","Total Percepciones","hr_payroll.NET","TALW","4999","l10n_mx_hr_payroll.structure_mx_bonus","none","code","result = categories.ALW"
-"l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_AISR_5110","Auxiliar de ISR","l10n_mx_hr_payroll.CAT_AUX","AUXISR","5110","l10n_mx_hr_payroll.structure_mx_bonus","none","code","sbc = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_isr_5150,ISR,hr_payroll.DED,D045,,5150,l10n_mx_hr_payroll.structure_mx_ptu,none,code,result = AUXISR
+l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_9999,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_ptu,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_ptu_sp_10000,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_ptu,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_bonus_1000,Bonus,hr_payroll.ALW,P011,,1000,l10n_mx_hr_payroll.structure_mx_bonus,python,code,result = (( inputs.ATSPTU.amount / inputs.TWDPTU.amount ) * inputs.WDPTU.amount) + (5)
+l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_4999,Total Percepciones,hr_payroll.NET,TALW,,4999,l10n_mx_hr_payroll.structure_mx_bonus,none,code,result = categories.ALW
+l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_AISR_5110,Auxiliar de ISR,l10n_mx_hr_payroll.CAT_AUX,AUXISR,,5110,l10n_mx_hr_payroll.structure_mx_bonus,none,code,"sbc = categories.ALW
 lim_inf = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).lim_inf
 excedente_lim_inf = sbc - lim_inf
 percent = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).percent
 marginal_tax = excedente_lim_inf * ( percent / 100 )
 fix_fee = contract.env['hr.payroll.isr.line'].search([('line_id','=', 4),('lim_inf','<=', sbc ),('lim_sup','>=', sbc )],limit=1).fix_fee
 result = fix_fee + marginal_tax"
-"l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_isr_5150","ISR","hr_payroll.DED","D045","5150","l10n_mx_hr_payroll.structure_mx_bonus","none","code","result = AUXISR"
-"l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_9999","Total Deducciones","hr_payroll.NET","TDED","9999","l10n_mx_hr_payroll.structure_mx_bonus","none","code","result = categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_10000","Salario Neto","hr_payroll.NET","SLYN","10000","l10n_mx_hr_payroll.structure_mx_bonus","none","code","result = categories.ALW - categories.DED"
-"l10n_mx_hr_payroll.hr_salary_rule_worked_days_proportional_weekly_settlement","Worked days proportional","hr_payroll.ALW","P001","1000","l10n_mx_hr_payroll.structure_mx_weekly_settlement","none","code","result = contract.wage*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_weekly_settlement","Christmas bonus proportional","hr_payroll.ALW","P004","1001","l10n_mx_hr_payroll.structure_mx_weekly_settlement","none","code","result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_weekly_settlement","Vacations proportional","hr_payroll.ALW","P009","1002","l10n_mx_hr_payroll.structure_mx_weekly_settlement","none","code",
-"l10n_mx_hr_payroll.hr_salary_rule_3_months_compensation_weekly_liquidation","3 months compensation","hr_payroll.ALW","3MCO",1000,"l10n_mx_hr_payroll.structure_mx_weekly_liquidation","none","code","result = contract.wage * 90"
-"l10n_mx_hr_payroll.hr_salary_rule_20_days_per_worked_year_weekly_liquidation","20 days per worked year","hr_payroll.ALW","20DPY",1003,"l10n_mx_hr_payroll.structure_mx_weekly_liquidation","none","code","result = contract.wage * contract.antiquity * 20"
-"l10n_mx_hr_payroll.hr_salary_rule_seniority_premium_weekly_liquidation","Seniority premium","hr_payroll.ALW","PRIANT",1004,"l10n_mx_hr_payroll.structure_mx_weekly_liquidation","none","code","result = contract.wage * contract.antiquity * 12"
-"l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_weekly_liquidation","Christmas bonus proportional","hr_payroll.ALW","P004","1001","l10n_mx_hr_payroll.structure_mx_weekly_liquidation","none","code","result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_weekly_liquidation","Vacations proportional","hr_payroll.ALW","P009","1002","l10n_mx_hr_payroll.structure_mx_weekly_liquidation","none","code",
-"l10n_mx_hr_payroll.hr_salary_rule_vacation_bonus_proportional_weekly_liquidation","Vacation bonus proportional","hr_payroll.ALW","PRIVAC",1005,"l10n_mx_hr_payroll.structure_mx_weekly_liquidation","none","code",
-"l10n_mx_hr_payroll.hr_salary_rule_worked_days_proportional_biweekly_settlement","Worked days proportional","hr_payroll.ALW","P001","1000","l10n_mx_hr_payroll.structure_mx_biweekly_settlement","none","code","result = contract.wage*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_biweekly_settlement","Christmas bonus proportional","hr_payroll.ALW","P004","1001","l10n_mx_hr_payroll.structure_mx_biweekly_settlement","none","code","result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_biweekly_settlement","Vacations proportional","hr_payroll.ALW","P009","1002","l10n_mx_hr_payroll.structure_mx_biweekly_settlement","none","code",
-"l10n_mx_hr_payroll.hr_salary_rule_3_months_compensation_biweekly_liquidation","3 months compensation","hr_payroll.ALW","3MCO",1000,"l10n_mx_hr_payroll.structure_mx_biweekly_liquidation","none","code","result = contract.wage * 90"
-"l10n_mx_hr_payroll.hr_salary_rule_20_days_per_worked_year_biweekly_liquidation","20 days per worked year","hr_payroll.ALW","20DPY",1003,"l10n_mx_hr_payroll.structure_mx_biweekly_liquidation","none","code",
-"l10n_mx_hr_payroll.hr_salary_rule_seniority_premium_biweekly_liquidation","Seniority premium","hr_payroll.ALW","PRIANT",1004,"l10n_mx_hr_payroll.structure_mx_biweekly_liquidation","none","code","result = contract.wage * contract.antiquity * 12"
-"l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_biweekly_liquidation","Christmas bonus proportional","hr_payroll.ALW","P004","1001","l10n_mx_hr_payroll.structure_mx_biweekly_liquidation","none","code","result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)"
-"l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_biweekly_liquidation","Vacations proportional","hr_payroll.ALW","P009","1002","l10n_mx_hr_payroll.structure_mx_biweekly_liquidation","none","code",
-"l10n_mx_hr_payroll.hr_salary_rule_vacation_bonus_proportional_biweekly_liquidation","Vacation bonus proportional","hr_payroll.ALW","PRIVAC",1005,"l10n_mx_hr_payroll.structure_mx_biweekly_liquidation","none","code",
+l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_isr_5150,ISR,hr_payroll.DED,D045,,5150,l10n_mx_hr_payroll.structure_mx_bonus,none,code,result = AUXISR
+l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_9999,Total Deducciones,hr_payroll.NET,TDED,,9999,l10n_mx_hr_payroll.structure_mx_bonus,none,code,result = categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_bonus_sp_10000,Salario Neto,hr_payroll.NET,SLYN,,10000,l10n_mx_hr_payroll.structure_mx_bonus,none,code,result = categories.ALW - categories.DED
+l10n_mx_hr_payroll.hr_salary_rule_worked_days_proportional_weekly_settlement,Worked days proportional,hr_payroll.ALW,P001,basic,1000,l10n_mx_hr_payroll.structure_mx_weekly_settlement,none,code,result = contract.wage*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_weekly_settlement,Christmas bonus proportional,hr_payroll.ALW,P004,,1001,l10n_mx_hr_payroll.structure_mx_weekly_settlement,none,code,result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_weekly_settlement,Vacations proportional,hr_payroll.ALW,P009,,1002,l10n_mx_hr_payroll.structure_mx_weekly_settlement,none,code,
+l10n_mx_hr_payroll.hr_salary_rule_3_months_compensation_weekly_liquidation,3 months compensation,hr_payroll.ALW,3MCO,,1000,l10n_mx_hr_payroll.structure_mx_weekly_liquidation,none,code,result = contract.wage * 90
+l10n_mx_hr_payroll.hr_salary_rule_20_days_per_worked_year_weekly_liquidation,20 days per worked year,hr_payroll.ALW,20DPY,,1003,l10n_mx_hr_payroll.structure_mx_weekly_liquidation,none,code,result = contract.wage * contract.antiquity * 20
+l10n_mx_hr_payroll.hr_salary_rule_seniority_premium_weekly_liquidation,Seniority premium,hr_payroll.ALW,PRIANT,,1004,l10n_mx_hr_payroll.structure_mx_weekly_liquidation,none,code,result = contract.wage * contract.antiquity * 12
+l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_weekly_liquidation,Christmas bonus proportional,hr_payroll.ALW,P004,,1001,l10n_mx_hr_payroll.structure_mx_weekly_liquidation,none,code,result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_weekly_liquidation,Vacations proportional,hr_payroll.ALW,P009,,1002,l10n_mx_hr_payroll.structure_mx_weekly_liquidation,none,code,
+l10n_mx_hr_payroll.hr_salary_rule_vacation_bonus_proportional_weekly_liquidation,Vacation bonus proportional,hr_payroll.ALW,PRIVAC,,1005,l10n_mx_hr_payroll.structure_mx_weekly_liquidation,none,code,
+l10n_mx_hr_payroll.hr_salary_rule_worked_days_proportional_biweekly_settlement,Worked days proportional,hr_payroll.ALW,P001,basic,1000,l10n_mx_hr_payroll.structure_mx_biweekly_settlement,none,code,result = contract.wage*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_biweekly_settlement,Christmas bonus proportional,hr_payroll.ALW,P004,,1001,l10n_mx_hr_payroll.structure_mx_biweekly_settlement,none,code,result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_biweekly_settlement,Vacations proportional,hr_payroll.ALW,P009,,1002,l10n_mx_hr_payroll.structure_mx_biweekly_settlement,none,code,
+l10n_mx_hr_payroll.hr_salary_rule_3_months_compensation_biweekly_liquidation,3 months compensation,hr_payroll.ALW,3MCO,,1000,l10n_mx_hr_payroll.structure_mx_biweekly_liquidation,none,code,result = contract.wage * 90
+l10n_mx_hr_payroll.hr_salary_rule_20_days_per_worked_year_biweekly_liquidation,20 days per worked year,hr_payroll.ALW,20DPY,,1003,l10n_mx_hr_payroll.structure_mx_biweekly_liquidation,none,code,
+l10n_mx_hr_payroll.hr_salary_rule_seniority_premium_biweekly_liquidation,Seniority premium,hr_payroll.ALW,PRIANT,,1004,l10n_mx_hr_payroll.structure_mx_biweekly_liquidation,none,code,result = contract.wage * contract.antiquity * 12
+l10n_mx_hr_payroll.hr_salary_rule_christmas_bonus_proportional_biweekly_liquidation,Christmas bonus proportional,hr_payroll.ALW,P004,,1001,l10n_mx_hr_payroll.structure_mx_biweekly_liquidation,none,code,result = ((contract.wage * 15)/365)*(worked_days.WORK100.number_of_days)
+l10n_mx_hr_payroll.hr_salary_rule_vacations_proportional_biweekly_liquidation,Vacations proportional,hr_payroll.ALW,P009,,1002,l10n_mx_hr_payroll.structure_mx_biweekly_liquidation,none,code,
+l10n_mx_hr_payroll.hr_salary_rule_vacation_bonus_proportional_biweekly_liquidation,Vacation bonus proportional,hr_payroll.ALW,PRIVAC,,1005,l10n_mx_hr_payroll.structure_mx_biweekly_liquidation,none,code,

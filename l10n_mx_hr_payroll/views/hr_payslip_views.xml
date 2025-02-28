@@ -28,6 +28,10 @@
                             attrs="{'invisible':[('hide_rule','=', True)]}"
                         />
                         <field
+                            name="reporting_category"
+                            attrs="{'invisible':[('hide_rule','=', True)]}"
+                        />
+                        <field
                             name="category_id"
                             readonly="1"
                             force_save="1"

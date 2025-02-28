@@ -5,6 +5,14 @@ class HrSalaryRule(models.Model):
     _inherit = "hr.salary.rule"
     _description = "Salary Rule"
 
+    reporting_category = fields.Selection(
+        [
+            ("basic", "BASIC"),
+            ("gross", "GROSS"),
+            ("net", "NET"),
+        ]
+    )
+
     rule_type_cfdi = fields.Selection(
         [
             ("na", "N/A"),

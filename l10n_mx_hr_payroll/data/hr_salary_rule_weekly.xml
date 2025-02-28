@@ -9,6 +9,7 @@
      Daily Wage -->
         <field name="sequence" eval="1000" />
         <field name="code">P001</field>
+        <field name="reporting_category">basic</field>
         <field name="category_id" ref="hr_payroll.ALW" />
         <field name="name">Salary</field>
         <field name="rule_type_cfdi">alw</field>
