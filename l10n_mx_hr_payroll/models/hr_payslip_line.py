@@ -12,6 +12,10 @@ class HrPayslipLine(models.Model):
     _inherit = "hr.payslip.line"
     _description = "Payslip Line"
 
+    reporting_category = fields.Selection(
+        related="salary_rule_id.reporting_category", readonly=False
+    )
+
     rule_type = fields.Selection(
         [
             ("alw", "Allowance"),
