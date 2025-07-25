@@ -1,0 +1,233 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_mx_edi_account_move_payment_report
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-25 16:28+0000\n"
+"PO-Revision-Date: 2025-07-25 16:28+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.actions.report,print_report_name:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice
+msgid "'Payment Receipt - %s' % (object.move_id.name)"
+msgstr "'Recibo de Pago - %s' % (object.move_id.name)"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "50 USD"
+msgstr ""
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span class=\"ps-1\">Emitter Acc. Ben.</span>"
+msgstr "<span class=\"ps-1\">Cuenta Emisor Beneficiario</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span class=\"ps-1\">Emitter Acc. Ord.</span>"
+msgstr "<span class=\"ps-1\">Cuenta Emisor Ordenante</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span> | Certification Date:</span>"
+msgstr "<span> | Fecha de Certificación:</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span> | Emission Date:</span>"
+msgstr "<span> | Fecha de Emisión:</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span> | Expedition place:</span>"
+msgstr "<span> | Lugar de Expedición:</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span> | Fiscal Folio:</span>"
+msgstr "<span> | Folio Fiscal:</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span> | Fiscal Regime:</span>"
+msgstr "<span> | Régimen Fiscal:</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span> | SAT Certificate:</span>"
+msgstr "<span> | Certificado SAT:</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span>Digital stamp SAT</span>"
+msgstr "<span>Sello digital SAT</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span>Digital stamp of the emitter</span>"
+msgstr "<span>Sello digital del emisor</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span>Emitter certificate:</span>"
+msgstr "<span>Certificado del emisor:</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span>Extra Info</span>"
+msgstr "<span>Información adicional</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span>Original chain complement of digital certification SAT</span>"
+msgstr "<span>Cadena original del complemento de certificación digital SAT</span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<span>XML VAT: </span>"
+msgstr "<span>IVA del XML: </span>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<strong>Payment Way:</strong>"
+msgstr "<strong>Forma de pago:</strong>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "<strong>This document is a printed representation of a CFDI</strong>"
+msgstr "<strong>Este documento es una representación impresa del CFDI</strong>"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Account Ben."
+msgstr "Cuenta Beneficiario"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Account Ord."
+msgstr "Cuenta Ordenante"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Amount Paid"
+msgstr "Monto Pagado"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Balance"
+msgstr "Saldo"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Bank Name Acc. Ord."
+msgstr "Banco Cuenta Ordenante"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Barcode"
+msgstr "Código de Barras"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Credit card"
+msgstr "Tarjeta de crédito"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Customer:"
+msgstr "Cliente:"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Fiscal Regime: ("
+msgstr "Régimen Fiscal: ("
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Invoice"
+msgstr "Factura"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Invoice Date"
+msgstr "Fecha de la Factura"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Invoice Number"
+msgstr "Número de Factura"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Memo:"
+msgstr ""
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model,name:l10n_mx_edi_account_move_payment_report.model_l10n_mx_edi_document
+msgid "Mexican documents that needs to transit outside of Odoo"
+msgstr "Documentos mexicanos que se deben procesar fuera de Odoo"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Original Amount"
+msgstr "Monto Original"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Partiality"
+msgstr "Parcialidad"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Payment Amount:"
+msgstr "Monto del Pago:"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Payment Date:"
+msgstr "Fecha de Pago:"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Payment Method:"
+msgstr "Método de Pago:"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.actions.report,name:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.account_move_print_payment
+msgid "Payment Receipt"
+msgstr "Recibo de Pago"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Payment Receipt:"
+msgstr "Recibo de Pago"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Previous balance"
+msgstr "Saldo anterior"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "Sample Memo"
+msgstr ""
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
+msgid "UUID"
+msgstr ""
+
