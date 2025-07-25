@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+        <record id="account_move_print_payment" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.l10n_mx_edi</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="l10n_mx_edi.account_move_form_inherit_l10n_mx_edi"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_show_document']" position="before">
+                    <button name="action_print_payment"
+                            type="object"
+                            string="Payment Receipt"
+                            invisible="not (state == 'payment_sent' or state == 'payment_sent_pue')"
+                    />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
+
