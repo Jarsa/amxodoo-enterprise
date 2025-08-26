@@ -4,7 +4,7 @@
 {
     "name": "Payment Method on Statement Line",
     "summary": "Adds payment method to bank statement lines for use in CFDI payment complement",
-    "version": "17.0.1.0.0",
+    "version": "17.0.1.0.1",
     "category": "Report",
     "author": "Jarsa",
     "website": "https://www.jarsa.com",
