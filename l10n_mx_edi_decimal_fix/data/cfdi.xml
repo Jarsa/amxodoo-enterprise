@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="cfdiv40_precision2" inherit_id="l10n_mx_edi.cfdiv40">
+
+        <!-- cfdi:Comprobante -->
+        <xpath
+            expr="//*[local-name()='Comprobante' and namespace-uri()='http://www.sat.gob.mx/cfd/4']"
+            position="attributes"
+        >
+            <attribute name="t-att-SubTotal">format_float(subtotal, precision=2)</attribute>
+            <attribute name="t-att-Descuento">format_float(descuento, precision=2)</attribute>
+            <attribute name="t-att-Total">format_float(total, precision=2)</attribute>
+        </xpath>
+
+        <!-- cfdi:Impuestos (totales del comprobante) -->
+        <xpath
+            expr="
+            //*[local-name()='Comprobante' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+            /*[local-name()='Impuestos' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+        "
+            position="attributes"
+        >
+            <attribute
+                name="t-att-TotalImpuestosTrasladados"
+            >format_float(total_impuestos_trasladados, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalImpuestosRetenidos"
+            >format_float(total_impuestos_retenidos, precision=2)</attribute>
+        </xpath>
+
+        <!-- cfdi:Impuestos/cfdi:Retenciones//cfdi:Retencion -->
+        <xpath
+            expr="
+            //*[local-name()='Comprobante' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+            /*[local-name()='Impuestos' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+            /*[local-name()='Retenciones' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+            //*[local-name()='Retencion' and namespace-uri()='http://www.sat.gob.mx/cfd/4']"
+            position="attributes"
+        >
+            <attribute name="t-att-Importe">format_float(tax_values['importe'], precision=2)</attribute>
+        </xpath>
+
+        <!-- cfdi:Impuestos/cfdi:Traslados//cfdi:Traslado -->
+        <xpath
+            expr="
+            //*[local-name()='Comprobante' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+            /*[local-name()='Impuestos' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+            /*[local-name()='Traslados' and namespace-uri()='http://www.sat.gob.mx/cfd/4']
+            //*[local-name()='Traslado' and namespace-uri()='http://www.sat.gob.mx/cfd/4']"
+            position="attributes"
+        >
+            <attribute name="t-att-Base">format_float(tax_values['base'], precision=2)</attribute>
+            <attribute name="t-att-Importe">format_float(tax_values['importe'], precision=2)</attribute>
+        </xpath>
+
+    </template>
+</odoo>

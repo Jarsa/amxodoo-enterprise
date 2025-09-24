@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="payment20_precision2" inherit_id="l10n_mx_edi.payment20">
+
+        <!-- Totales -->
+        <xpath
+            expr="//*[local-name()='Totales' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
+            position="attributes"
+        >
+            <attribute
+                name="t-att-TotalTrasladosBaseIVA0"
+            >format_float(total_traslados_base_iva0, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalTrasladosImpuestoIVA0"
+            >format_float(total_traslados_impuesto_iva0, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalTrasladosBaseIVAExento"
+            >format_float(total_traslados_base_iva_exento, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalTrasladosBaseIVA8"
+            >format_float(total_traslados_base_iva8, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalTrasladosImpuestoIVA8"
+            >format_float(total_traslados_impuesto_iva8, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalTrasladosBaseIVA16"
+            >format_float(total_traslados_base_iva16, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalTrasladosImpuestoIVA16"
+            >format_float(total_traslados_impuesto_iva16, precision=2)</attribute>
+            <attribute name="t-att-TotalRetencionesISR">format_float(total_retenciones_isr, precision=2)</attribute>
+            <attribute name="t-att-TotalRetencionesIVA">format_float(total_retenciones_iva, precision=2)</attribute>
+            <attribute name="t-att-TotalRetencionesIEPS">format_float(total_retenciones_ieps, precision=2)</attribute>
+            <attribute name="t-att-MontoTotalPagos">format_float(monto_total_pagos, precision=2)</attribute>
+        </xpath>
+
+        <!-- Pago -->
+        <xpath
+            expr="//*[local-name()='Pago' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
+            position="attributes"
+        >
+            <attribute name="t-att-Monto">format_float(monto, precision=2)</attribute>
+        </xpath>
+
+        <!-- DoctoRelacionado -->
+        <xpath
+            expr="//*[local-name()='DoctoRelacionado' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
+            position="attributes"
+        >
+            <attribute
+                name="t-att-ImpSaldoAnt"
+            >invoice_values['format_float'](invoice_values['imp_saldo_ant'], precision=2)</attribute>
+            <attribute
+                name="t-att-ImpPagado"
+            >invoice_values['format_float'](invoice_values['imp_pagado'], precision=2)</attribute>
+            <attribute
+                name="t-att-ImpSaldoInsoluto"
+            >invoice_values['format_float'](invoice_values['imp_saldo_insoluto'], precision=2)</attribute>
+        </xpath>
+
+    </template>
+</odoo>
