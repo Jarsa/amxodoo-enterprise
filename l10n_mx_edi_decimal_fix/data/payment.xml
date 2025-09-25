@@ -31,7 +31,12 @@
             <attribute name="t-att-TotalRetencionesISR">format_float(total_retenciones_isr, precision=2)</attribute>
             <attribute name="t-att-TotalRetencionesIVA">format_float(total_retenciones_iva, precision=2)</attribute>
             <attribute name="t-att-TotalRetencionesIEPS">format_float(total_retenciones_ieps, precision=2)</attribute>
-            <attribute name="t-att-MontoTotalPagos">format_float(monto_total_pagos, precision=2)</attribute>
+            <attribute name="t-att-MontoTotalPagos">
+                format_float(
+                    float(format_float(monto, precision=2)) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
         </xpath>
 
         <!-- Pago -->
