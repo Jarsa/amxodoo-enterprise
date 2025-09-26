@@ -7,27 +7,76 @@
             expr="//*[local-name()='Totales' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
             position="attributes"
         >
-            <attribute
-                name="t-att-TotalTrasladosBaseIVA0"
-            >format_float(total_traslados_base_iva0, precision=2)</attribute>
-            <attribute
-                name="t-att-TotalTrasladosImpuestoIVA0"
-            >format_float(total_traslados_impuesto_iva0, precision=2)</attribute>
-            <attribute
-                name="t-att-TotalTrasladosBaseIVAExento"
-            >format_float(total_traslados_base_iva_exento, precision=2)</attribute>
-            <attribute
-                name="t-att-TotalTrasladosBaseIVA8"
-            >format_float(total_traslados_base_iva8, precision=2)</attribute>
-            <attribute
-                name="t-att-TotalTrasladosImpuestoIVA8"
-            >format_float(total_traslados_impuesto_iva8, precision=2)</attribute>
-            <attribute
-                name="t-att-TotalTrasladosBaseIVA16"
-            >format_float(total_traslados_base_iva16, precision=2)</attribute>
-            <attribute
-                name="t-att-TotalTrasladosImpuestoIVA16"
-            >format_float(total_traslados_impuesto_iva16, precision=2)</attribute>
+            <attribute name="t-att-TotalTrasladosBaseIVA0">
+                format_float(
+                    sum(
+                        float(format_float(traslado['base'], precision=2)) if traslado['tasa_o_cuota'] == 0 and traslado['tipo_factor'] == 'Tasa' else 0
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
+            <attribute name="t-att-TotalTrasladosImpuestoIVA0">
+                format_float(
+                    sum(
+                        float(format_float(traslado['importe'], precision=2)) if traslado['tasa_o_cuota'] == 0 and traslado['tipo_factor'] == 'Tasa' else 0
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
+            <attribute name="t-att-TotalTrasladosBaseIVAExento">
+                format_float(
+                    sum(
+                        float(format_float(traslado['base'], precision=2)) if traslado['tasa_o_cuota'] == 0 and traslado['tipo_factor'] == 'Exento' else 0
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
+            <attribute name="t-att-TotalTrasladosBaseIVA8">
+                format_float(
+                    sum(
+                        float(format_float(traslado['base'], precision=2)) if traslado['tasa_o_cuota'] == 0.08 else 0
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
+            <attribute name="t-att-TotalTrasladosImpuestoIVA8">
+                format_float(
+                    sum(
+                        float(format_float(traslado['importe'], precision=2)) if traslado['tasa_o_cuota'] == 0.08 else 0
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
+            <attribute name="t-att-TotalTrasladosBaseIVA16">
+                format_float(
+                    sum(
+                        float(format_float(traslado['base'], precision=2)) if traslado['tasa_o_cuota'] == 0.16 else 0
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
+            <attribute name="t-att-TotalTrasladosImpuestoIVA16">
+                format_float(
+                    sum(
+                        float(format_float(traslado['importe'], precision=2)) if traslado['tasa_o_cuota'] == 0.16 else 0
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    precision=2
+                )
+            </attribute>
             <attribute name="t-att-TotalRetencionesISR">format_float(total_retenciones_isr, precision=2)</attribute>
             <attribute name="t-att-TotalRetencionesIVA">format_float(total_retenciones_iva, precision=2)</attribute>
             <attribute name="t-att-TotalRetencionesIEPS">format_float(total_retenciones_ieps, precision=2)</attribute>
@@ -61,6 +110,32 @@
             <attribute
                 name="t-att-ImpSaldoInsoluto"
             >invoice_values['format_float'](invoice_values['imp_saldo_insoluto'], precision=2)</attribute>
+        </xpath>
+
+        <xpath
+            expr="//*[local-name()='TrasladoP' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
+            position="attributes"
+        >
+            <attribute name="t-att-BaseP">
+                format_float(
+                    sum(
+                        float(format_float(traslado['base'], precision=2))
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ),
+                    precision=6
+                )
+            </attribute>
+            <attribute name="t-att-ImporteP">
+                format_float(
+                    sum(
+                        float(format_float(traslado['importe'], precision=2))
+                        for docto in docto_relationado_list
+                        for traslado in docto['traslados_list']
+                    ),
+                    precision=6
+                )
+            </attribute>
         </xpath>
 
     </template>
