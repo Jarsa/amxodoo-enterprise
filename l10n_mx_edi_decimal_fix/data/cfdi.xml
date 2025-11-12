@@ -9,7 +9,12 @@
         >
             <attribute name="t-att-SubTotal">format_float(subtotal, precision=2)</attribute>
             <attribute name="t-att-Descuento">format_float(descuento, precision=2)</attribute>
-            <attribute name="t-att-Total">format_float(total, precision=2)</attribute>
+            <attribute name="t-att-Total">format_float(
+                float(format_float(subtotal, precision=2)) +
+                float(format_float(descuento or 0, precision=2)) +
+                float(format_float(total_impuestos_trasladados or 0, precision=2)),
+                precision=2)
+            </attribute>
         </xpath>
 
         <!-- cfdi:Impuestos (totales del comprobante) -->
