@@ -21,8 +21,7 @@
                                 <h3><strong id="payment_title">Payment Receipt: <span t-esc="o.move_id.name"></span></strong></h3>
                                 <div name="date" class="row">
                                     <div class="col-6">
-                                        <t t-set="d" t-value="str(o.datetime).split(' ')[0].split('-')"/>
-                                        <span>Payment Date: <t t-esc="d[1]"/>/<t t-esc="d[2]"/>/<t t-esc="d[0]"/></span>
+                                        <span>Payment Date: <span t-field="o.move_id.date"/></span>
                                     </div>
                                 </div>
 
