@@ -3,7 +3,7 @@
 
 {
     "name": "Payment Receipt on Invoice",
-    "version": "17.0.1.0.0",
+    "version": "17.0.1.0.1",
     "category": "Report",
     "author": "Jarsa",
     "website": "https://www.jarsa.com",
@@ -15,6 +15,7 @@
     "data": [
         "report/report_payment_receipt_invoice.xml",
         "views/report_action.xml",
+        "views/account_bank_statement_line_views.xml",
     ],
     "installable": True,
 }
