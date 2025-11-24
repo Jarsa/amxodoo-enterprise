@@ -1,6 +1,6 @@
 from werkzeug.urls import url_quote_plus
 
-from odoo import models
+from odoo import models, _
 from odoo.addons.base.models.ir_qweb import keep_query
 
 class L10nMxEdiDocument(models.Model):
@@ -9,6 +9,24 @@ class L10nMxEdiDocument(models.Model):
 
     def action_print_payment(self):
         return self.env.ref("l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice").sudo().report_action(self)
+
+    def action_send_payment_email(self):
+        self.ensure_one()
+
+        template = self.env.ref('l10n_mx_edi_account_move_payment_report.mail_template_data_payment_receipt', raise_if_not_found=False)
+
+        return {
+            'name': _("Send"),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'target': 'new',
+            'context': {
+                'default_res_ids': self.ids,
+                'default_template_id': template and template.id or False,
+            },
+        }
 
     def _l10n_mx_edi_get_extra_common_report_values(self):
         self.ensure_one()
