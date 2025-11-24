@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-25 16:28+0000\n"
-"PO-Revision-Date: 2025-07-25 16:28+0000\n"
+"POT-Creation-Date: 2025-11-24 23:16+0000\n"
+"PO-Revision-Date: 2025-11-24 23:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -23,6 +23,27 @@ msgstr "'Recibo de Pago - %s' % (object.move_id.name)"
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "50 USD"
+msgstr ""
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:mail.template,body_html:l10n_mx_edi_account_move_payment_report.mail_template_data_payment_receipt
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Dear <t t-out=\"object.move_id.partner_id.name or ''\">Azure Interior</t><br><br>\n"
+"        Thank you for your payment.\n"
+"        Here is your payment receipt <span style=\"font-weight:bold;\" t-out=\"(object.move_id.name or '').replace('/','-') or ''\">BNK1-2021-05-0002</span> amounting\n"
+"        to <span style=\"font-weight:bold;\" t-out=\"format_amount(object.move_id.statement_line_id.amount or object.move_id.payment_id.amount, object.move_id.currency_id) or ''\">$ 10.00</span> from <t t-out=\"object.move_id.company_id.name or ''\">YourCompany</t>.\n"
+"        <br><br>\n"
+"        Do not hesitate to contact us if you have any questions.\n"
+"        <br><br>\n"
+"        Best regards,\n"
+"        <t t-if=\"not is_html_empty(user.signature)\">\n"
+"            <br><br>\n"
+"            <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"        </t>\n"
+"    </p>\n"
+"</div>\n"
 msgstr ""
 
 #. module: l10n_mx_edi_account_move_payment_report
@@ -88,7 +109,8 @@ msgstr "<span>Información adicional</span>"
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "<span>Original chain complement of digital certification SAT</span>"
-msgstr "<span>Cadena original del complemento de certificación digital SAT</span>"
+msgstr ""
+"<span>Cadena original del complemento de certificación digital SAT</span>"
 
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
@@ -103,7 +125,8 @@ msgstr "<strong>Forma de pago:</strong>"
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "<strong>This document is a printed representation of a CFDI</strong>"
-msgstr "<strong>Este documento es una representación impresa del CFDI</strong>"
+msgstr ""
+"<strong>Este documento es una representación impresa del CFDI</strong>"
 
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
@@ -116,9 +139,19 @@ msgid "Account Ord."
 msgstr "Cuenta Ordenante"
 
 #. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_needaction
+msgid "Action Needed"
+msgstr "Accion necesaria"
+
+#. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "Amount Paid"
 msgstr "Monto Pagado"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_attachment_count
+msgid "Attachment Count"
+msgstr "Cantidad de adjuntos"
 
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
@@ -129,6 +162,11 @@ msgstr "Saldo"
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "Bank Name Acc. Ord."
 msgstr "Banco Cuenta Ordenante"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model,name:l10n_mx_edi_account_move_payment_report.model_account_bank_statement_line
+msgid "Bank Statement Line"
+msgstr "Línea de un estado de cuenta bancario"
 
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
@@ -151,9 +189,52 @@ msgid "Customer:"
 msgstr "Cliente:"
 
 #. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__failed_message_ids
+msgid "Failed Messages"
+msgstr "Mensajes fallidos"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_account_bank_statement_line__l10n_mx_edi_cfdi_uuid
+msgid "Fiscal Folio"
+msgstr "Folio fiscal"
+
+#. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "Fiscal Regime: ("
 msgstr "Régimen Fiscal: ("
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,help:l10n_mx_edi_account_move_payment_report.field_account_bank_statement_line__l10n_mx_edi_cfdi_uuid
+msgid "Folio in electronic invoice, is returned by SAT when send to stamp."
+msgstr ""
+"Folio en facturación electrónica, lo regresa el SAT cuando se envía para "
+"firmar."
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_follower_ids
+msgid "Followers"
+msgstr "Seguidores"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Seguidores (Contactos)"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__has_message
+msgid "Has Message"
+msgstr "Tiene mensajes"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,help:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si está marcado, los nuevos mensajes requerirán tu atención."
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,help:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_has_error
+#: model:ir.model.fields,help:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si está marcado, algunos mensajes tienen un error de entrega."
 
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
@@ -171,14 +252,49 @@ msgid "Invoice Number"
 msgstr "Número de Factura"
 
 #. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_is_follower
+msgid "Is Follower"
+msgstr "Es seguidor"
+
+#. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "Memo:"
 msgstr ""
 
 #. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_has_error
+msgid "Message Delivery error"
+msgstr "Error en la entrega del mensaje"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_ids
+msgid "Messages"
+msgstr "Mensajes"
+
+#. module: l10n_mx_edi_account_move_payment_report
 #: model:ir.model,name:l10n_mx_edi_account_move_payment_report.model_l10n_mx_edi_document
 msgid "Mexican documents that needs to transit outside of Odoo"
 msgstr "Documentos mexicanos que se deben procesar fuera de Odoo"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Número de acciones"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_has_error_counter
+msgid "Number of errors"
+msgstr "Número de errores"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,help:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Número de mensajes que requieren acción"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,help:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Número de mensajes con error de entrega"
 
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
@@ -217,9 +333,24 @@ msgid "Payment Receipt:"
 msgstr "Recibo de Pago"
 
 #. module: l10n_mx_edi_account_move_payment_report
+#: model:mail.template,name:l10n_mx_edi_account_move_payment_report.mail_template_data_payment_receipt
+msgid "Payment: Payment Receipt"
+msgstr "Pago: Recibo de pago"
+
+#. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "Previous balance"
 msgstr "Saldo anterior"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__rating_ids
+msgid "Ratings"
+msgstr "Calificaciones"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Error en la entrega de SMS"
 
 #. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
@@ -227,7 +358,44 @@ msgid "Sample Memo"
 msgstr ""
 
 #. module: l10n_mx_edi_account_move_payment_report
+#. odoo-python
+#: code:addons/l10n_mx_edi_account_move_payment_report/models/l10n_mx_edi_document.py:0
+#, python-format
+msgid "Send"
+msgstr "Enviar"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.account_move_print_payment
+msgid "Send Payment Receipt"
+msgstr "Enviar comprobante de pago"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:mail.template,description:l10n_mx_edi_account_move_payment_report.mail_template_data_payment_receipt
+msgid ""
+"Sent manually to customer when clicking on 'Send receipt by email' in "
+"payment action"
+msgstr ""
+
+#. module: l10n_mx_edi_account_move_payment_report
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_account_move_payment_report.report_payment_receipt_invoice_template
 msgid "UUID"
 msgstr ""
 
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,field_description:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__website_message_ids
+msgid "Website Messages"
+msgstr "Mensajes del sitio web"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:ir.model.fields,help:l10n_mx_edi_account_move_payment_report.field_l10n_mx_edi_document__website_message_ids
+msgid "Website communication history"
+msgstr "Historial de comunicación del sitio web"
+
+#. module: l10n_mx_edi_account_move_payment_report
+#: model:mail.template,subject:l10n_mx_edi_account_move_payment_report.mail_template_data_payment_receipt
+msgid ""
+"{{ object.move_id.company_id.name }} Payment Receipt (Ref {{ "
+"object.move_id.name or 'n/a' }})"
+msgstr ""
+"{{ object.move_id.company_id.name }} Recibo de pago (Ref {{ "
+"object.move_id.name or 'n/a' }})"
