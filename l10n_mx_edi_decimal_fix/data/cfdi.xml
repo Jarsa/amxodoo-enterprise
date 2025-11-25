@@ -7,13 +7,26 @@
             expr="//*[local-name()='Comprobante' and namespace-uri()='http://www.sat.gob.mx/cfd/4']"
             position="attributes"
         >
-            <attribute name="t-att-SubTotal">format_float(subtotal, precision=2)</attribute>
-            <attribute name="t-att-Descuento">format_float(descuento, precision=2)</attribute>
-            <attribute name="t-att-Total">format_float(
-                float(format_float(subtotal, precision=2)) +
-                float(format_float(descuento or 0, precision=2)) +
-                float(format_float(total_impuestos_trasladados or 0, precision=2)),
-                precision=2)
+            <attribute name="t-att-SubTotal">
+                format_float(
+                    float_round(subtotal, precision_digits=2),
+                    precision=2
+                )
+            </attribute>
+            <attribute name="t-att-Descuento">
+                format_float(
+                    float_round(descuento, precision_digits=2),
+                    precision=2
+                ) if descuento else False
+            </attribute>
+            <attribute name="t-att-Total">
+                format_float(
+                    float_round(subtotal, precision_digits=2) -
+                    (float_round(descuento, precision_digits=2) if descuento else 0) +
+                    (float(format_float(total_impuestos_trasladados, precision=2)) if total_impuestos_trasladados else 0) -
+                    (float(format_float(total_impuestos_retenidos, precision=2)) if total_impuestos_retenidos else 0),
+                    precision=2
+                )
             </attribute>
         </xpath>
 
@@ -54,7 +67,9 @@
             //*[local-name()='Traslado' and namespace-uri()='http://www.sat.gob.mx/cfd/4']"
             position="attributes"
         >
-            <attribute name="t-att-Base">format_float(tax_values['base'], precision=2)</attribute>
+            <attribute
+                name="t-att-Base"
+            >format_float(float_round(tax_values['base'], precision_digits=2), precision=2)</attribute>
             <attribute name="t-att-Importe">format_float(tax_values['importe'], precision=2)</attribute>
         </xpath>
 
