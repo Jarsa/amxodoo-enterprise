@@ -7,6 +7,6 @@ class L10nMxEdiDocument(models.Model):
 
     @api.model
     def _add_base_cfdi_values(self, cfdi_values):
-        res = super()._add_base_cfdi_values()
+        res = super()._add_base_cfdi_values(cfdi_values)
         res["float_round"] = float_round
         return res
