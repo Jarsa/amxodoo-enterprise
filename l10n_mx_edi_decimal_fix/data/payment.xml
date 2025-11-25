@@ -110,7 +110,7 @@
             <attribute name="t-att-TotalRetencionesIEPS">format_float(total_retenciones_ieps, precision=2)</attribute>
             <attribute name="t-att-MontoTotalPagos">
                 format_float(
-                    float(format_float(monto, precision=6)) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    float(format_float(monto, precision=2)) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
                     precision=2
                 )
             </attribute>
