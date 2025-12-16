@@ -13,10 +13,10 @@
         "l10n_mx_edi",
     ],
     "data": [
-        "data/mail_template_data.xml",
         "report/report_payment_receipt_invoice.xml",
         "views/report_action.xml",
         "views/account_bank_statement_line_views.xml",
+        "data/mail_template_data.xml",
     ],
     "installable": True,
 }
