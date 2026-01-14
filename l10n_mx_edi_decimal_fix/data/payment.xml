@@ -22,15 +22,8 @@
                 ) &gt; 0 else False
             </attribute>
             <attribute name="t-att-TotalTrasladosImpuestoIVA0">
-                format_float(
-                    sum(
-                        float(format_float(traslado['importe'], precision=6)) / float(format_float(docto['equivalencia'], precision=10) or '1') if traslado['tasa_o_cuota'] == 0 and traslado['tipo_factor'] == 'Tasa' else 0
-                        for docto in docto_relationado_list
-                        for traslado in docto['traslados_list']
-                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
-                    precision=2
-                ) if sum(
-                    float(format_float(traslado['importe'], precision=6)) / float(format_float(docto['equivalencia'], precision=10) or '1') if traslado['tasa_o_cuota'] == 0 and traslado['tipo_factor'] == 'Tasa' else 0
+                '0' if sum(
+                    float(format_float(traslado['base'], precision=6)) / float(format_float(docto['equivalencia'], precision=10) or '1') if traslado['tasa_o_cuota'] == 0 and traslado['tipo_factor'] == 'Tasa' else 0
                     for docto in docto_relationado_list
                     for traslado in docto['traslados_list']
                 ) &gt; 0 else False
