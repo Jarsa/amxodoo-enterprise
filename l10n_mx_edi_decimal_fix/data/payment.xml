@@ -103,7 +103,15 @@
             <attribute name="t-att-TotalRetencionesIEPS">format_float(total_retenciones_ieps, precision=2)</attribute>
             <attribute name="t-att-MontoTotalPagos">
                 format_float(
-                    float(format_float(monto, precision=2)) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
+                    float(
+                        format_float(
+                            sum(
+                                float(format_float(docto['imp_pagado'], precision=2))
+                                for docto in docto_relationado_list
+                            ),
+                            precision=2
+                        )
+                    ) * float(format_float(tipo_cambio, precision=tipo_cambio_dp) or '1'),
                     precision=2
                 )
             </attribute>
@@ -114,7 +122,15 @@
             expr="//*[local-name()='Pago' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
             position="attributes"
         >
-            <attribute name="t-att-Monto">format_float(monto, precision=2)</attribute>
+            <attribute name="t-att-Monto">
+                format_float(
+                    sum(
+                        float(format_float(docto['imp_pagado'], precision=2))
+                        for docto in docto_relationado_list
+                    ),
+                    precision=2
+                )
+            </attribute>
         </xpath>
 
         <!-- DoctoRelacionado -->
