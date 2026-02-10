@@ -98,9 +98,15 @@
                     for traslado in docto['traslados_list']
                 ) &gt; 0 else False
             </attribute>
-            <attribute name="t-att-TotalRetencionesISR">format_float(total_retenciones_isr, precision=2)</attribute>
-            <attribute name="t-att-TotalRetencionesIVA">format_float(total_retenciones_iva, precision=2)</attribute>
-            <attribute name="t-att-TotalRetencionesIEPS">format_float(total_retenciones_ieps, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalRetencionesISR"
+            >format_float(total_retenciones_isr, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalRetencionesIVA"
+            >format_float(total_retenciones_iva, precision=2)</attribute>
+            <attribute
+                name="t-att-TotalRetencionesIEPS"
+            >format_float(total_retenciones_ieps, precision=2)</attribute>
             <attribute name="t-att-MontoTotalPagos">
                 format_float(
                     float(
@@ -144,9 +150,10 @@
             <attribute
                 name="t-att-ImpPagado"
             >invoice_values['format_float'](invoice_values['imp_pagado'], precision=2)</attribute>
-            <attribute
-                name="t-att-ImpSaldoInsoluto"
-            >invoice_values['format_float'](invoice_values['imp_saldo_insoluto'], precision=2)</attribute>
+            <attribute name="t-att-ImpSaldoInsoluto">invoice_values['format_float'](
+                abs(invoice_values['imp_saldo_insoluto']), precision=2
+            )</attribute>
+
         </xpath>
 
         <xpath
