@@ -112,7 +112,7 @@
                     float(
                         format_float(
                             sum(
-                                float(format_float(docto['imp_pagado'], precision=2))
+                                float(format_float(docto['imp_pagado'], precision=2)) if docto['moneda'] == moneda else float(format_float(docto['imp_pagado'], precision=2)) / float(format_float(docto['equivalencia'], precision=10) or '1')
                                 for docto in docto_relationado_list
                             ),
                             precision=2
@@ -131,7 +131,7 @@
             <attribute name="t-att-Monto">
                 format_float(
                     sum(
-                        float(format_float(docto['imp_pagado'], precision=2))
+                        float(format_float(docto['imp_pagado'], precision=2)) if docto['moneda'] == moneda else float(format_float(docto['imp_pagado'], precision=2)) / float(format_float(docto['equivalencia'], precision=10) or '1')
                         for docto in docto_relationado_list
                     ),
                     precision=2
