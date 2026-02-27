@@ -1,4 +1,6 @@
 from odoo import models
+import math
+
 
 class MexicanAccountReportCustomHandler(models.AbstractModel):
     _inherit = 'l10n_mx.report.handler'
@@ -27,5 +29,9 @@ class MexicanAccountReportCustomHandler(models.AbstractModel):
         for partner, data in diot_values.items():
             for label, value in data.items():
                 if value and isinstance(value, float):
-                    diot_values[partner][label] = int(value)
+                    decimal = round(value - math.floor(value), 2)
+                    if decimal <= 0.50:
+                        diot_values[partner][label] = math.floor(value)
+                    else:
+                        diot_values[partner][label] = math.ceil(value)
         return diot_values
