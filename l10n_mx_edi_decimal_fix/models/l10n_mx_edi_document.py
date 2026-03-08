@@ -35,3 +35,12 @@ class L10nMxEdiDocument(models.Model):
             'format_float': format_float,
         })
         return res
+
+    @api.model
+    def _get_company_cfdi_values(self, company):
+        res = super()._get_company_cfdi_values(company)
+        if self._context.get("params", {}).get("model") == "account.move":
+            move = self.env["account.move"].browse(self._context.get("params", {}).get("id"))
+            if move and move.journal_id.l10n_mx_address_issued_id != res.get("issued_address"):
+                res["issued_address"] = move.journal_id.l10n_mx_address_issued_id
+        return res
