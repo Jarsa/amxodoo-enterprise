@@ -1,0 +1,131 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * l10n_mx_edi_cfdi_payment_followup
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-31 00:00+0000\n"
+"PO-Revision-Date: 2026-03-31 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:account_move.l10n_mx_edi_cfdi_payment_state
+msgid "CFDI Payment State"
+msgstr "Estado del Complemento de Pago CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:account_move.l10n_mx_edi_cfdi_payment_last_followup_date
+msgid "Last Follow-up Date"
+msgstr "Fecha de Último Seguimiento"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields.selection,name:account_move.selection__account_move__l10n_mx_edi_cfdi_payment_state__not_required
+msgid "Not Required"
+msgstr "No Requerido"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields.selection,name:account_move.selection__account_move__l10n_mx_edi_cfdi_payment_state__pending
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields.selection,name:account_move.selection__account_move__l10n_mx_edi_cfdi_payment_state__requested
+msgid "Requested"
+msgstr "Solicitado"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields.selection,name:account_move.selection__account_move__l10n_mx_edi_cfdi_payment_state__received
+msgid "Received"
+msgstr "Recibido"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields.selection,name:account_move.selection__account_move__l10n_mx_edi_cfdi_payment_state__validated
+msgid "Validated"
+msgstr "Validado"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields.selection,name:account_move.selection__account_move__l10n_mx_edi_cfdi_payment_state__error
+msgid "Error"
+msgstr "Error"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_account_payment_form_cfdi_followup
+msgid "Request Complement"
+msgstr "Solicitar Complemento"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:res_config_settings.l10n_mx_edi_cfdi_payment_start_date
+msgid "CFDI Payment Follow-up Start Date"
+msgstr "Fecha de Inicio del Seguimiento de Complementos CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:res_config_settings.l10n_mx_edi_cfdi_responsible_user_id
+msgid "CFDI Follow-up Responsible User"
+msgstr "Usuario Responsable del Seguimiento CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:res.groups,name:l10n_mx_edi_cfdi_payment_followup.group_cfdi_payment_followup
+msgid "CFDI Payment Follow-up"
+msgstr "Seguimiento de Complementos de Pago CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:mail.template,name:l10n_mx_edi_cfdi_payment_followup.mail_template_cfdi_complement_request
+msgid "CFDI Payment Complement Request"
+msgstr "Solicitud de Complemento de Pago CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.cron,name:l10n_mx_edi_cfdi_payment_followup.ir_cron_cfdi_payment_followup
+msgid "CFDI Payment Complement Follow-up"
+msgstr "Seguimiento Automático de Complementos de Pago CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+msgid "CFDI Complement Error"
+msgstr "Error en Complemento de Pago CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+msgid "UUID not found in XML"
+msgstr "UUID no encontrado en el XML"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+msgid "No Pago node found"
+msgstr "No se encontró el nodo Pago"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "Payment form is not SPEI (03), found: %s"
+msgstr "La forma de pago no es SPEI (03), se encontró: %s"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "Complement date %s precedes payment date %s"
+msgstr "La fecha del complemento %s es anterior a la fecha de pago %s"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "Invoice UUID %s not found in reconciled invoices"
+msgstr "El UUID de factura %s no se encontró entre las facturas conciliadas"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "Outstanding balance not zero for invoice %s: %s"
+msgstr "El saldo insoluto no es cero para la factura %s: %s"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "Amount mismatch: XML total %(xml)s vs Odoo %(odoo)s"
+msgstr "Diferencia de importe: total XML %(xml)s vs Odoo %(odoo)s"

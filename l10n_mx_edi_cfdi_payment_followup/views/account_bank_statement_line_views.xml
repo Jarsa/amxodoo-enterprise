@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Bank reconciliation list view: add CFDI state columns and action button -->
+    <record id="view_bank_statement_line_tree_cfdi_followup" model="ir.ui.view">
+        <field name="name">
+            account.bank.statement.line.tree.cfdi.payment.followup
+        </field>
+        <field name="model">account.bank.statement.line</field>
+        <field
+            name="inherit_id"
+            ref="account_accountant.view_bank_statement_line_tree_bank_rec_widget"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='id']" position="before">
+                <field
+                    name="l10n_mx_edi_cfdi_payment_state"
+                    optional="show"
+                    widget="badge"
+                    decoration-success="l10n_mx_edi_cfdi_payment_state == 'validated'"
+                    decoration-warning="l10n_mx_edi_cfdi_payment_state in ('pending', 'requested')"
+                    decoration-danger="l10n_mx_edi_cfdi_payment_state == 'error'"
+                    column_invisible="True"
+                />
+                <field
+                    name="l10n_mx_edi_cfdi_payment_last_followup_date"
+                    optional="hide"
+                    column_invisible="True"
+                />
+                <button
+                    name="action_request_cfdi_complement"
+                    type="object"
+                    string="Request Complement"
+                    icon="fa-envelope-o"
+                    invisible="l10n_mx_edi_cfdi_payment_state not in ('pending', 'error')"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

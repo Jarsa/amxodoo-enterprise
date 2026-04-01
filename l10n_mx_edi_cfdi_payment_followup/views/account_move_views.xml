@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- List view: add optional CFDI state columns -->
+    <record id="view_move_tree_cfdi_payment_followup" model="ir.ui.view">
+        <field name="name">account.move.tree.cfdi.payment.followup</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='activity_ids']" position="before">
+                <field
+                    name="l10n_mx_edi_cfdi_payment_state"
+                    optional="show"
+                    widget="badge"
+                    decoration-success="l10n_mx_edi_cfdi_payment_state == 'validated'"
+                    decoration-warning="l10n_mx_edi_cfdi_payment_state in ('pending', 'requested')"
+                    decoration-danger="l10n_mx_edi_cfdi_payment_state == 'error'"
+                />
+                <field
+                    name="l10n_mx_edi_cfdi_payment_last_followup_date"
+                    optional="hide"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search view: add CFDI state filters and group-by -->
+    <record id="view_account_move_filter_cfdi_payment_followup" model="ir.ui.view">
+        <field name="name">account.move.search.cfdi.payment.followup</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='unposted']" position="before">
+                <filter
+                    name="cfdi_pending"
+                    string="CFDI Pending"
+                    domain="[('l10n_mx_edi_cfdi_payment_state', '=', 'pending')]"
+                />
+                <filter
+                    name="cfdi_requested"
+                    string="CFDI Requested"
+                    domain="[('l10n_mx_edi_cfdi_payment_state', '=', 'requested')]"
+                />
+                <filter
+                    name="cfdi_error"
+                    string="CFDI Error"
+                    domain="[('l10n_mx_edi_cfdi_payment_state', '=', 'error')]"
+                />
+                <filter
+                    name="cfdi_validated"
+                    string="CFDI Validated"
+                    domain="[('l10n_mx_edi_cfdi_payment_state', '=', 'validated')]"
+                />
+                <separator />
+            </xpath>
+            <xpath expr="//filter[@name='by_company']" position="after">
+                <filter
+                    name="group_cfdi_state"
+                    string="CFDI State"
+                    context="{'group_by': 'l10n_mx_edi_cfdi_payment_state'}"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

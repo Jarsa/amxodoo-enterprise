@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form_cfdi_followup" model="ir.ui.view">
+        <field name="name">
+            res.config.settings.view.form.inherit.l10n_mx_edi_cfdi_payment_followup
+        </field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="l10n_mx_edi.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='l10n_mx_edi_settings']" position="inside">
+                <setting
+                    string="CFDI Payment Complement Follow-up"
+                    help="Configure tracking of CFDI payment complements for PPD invoices."
+                >
+                    <div class="row mt16">
+                        <label
+                            for="l10n_mx_edi_cfdi_payment_start_date"
+                            class="col-lg-3 o_light_label"
+                        />
+                        <field name="l10n_mx_edi_cfdi_payment_start_date" />
+                    </div>
+                    <div class="row">
+                        <label
+                            for="l10n_mx_edi_cfdi_responsible_user_id"
+                            class="col-lg-3 o_light_label"
+                        />
+                        <field name="l10n_mx_edi_cfdi_responsible_user_id" />
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

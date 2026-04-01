@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="mail_template_cfdi_complement_request" model="mail.template">
+        <field name="name">CFDI Payment Complement Request</field>
+        <field name="model_id" ref="account.model_account_move" />
+        <field name="subject">Payment Complement Request — {{ object.name }}</field>
+        <field name="email_to">{{ object.partner_id.email }}</field>
+        <field name="auto_delete" eval="True" />
+        <field
+            name="body_html"
+        ><![CDATA[
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+    <p>Dear {{ object.partner_id.name }},</p>
+    <p>
+        We are requesting the CFDI Payment Complement (Complemento de Pago)
+        for the following payment:
+    </p>
+    <table style="border-collapse: collapse; width: 100%; margin-bottom: 16px;">
+        <tr style="background-color: #f5f5f5;">
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">
+                Field
+            </th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">
+                Value
+            </th>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">Payment Reference</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                {{ object.name }}
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">Payment Date</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                {{ object.date }}
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">Amount</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">
+                {{ '%.2f' % object.amount_total }} {{ object.currency_id.name }}
+            </td>
+        </tr>
+    </table>
+    <p><strong>Related Invoices:</strong></p>
+    <ul>
+        {% for line in object.line_ids %}
+            {% for partial in line.matched_debit_ids + line.matched_credit_ids %}
+                {% set counterpart = partial.debit_move_id if partial.credit_move_id == line else partial.credit_move_id %}
+                {% if counterpart.move_id and counterpart.move_id.id != object.id %}
+                    <li>
+                        {{ counterpart.move_id.name }}
+                        — {{ '%.2f' % counterpart.move_id.amount_total }}
+                        {{ counterpart.move_id.currency_id.name }}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </ul>
+    <p>
+        Please send the corresponding CFDI XML file at your earliest convenience.
+    </p>
+    <p>
+        Thank you,<br/>
+        {{ object.company_id.name }}
+    </p>
+</div>
+        ]]></field>
+    </record>
+</odoo>
