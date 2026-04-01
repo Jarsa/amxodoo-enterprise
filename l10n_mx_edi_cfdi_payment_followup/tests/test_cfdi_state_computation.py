@@ -53,10 +53,10 @@ class TestCfdiStateComputation(TestCfdiPaymentFollowupCommon):
         )
         pue_payment.action_post()
         pay_line = pue_payment.move_id.line_ids.filtered(
-            lambda l: l.account_id.account_type == "asset_receivable"
+            lambda line: line.account_id.account_type == "asset_receivable"
         )
         inv_line = pue_invoice.line_ids.filtered(
-            lambda l: l.account_id.account_type == "asset_receivable"
+            lambda line: line.account_id.account_type == "asset_receivable"
         )
         (pay_line | inv_line).reconcile()
 

@@ -346,30 +346,30 @@ class AccountMove(models.Model):
             self.message_post(
                 body=_(
                     "Replacement CFDI payment complement received. "
-                    "Previous UUID: %s — New UUID: %s. "
+                    "Previous UUID: %(prev)s — New UUID: %(new)s. "
                     "Please verify the fiscal status of both documents."
                 )
-                % (previous_uuid, uuid),
+                % {"prev": previous_uuid, "new": uuid},
                 message_type="comment",
                 subtype_xmlid="mail.mt_note",
             )
             self._create_cfdi_payment_activity(
                 _(
                     "A replacement complement was received for this payment.\n"
-                    "Previous UUID: %s\nNew UUID: %s"
+                    "Previous UUID: %(prev)s\nNew UUID: %(new)s"
                 )
-                % (previous_uuid, uuid)
+                % {"prev": previous_uuid, "new": uuid}
             )
         else:
             self.message_post(
-                body=_("CFDI payment complement validated successfully. UUID: %s")
-                % uuid,
+                body=_("CFDI payment complement validated successfully. UUID: %(uuid)s")
+                % {"uuid": uuid},
                 message_type="comment",
                 subtype_xmlid="mail.mt_note",
             )
 
     def _on_cfdi_xml_error(self, combined_error):
-        """Set state to error, create activity and post chatter on validation failure."""
+        """Set state to error, create activity and post chatter on failure."""
         self.with_context(cfdi_followup_skip_notify=True).write(
             {"l10n_mx_edi_cfdi_payment_state": "error"}
         )
@@ -404,22 +404,32 @@ class AccountMove(models.Model):
                 try:
                     fecha = datetime.fromisoformat(fecha_str).date()
                 except ValueError:
-                    errors.append(_("Invalid FechaPago format: %s") % fecha_str)
+                    errors.append(
+                        _("Invalid FechaPago format: %(fecha)s") % {"fecha": fecha_str}
+                    )
                     continue
                 record_date = self.date
                 if record_date:
                     if fecha < record_date:
                         errors.append(
-                            _("Complement date %s precedes payment date %s")
-                            % (fecha, record_date)
+                            _(
+                                "Complement date %(fecha)s precedes"
+                                " payment date %(date)s"
+                            )
+                            % {"fecha": fecha, "date": record_date}
                         )
                     elif fecha > record_date + timedelta(days=tolerance_days):
                         errors.append(
                             _(
-                                "Complement date %s exceeds payment date %s "
-                                "by more than %d day(s)"
+                                "Complement date %(fecha)s exceeds"
+                                " payment date %(date)s"
+                                " by more than %(days)d day(s)"
                             )
-                            % (fecha, record_date, tolerance_days)
+                            % {
+                                "fecha": fecha,
+                                "date": record_date,
+                                "days": tolerance_days,
+                            }
                         )
 
         # Collect reconciled invoice UUIDs
@@ -437,15 +447,19 @@ class AccountMove(models.Model):
                 # Rule 6: IdDocumento must match a reconciled invoice UUID
                 if inv_uuid not in reconciled_uuids:
                     errors.append(
-                        _("Invoice UUID %s not found in reconciled invoices") % inv_uuid
+                        _("Invoice UUID %(uuid)s not found in reconciled invoices")
+                        % {"uuid": inv_uuid}
                     )
 
                 # Rule 7: ImporteSaldoInsoluto must be "0.00"
                 saldo = docto.get("ImporteSaldoInsoluto", "")
                 if saldo and saldo != "0.00":
                     errors.append(
-                        _("Outstanding balance not zero for invoice %s: %s")
-                        % (inv_uuid, saldo)
+                        _(
+                            "Outstanding balance not zero for"
+                            " invoice %(uuid)s: %(saldo)s"
+                        )
+                        % {"uuid": inv_uuid, "saldo": saldo}
                     )
 
         # Rule 8: Sum of Monto must match Odoo payment amount (tolerance ±1.00)

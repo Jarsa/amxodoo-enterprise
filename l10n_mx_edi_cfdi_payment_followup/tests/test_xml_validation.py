@@ -89,7 +89,7 @@ class TestXmlValidation(TestCfdiPaymentFollowupCommon):
         self.assertEqual(self.payment.move_id.l10n_mx_edi_cfdi_payment_state, "error")
 
     def test_date_within_tolerance(self):
-        """FechaPago exactly 2 days after payment date → 'validated' (default tolerance=2)."""
+        """FechaPago 2 days after payment date → validated (default tolerance=2)."""
         self.env["ir.config_parameter"].set_param(
             "l10n_mx_edi_cfdi_payment_date_tolerance_days", "2"
         )
@@ -168,7 +168,7 @@ class TestXmlValidation(TestCfdiPaymentFollowupCommon):
         )
 
     def test_multiple_errors_reported(self):
-        """Multiple failures (forma_pago + unknown uuid + nonzero saldo) → single 'error'."""
+        """Multiple failures (forma_pago + unknown uuid + nonzero saldo) → one error."""
         xml = self._build_cfdi_xml(
             payment_uuid=self.payment_uuid,
             payment_date=fields.Date.today(),

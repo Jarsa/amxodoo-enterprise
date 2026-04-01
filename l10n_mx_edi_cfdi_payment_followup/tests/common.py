@@ -177,10 +177,10 @@ class TestCfdiPaymentFollowupCommon(TransactionCase):
 
         # ---- Reconcile payment with invoice ---------------------------------
         pay_line = cls.payment.move_id.line_ids.filtered(
-            lambda l: l.account_id.account_type == "asset_receivable"
+            lambda line: line.account_id.account_type == "asset_receivable"
         )
         inv_line = cls.invoice.line_ids.filtered(
-            lambda l: l.account_id.account_type == "asset_receivable"
+            lambda line: line.account_id.account_type == "asset_receivable"
         )
         (pay_line | inv_line).reconcile()
 
