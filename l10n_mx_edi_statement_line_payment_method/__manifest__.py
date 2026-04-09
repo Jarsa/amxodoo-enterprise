@@ -7,7 +7,7 @@
     "version": "17.0.1.0.1",
     "category": "Report",
     "author": "Jarsa",
-    "website": "https://www.jarsa.com",
+    "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "depends": [
         "account",
