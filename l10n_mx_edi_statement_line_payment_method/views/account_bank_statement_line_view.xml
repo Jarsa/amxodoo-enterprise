@@ -44,4 +44,29 @@
             </xpath>
         </field>
     </record>
+
+    <record
+        id="view_bank_statement_line_quick_create_inherit_payment_method"
+        model="ir.ui.view"
+    >
+        <field
+            name="name"
+        >account.bank.statement.line.quick.create.inherit.payment.method</field>
+        <field name="model">account.bank.statement.line</field>
+        <field
+            name="inherit_id"
+            ref="account_accountant.view_bank_statement_line_quick_create_form_bank_rec_widget"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_ref']" position="after">
+                <field name="country_code" invisible="True" />
+                <field
+                    name="l10n_mx_edi_payment_method_id"
+                    placeholder="Payment Method"
+                    options="{'no_create': 1, 'no_open': 1}"
+                    invisible="country_code != 'MX'"
+                />
+            </xpath>
+        </field>
+    </record>
 </odoo>
