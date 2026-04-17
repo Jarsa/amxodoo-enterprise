@@ -1,6 +1,7 @@
+from decimal import ROUND_HALF_UP, Decimal
+
 from odoo import api, models
-from odoo.tools.float_utils import float_is_zero, float_round
-from decimal import Decimal, ROUND_HALF_UP
+from odoo.tools.float_utils import float_round
 
 
 class L10nMxEdiDocument(models.Model):
@@ -23,24 +24,27 @@ class L10nMxEdiDocument(models.Model):
             if amount is False:
                 amount = 0
 
-            qty = Decimal('1.' + ('0' * precision))
+            qty = Decimal("1." + ("0" * precision))
             value = Decimal(str(amount))
 
-            return format(
-                value.quantize(qty, rounding=ROUND_HALF_UP),
-                f'.{precision}f'
-            )
+            return format(value.quantize(qty, rounding=ROUND_HALF_UP), f".{precision}f")
 
-        cfdi_values.update({
-            'format_float': format_float,
-        })
+        cfdi_values.update(
+            {
+                "format_float": format_float,
+            }
+        )
         return res
 
     @api.model
     def _get_company_cfdi_values(self, company):
         res = super()._get_company_cfdi_values(company)
         if self._context.get("params", {}).get("model") == "account.move":
-            move = self.env["account.move"].browse(self._context.get("params", {}).get("id"))
-            if move and move.journal_id.l10n_mx_address_issued_id != res.get("issued_address"):
+            move = self.env["account.move"].browse(
+                self._context.get("params", {}).get("id")
+            )
+            if move and move.journal_id.l10n_mx_address_issued_id != res.get(
+                "issued_address"
+            ):
                 res["issued_address"] = move.journal_id.l10n_mx_address_issued_id
         return res
