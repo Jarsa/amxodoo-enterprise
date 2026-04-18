@@ -17,6 +17,12 @@ class TestDecimalFix(TestDecimalFixCommon):
     below the exact value.  float_round(..., precision_digits=2) would then produce
     41753.11 instead of the correct ROUND_HALF_UP result of 41753.12, causing the PAC
     to reject the CFDI due to arithmetic inconsistency.
+
+    With round_globally, _get_post_fix_tax_amounts_map uses float_round to compute
+    new_base_amount, which can shift the base by ±1 unit at 6dp (e.g. 41753.115 →
+    41753.114).  That delta propagates to cfdi_line_values['importe'] and then to
+    cfdi_values['subtotal'], breaking the 2dp rounding.  The fix overrides
+    _get_post_fix_tax_amounts_map to use Decimal ROUND_HALF_UP throughout.
     """
 
     # -------------------------------------------------------------------------
@@ -56,188 +62,205 @@ class TestDecimalFix(TestDecimalFixCommon):
 
     # -------------------------------------------------------------------------
     # Case 1: MXN 6 decimals — qty=0.5, price=83,506.23 — no discount
+    # Both round_per_line and round_globally must produce identical CFDI amounts.
     # -------------------------------------------------------------------------
 
     def test_half_up_rounding_subtotal(self):
         """
         SubTotal = 0.5 × 83506.23 = 41753.115 → ROUND_HALF_UP to 2 dp = 41753.12.
-        The bug was that float_round() rounded this to 41753.11 (HALF-EVEN or fp error),
-        while format_float() via Decimal correctly gives 41753.12.
+        Tested for both round_per_line and round_globally.
         """
-        with self.mx_external_setup(self.frozen_today):
-            invoice = self._create_invoice(
-                currency_id=self.mxn_currency.id,
-                invoice_line_ids=[
-                    Command.create(
-                        {
-                            "product_id": self.product.id,
-                            "quantity": 0.5,
-                            "price_unit": 83506.23,
-                            "tax_ids": [Command.set(self.tax_16.ids)],
-                        }
-                    ),
-                ],
-            )
 
-            with self.with_mocked_pac_sign_success():
-                invoice._l10n_mx_edi_cfdi_invoice_try_send()
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.mxn_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 0.5,
+                                "price_unit": 83506.23,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
 
-            document = self._get_invoice_document(invoice)
-            self.assertTrue(document, "CFDI invoice document was not created")
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
-            cfdi = self._get_cfdi_tree(document)
-            self._assert_comprobante_amounts(
-                cfdi, subtotal="41753.12", total="48433.62"
-            )
-            self._assert_aggregate_traslado(cfdi, base="41753.12", importe="6680.50")
+                document = self._get_invoice_document(invoice)
+                self.assertTrue(
+                    document,
+                    f"CFDI invoice document not created ({rounding_method})",
+                )
+
+                cfdi = self._get_cfdi_tree(document)
+                self._assert_comprobante_amounts(
+                    cfdi, subtotal="41753.12", total="48433.62"
+                )
+                self._assert_aggregate_traslado(
+                    cfdi, base="41753.12", importe="6680.50"
+                )
+
+        self._test_cfdi_rounding(run)
 
     # -------------------------------------------------------------------------
-    # Case 2: PPD payment after case 1 invoice
+    # Case 2: PPD payment after case 1 invoice — both rounding methods
     # -------------------------------------------------------------------------
 
     def test_half_up_rounding_payment(self):
         """
         PPD payment for the 41753.12 + IVA invoice.
         Validates ImpSaldoAnt, ImpPagado and ImpSaldoInsoluto are coherent at 2 dp.
+        Tested for both round_per_line and round_globally.
         """
-        with self.mx_external_setup(self.frozen_today):
-            invoice = self._create_invoice(
-                currency_id=self.mxn_currency.id,
-                invoice_line_ids=[
-                    Command.create(
-                        {
-                            "product_id": self.product.id,
-                            "quantity": 0.5,
-                            "price_unit": 83506.23,
-                            "tax_ids": [Command.set(self.tax_16.ids)],
-                        }
-                    ),
-                ],
-            )
-            with self.with_mocked_pac_sign_success():
-                invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
-            invoice_doc = self._get_invoice_document(invoice)
-            self.assertTrue(invoice_doc)
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.mxn_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 0.5,
+                                "price_unit": 83506.23,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
-            payment = self._create_payment(invoice)
-            with self.with_mocked_pac_sign_success():
-                payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+                invoice_doc = self._get_invoice_document(invoice)
+                self.assertTrue(invoice_doc)
 
-            pay_doc = self._get_payment_document(payment.move_id)
-            self.assertTrue(pay_doc, "CFDI payment document was not created")
+                payment = self._create_payment(invoice)
+                with self.with_mocked_pac_sign_success():
+                    payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
 
-            pay_cfdi = self._get_cfdi_tree(pay_doc)
-            ns_pago = "http://www.sat.gob.mx/Pagos20"
+                pay_doc = self._get_payment_document(payment.move_id)
+                self.assertTrue(
+                    pay_doc,
+                    f"CFDI payment document not created ({rounding_method})",
+                )
 
-            docto_list = pay_cfdi.findall(f".//{{{ns_pago}}}DoctoRelacionado")
-            self.assertTrue(docto_list, "No DoctoRelacionado in payment CFDI")
-            docto = docto_list[0]
-            imp_saldo_ant = docto.get("ImpSaldoAnt")
-            imp_pagado = docto.get("ImpPagado")
-            imp_saldo_insoluto = docto.get("ImpSaldoInsoluto")
+                pay_cfdi = self._get_cfdi_tree(pay_doc)
+                ns_pago = "http://www.sat.gob.mx/Pagos20"
 
-            # After fixing the invoice CFDI, the stored invoice total is coherent
-            # and the payment complement must reflect the 2-decimal rounded amount.
-            self.assertEqual(imp_saldo_insoluto, "0.00")
-            self.assertEqual(imp_saldo_ant, imp_pagado)
+                docto_list = pay_cfdi.findall(f".//{{{ns_pago}}}DoctoRelacionado")
+                self.assertTrue(docto_list, "No DoctoRelacionado in payment CFDI")
+                docto = docto_list[0]
+                imp_saldo_ant = docto.get("ImpSaldoAnt")
+                imp_pagado = docto.get("ImpPagado")
+                imp_saldo_insoluto = docto.get("ImpSaldoInsoluto")
 
-            # The paid amount must be positive and have at most 2 decimal places.
-            self.assertRegex(imp_pagado, r"^\d+\.\d{2}$")
+                self.assertEqual(imp_saldo_insoluto, "0.00")
+                self.assertEqual(imp_saldo_ant, imp_pagado)
+                self.assertRegex(imp_pagado, r"^\d+\.\d{2}$")
+
+        self._test_cfdi_rounding(run)
 
     # -------------------------------------------------------------------------
-    # Case 3: USD 6 decimals — same qty/price, payment in MXN
+    # Case 3: USD 6 decimals — same qty/price, payment in MXN — both methods
     # -------------------------------------------------------------------------
 
     def test_half_up_usd_multidivisa(self):
         """
         Invoice in USD (6 decimal places) for qty=0.5, price=83506.23.
         Then a payment in MXN to validate the currency conversion path.
+        Tested for both round_per_line and round_globally.
         """
         rate = 1.0 / 17.0  # 1 USD = 17 MXN
         self.setup_rates(self.usd_currency, (self.frozen_today, rate))
 
-        with self.mx_external_setup(self.frozen_today):
-            invoice = self._create_invoice(
-                currency_id=self.usd_currency.id,
-                invoice_line_ids=[
-                    Command.create(
-                        {
-                            "product_id": self.product.id,
-                            "quantity": 0.5,
-                            "price_unit": 83506.23,
-                            "tax_ids": [Command.set(self.tax_16.ids)],
-                        }
-                    ),
-                ],
-            )
-            with self.with_mocked_pac_sign_success():
-                invoice._l10n_mx_edi_cfdi_invoice_try_send()
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.usd_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 0.5,
+                                "price_unit": 83506.23,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
-            inv_doc = self._get_invoice_document(invoice)
-            self.assertTrue(
-                inv_doc, "CFDI invoice document was not created for USD invoice"
-            )
+                inv_doc = self._get_invoice_document(invoice)
+                self.assertTrue(
+                    inv_doc,
+                    f"CFDI invoice document not created for USD ({rounding_method})",
+                )
 
-            inv_cfdi = self._get_cfdi_tree(inv_doc)
-            self.assertEqual(inv_cfdi.get("Moneda"), "USD")
-            # SubTotal must be ROUND_HALF_UP of 41753.115 to 2 dp = 41753.12
-            self._assert_comprobante_amounts(
-                inv_cfdi, subtotal="41753.12", total="48433.62"
-            )
+                inv_cfdi = self._get_cfdi_tree(inv_doc)
+                self.assertEqual(inv_cfdi.get("Moneda"), "USD")
+                self._assert_comprobante_amounts(
+                    inv_cfdi, subtotal="41753.12", total="48433.62"
+                )
 
-        with self.mx_external_setup(self.frozen_today):
-            payment = self._create_payment(
-                invoice,
-                currency_id=self.mxn_currency.id,
-            )
-            with self.with_mocked_pac_sign_success():
-                payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+            with self.mx_external_setup(self.frozen_today):
+                payment = self._create_payment(
+                    invoice,
+                    currency_id=self.mxn_currency.id,
+                )
+                with self.with_mocked_pac_sign_success():
+                    payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
 
-            pay_doc = self._get_payment_document(payment.move_id)
-            self.assertTrue(
-                pay_doc, "CFDI payment document was not created for USD→MXN"
-            )
+                pay_doc = self._get_payment_document(payment.move_id)
+                self.assertTrue(
+                    pay_doc,
+                    f"CFDI payment document not created for USD→MXN ({rounding_method})",
+                )
+
+        self._test_cfdi_rounding(run)
 
     # -------------------------------------------------------------------------
-    # Case 4: MXN 6 decimals — same qty/price with 10% discount
+    # Case 4: MXN 6 decimals — same qty/price with 10% discount — both methods
     # -------------------------------------------------------------------------
 
     def test_half_up_rounding_with_discount(self):
         """
         10% discount on same line.
         SubTotal (gross) = 41753.12, Descuento = 4175.31 (ROUND_HALF_UP of 4175.3115).
-        Validates that the Descuento attribute is correctly included and Total is
-        coherent.
+        Tested for both round_per_line and round_globally.
         """
-        with self.mx_external_setup(self.frozen_today):
-            invoice = self._create_invoice(
-                currency_id=self.mxn_currency.id,
-                invoice_line_ids=[
-                    Command.create(
-                        {
-                            "product_id": self.product.id,
-                            "quantity": 0.5,
-                            "price_unit": 83506.23,
-                            "discount": 10.0,
-                            "tax_ids": [Command.set(self.tax_16.ids)],
-                        }
-                    ),
-                ],
-            )
-            with self.with_mocked_pac_sign_success():
-                invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
-            document = self._get_invoice_document(invoice)
-            self.assertTrue(document)
+        def run(_rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.mxn_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 0.5,
+                                "price_unit": 83506.23,
+                                "discount": 10.0,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
 
-            cfdi = self._get_cfdi_tree(document)
-            # SubTotal is gross (before discount) = ROUND_HALF_UP(41753.115) = 41753.12
-            self.assertEqual(cfdi.get("SubTotal"), "41753.12")
-            # Descuento = ROUND_HALF_UP(4175.3115) = 4175.31
-            self.assertEqual(cfdi.get("Descuento"), "4175.31")
-            # Total must be a valid 2-decimal number
-            self.assertRegex(cfdi.get("Total"), r"^\d+\.\d{2}$")
-            # Total = SubTotal - Descuento + IVA → must be positive
-            total = float(cfdi.get("Total"))
-            self.assertGreater(total, 0.0)
+                document = self._get_invoice_document(invoice)
+                self.assertTrue(document)
+
+                cfdi = self._get_cfdi_tree(document)
+                self.assertEqual(cfdi.get("SubTotal"), "41753.12")
+                self.assertEqual(cfdi.get("Descuento"), "4175.31")
+                self.assertRegex(cfdi.get("Total"), r"^\d+\.\d{2}$")
+                total = float(cfdi.get("Total"))
+                self.assertGreater(total, 0.0)
+
+        self._test_cfdi_rounding(run)
