@@ -156,6 +156,20 @@
 
         </xpath>
 
+        <!-- TrasladoDR: format BaseDR/ImporteDR to 6dp so SAT validation
+             BaseP == sum(BaseDR/EquivalenciaDR) holds at 6dp precision -->
+        <xpath
+            expr="//*[local-name()='TrasladoDR' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
+            position="attributes"
+        >
+            <attribute
+                name="t-att-BaseDR"
+            >invoice_values['format_float'](tax_values['base'], precision=6)</attribute>
+            <attribute
+                name="t-att-ImporteDR"
+            >invoice_values['format_float'](tax_values['importe'], precision=6)</attribute>
+        </xpath>
+
         <xpath
             expr="//*[local-name()='TrasladoP' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
             position="attributes"
@@ -166,6 +180,9 @@
                         float(format_float(traslado['base'], precision=6)) / float(format_float(docto['equivalencia'], precision=10) or '1')
                         for docto in docto_relationado_list
                         for traslado in docto['traslados_list']
+                        if traslado['impuesto'] == tax_values['impuesto']
+                        and traslado['tipo_factor'] == tax_values['tipo_factor']
+                        and traslado['tasa_o_cuota'] == tax_values['tasa_o_cuota']
                     ),
                     precision=6
                 )
@@ -176,6 +193,9 @@
                         float(format_float(traslado['importe'], precision=6)) / float(format_float(docto['equivalencia'], precision=10) or '1')
                         for docto in docto_relationado_list
                         for traslado in docto['traslados_list']
+                        if traslado['impuesto'] == tax_values['impuesto']
+                        and traslado['tipo_factor'] == tax_values['tipo_factor']
+                        and traslado['tasa_o_cuota'] == tax_values['tasa_o_cuota']
                     ),
                     precision=6
                 )

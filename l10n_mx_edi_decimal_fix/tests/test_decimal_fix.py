@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from lxml import etree
 
 from odoo import Command
@@ -262,5 +264,101 @@ class TestDecimalFix(TestDecimalFixCommon):
                 self.assertRegex(cfdi.get("Total"), r"^\d+\.\d{2}$")
                 total = float(cfdi.get("Total"))
                 self.assertGreater(total, 0.0)
+
+        self._test_cfdi_rounding(run)
+
+    # -------------------------------------------------------------------------
+    # Case 5: BaseDR / BaseP consistency at 6dp — SAT validation rule
+    # -------------------------------------------------------------------------
+
+    def test_traslado_dr_base_p_consistency(self):
+        """
+        USD invoice with a price that yields a base with more than 2 decimal
+        places when stored with 6dp precision (e.g. 500.001).
+
+        Root cause: the original payment20 template formats BaseDR to 2dp while
+        BaseP already uses 6dp.  With 6dp accounting the values can diverge:
+          BaseDR = "500.00"  (2dp)
+          BaseP  = "500.001000"  (6dp)
+        SAT rejects with:
+          "El campo BaseP... no es igual a la suma de los importes de las bases
+           registrados en los documentos relacionados..."
+
+        Fix: TrasladoDR is overridden to use 6dp so both sides match exactly.
+        Tested for both round_per_line and round_globally.
+        """
+        rate = 1.0 / 17.0
+        self.setup_rates(self.usd_currency, (self.frozen_today, rate))
+
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.usd_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 1,
+                                "price_unit": 500.001,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
+
+                payment = self._create_payment(
+                    invoice, currency_id=self.usd_currency.id
+                )
+                with self.with_mocked_pac_sign_success():
+                    payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+
+                pay_doc = self._get_payment_document(payment.move_id)
+                self.assertTrue(
+                    pay_doc,
+                    f"No payment document created ({rounding_method})",
+                )
+
+                pay_cfdi = self._get_cfdi_tree(pay_doc)
+                ns_pago = "http://www.sat.gob.mx/Pagos20"
+
+                # Collect BaseDR values per DoctoRelacionado and verify 6dp.
+                docto_list = pay_cfdi.findall(f".//{{{ns_pago}}}DoctoRelacionado")
+                self.assertTrue(
+                    docto_list, f"No DoctoRelacionado found ({rounding_method})"
+                )
+                base_dr_total = Decimal("0")
+                for docto in docto_list:
+                    equivalencia = Decimal(docto.get("EquivalenciaDR") or "1")
+                    traslados_dr = docto.findall(
+                        f"{{{ns_pago}}}ImpuestosDR"
+                        f"/{{{ns_pago}}}TrasladosDR"
+                        f"/{{{ns_pago}}}TrasladoDR"
+                    )
+                    for tdr in traslados_dr:
+                        base_dr_str = tdr.get("BaseDR", "0")
+                        self.assertRegex(
+                            base_dr_str,
+                            r"^\d+\.\d{6}$",
+                            f"BaseDR must have 6 decimal places ({rounding_method})",
+                        )
+                        base_dr_total += Decimal(base_dr_str) / equivalencia
+
+                # BaseP must equal sum(BaseDR / EquivalenciaDR) exactly at 6dp.
+                traslados_p = pay_cfdi.findall(f".//{{{ns_pago}}}TrasladoP")
+                self.assertTrue(traslados_p, f"No TrasladoP found ({rounding_method})")
+                for tp in traslados_p:
+                    base_p_str = tp.get("BaseP", "0")
+                    self.assertRegex(
+                        base_p_str,
+                        r"^\d+\.\d{6}$",
+                        f"BaseP must have 6 decimal places ({rounding_method})",
+                    )
+                    self.assertEqual(
+                        Decimal(base_p_str),
+                        base_dr_total,
+                        f"BaseP must equal sum(BaseDR/EquivalenciaDR) ({rounding_method})",
+                    )
 
         self._test_cfdi_rounding(run)

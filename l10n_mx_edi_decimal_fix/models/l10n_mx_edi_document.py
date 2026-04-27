@@ -40,8 +40,8 @@ class L10nMxEdiDocument(models.Model):
         d_tax = Decimal(str(tax_amount))
         d_rate = Decimal(str(tax_rate))
 
-        mismatch = (d_base * d_rate - d_tax).copy_abs().quantize(
-            qty, rounding=ROUND_DOWN
+        mismatch = (
+            (d_base * d_rate - d_tax).copy_abs().quantize(qty, rounding=ROUND_DOWN)
         )
         if mismatch == Decimal("0"):
             # No arithmetic inconsistency at precision_digits — return values
@@ -74,8 +74,11 @@ class L10nMxEdiDocument(models.Model):
             move = self.env["account.move"].browse(
                 self._context.get("params", {}).get("id")
             )
-            if move and move.journal_id.l10n_mx_address_issued_id != res.get(
-                "issued_address"
+            if (
+                move
+                and move.journal_id.l10n_mx_address_issued_id
+                and move.journal_id.l10n_mx_address_issued_id
+                != res.get("issued_address")
             ):
                 res["issued_address"] = move.journal_id.l10n_mx_address_issued_id
         return res
