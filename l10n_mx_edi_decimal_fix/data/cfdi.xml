@@ -15,10 +15,10 @@
             </attribute>
             <attribute name="t-att-Total">
                 format_float(
-                    float(format_float(subtotal, precision=2)) -
-                    (float(format_float(descuento, precision=2)) if descuento else 0) +
-                    (float(format_float(total_impuestos_trasladados, precision=2)) if total_impuestos_trasladados else 0) -
-                    (float(format_float(total_impuestos_retenidos, precision=2)) if total_impuestos_retenidos else 0),
+                    float(format_float(subtotal, precision=2))
+                    - float(format_float(descuento, precision=2) if descuento else '0')
+                    + float(format_float(total_impuestos_trasladados, precision=2) if total_impuestos_trasladados else '0')
+                    - float(format_float(total_impuestos_retenidos, precision=2) if total_impuestos_retenidos else '0'),
                     precision=2
                 )
             </attribute>
