@@ -28,6 +28,7 @@ class AccountMove(models.Model):
         readonly=False,
         copy=False,
         tracking=True,
+        default="not_required",
     )
     l10n_mx_edi_cfdi_payment_last_followup_date = fields.Datetime(
         string="Last Follow-up Date",
@@ -57,6 +58,26 @@ class AccountMove(models.Model):
         """Return the configured start date for the current company (or False)."""
         return self.company_id.l10n_mx_edi_cfdi_payment_start_date or False
 
+    @api.model
+    def _l10n_mx_edi_cfdi_recompute_for_company(self, company, start_date):
+        """Recompute the CFDI payment state for moves in scope of the company.
+
+        Targets only payment-type entries from ``start_date`` onwards so the
+        recomputation cost is bounded to the configured range, never the whole
+        history.
+        """
+        moves = self.search(
+            [
+                ("company_id", "=", company.id),
+                ("move_type", "=", "entry"),
+                ("date", ">=", start_date),
+            ]
+        )
+        if moves:
+            self.env.add_to_compute(
+                self._fields["l10n_mx_edi_cfdi_payment_state"], moves
+            )
+
     @api.depends(
         "payment_state",
         "move_type",
@@ -68,9 +89,17 @@ class AccountMove(models.Model):
     )
     def _compute_l10n_mx_edi_cfdi_payment_state(self):
         for record in self:
-            # Eligibility rules first: a record that no longer qualifies must
-            # fall back to "not_required" even if it was previously in
-            # 'error' or 'requested' (e.g. on un-reconcile from a PPD invoice).
+            # Fast-path: if the company has no follow-up start date configured,
+            # the feature is disabled for this record. This avoids loading
+            # related lines / reconciled invoices for the whole history when
+            # the module is installed on a database with years of data.
+            start_date = record._get_cfdi_payment_start_date()
+            if not start_date:
+                record.l10n_mx_edi_cfdi_payment_state = "not_required"
+                continue
+            if record.date and record.date < start_date:
+                record.l10n_mx_edi_cfdi_payment_state = "not_required"
+                continue
 
             # Rule 1: Only process payment-type entries
             if record.move_type != "entry":
@@ -80,13 +109,7 @@ class AccountMove(models.Model):
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
                 continue
 
-            # Rule 2: Check start date
-            start_date = record._get_cfdi_payment_start_date()
-            if start_date and record.date and record.date < start_date:
-                record.l10n_mx_edi_cfdi_payment_state = "not_required"
-                continue
-
-            # Rule 3: Must have at least one PPD reconciled invoice
+            # Rule 2: Must have at least one PPD reconciled invoice
             reconciled_invoices = record._get_cfdi_reconciled_invoices()
             has_ppd = any(
                 inv.l10n_mx_edi_payment_policy == "PPD" for inv in reconciled_invoices

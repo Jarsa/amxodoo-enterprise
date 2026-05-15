@@ -3,7 +3,7 @@ from datetime import timedelta
 from odoo import fields
 from odoo.tests import tagged
 
-from .. import post_init_hook
+from .. import pre_init_hook
 from .common import TestCfdiPaymentFollowupCommon
 
 
@@ -155,21 +155,41 @@ class TestFollowupButton(TestCfdiPaymentFollowupCommon):
         self.assertTrue(activities)
         self.assertEqual(activities[0].user_id, self.responsible_user)
 
-    def test_post_init_hook_sets_start_date(self):
-        """post_init_hook sets start_date for companies without it."""
-        from datetime import date
-
-        # Create a new company with no start_date
-        new_company = self.env["res.company"].create(
-            {
-                "name": "New Company No StartDate",
-                "country_id": self.env.ref("base.mx").id,
-                "currency_id": self.mxn.id,
-            }
+    def test_pre_init_hook_initializes_state_without_compute(self):
+        """pre_init_hook pre-fills the column with 'not_required' so Odoo does
+        not queue a recompute over historical data when the stored compute
+        field is registered.
+        """
+        AccountMove = self.env["account.move"]
+        # Wipe the column to simulate the state right before the module is
+        # installed for the first time.
+        self.env.cr.execute(
+            "UPDATE account_move SET l10n_mx_edi_cfdi_payment_state = NULL "
+            "WHERE id = %s",
+            [self.payment.move_id.id],
         )
-        # Ensure field is not set
-        new_company.l10n_mx_edi_cfdi_payment_start_date = False
+        AccountMove.invalidate_model(["l10n_mx_edi_cfdi_payment_state"])
 
-        post_init_hook(self.env)
+        pre_init_hook(self.env)
 
-        self.assertEqual(new_company.l10n_mx_edi_cfdi_payment_start_date, date.today())
+        self.env.cr.execute(
+            "SELECT l10n_mx_edi_cfdi_payment_state FROM account_move WHERE id = %s",
+            [self.payment.move_id.id],
+        )
+        self.assertEqual(self.env.cr.fetchone()[0], "not_required")
+
+    def test_set_start_date_recomputes_in_range(self):
+        """Setting start_date on the company triggers a bounded recompute
+        for moves from that date onwards.
+        """
+        # Disable feature: simulates the state right after a fresh install
+        self.company_mx.l10n_mx_edi_cfdi_payment_start_date = False
+        self.env.flush_all()
+        self.payment.move_id.write({"l10n_mx_edi_cfdi_payment_state": "not_required"})
+        # Enabling the feature should recompute the reconciled PPD payment
+        self.company_mx.l10n_mx_edi_cfdi_payment_start_date = "2020-01-01"
+        self.env.flush_all()
+        self.assertIn(
+            self.payment.move_id.l10n_mx_edi_cfdi_payment_state,
+            ("pending", "validated", "error", "requested"),
+        )
