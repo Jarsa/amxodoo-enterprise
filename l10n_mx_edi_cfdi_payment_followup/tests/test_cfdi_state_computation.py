@@ -159,6 +159,48 @@ class TestCfdiStateComputation(TestCfdiPaymentFollowupCommon):
         entry.action_post()
         self.assertEqual(entry.l10n_mx_edi_cfdi_payment_state, "not_required")
 
+    def test_unreconcile_clears_error(self):
+        """Un-reconciling from a PPD invoice releases 'error' to 'not_required'."""
+        move = self._get_payment_move()
+        move.write(
+            {
+                "l10n_mx_edi_cfdi_uuid": False,
+                "l10n_mx_edi_cfdi_payment_state": "error",
+            }
+        )
+        # Sanity: state is preserved while reconciliation still holds
+        move.invalidate_recordset(["l10n_mx_edi_cfdi_payment_state"])
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "error")
+
+        # Break the reconciliation with the PPD invoice
+        pay_line = move.line_ids.filtered(
+            lambda line: line.account_id.account_type == "asset_receivable"
+        )
+        pay_line.remove_move_reconcile()
+
+        move.invalidate_recordset(["l10n_mx_edi_cfdi_payment_state"])
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "not_required")
+
+    def test_unreconcile_clears_requested(self):
+        """Un-reconciling from a PPD invoice releases 'requested' to 'not_required'."""
+        move = self._get_payment_move()
+        move.write(
+            {
+                "l10n_mx_edi_cfdi_uuid": False,
+                "l10n_mx_edi_cfdi_payment_state": "requested",
+            }
+        )
+        move.invalidate_recordset(["l10n_mx_edi_cfdi_payment_state"])
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "requested")
+
+        pay_line = move.line_ids.filtered(
+            lambda line: line.account_id.account_type == "asset_receivable"
+        )
+        pay_line.remove_move_reconcile()
+
+        move.invalidate_recordset(["l10n_mx_edi_cfdi_payment_state"])
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "not_required")
+
     def test_multicompany_start_date(self):
         """Two companies with different start dates behave independently."""
         company2 = self.env["res.company"].create(

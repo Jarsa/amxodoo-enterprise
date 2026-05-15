@@ -12,7 +12,7 @@
                     string="Request Complement"
                     type="object"
                     class="oe_highlight"
-                    invisible="l10n_mx_edi_cfdi_payment_state not in ('pending', 'error')"
+                    invisible="l10n_mx_edi_cfdi_payment_state not in ('pending', 'requested', 'error')"
                 />
                 <field
                     name="l10n_mx_edi_cfdi_payment_state"

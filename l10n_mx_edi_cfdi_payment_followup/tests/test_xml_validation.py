@@ -210,6 +210,43 @@ class TestXmlValidation(TestCfdiPaymentFollowupCommon):
         )
         self.assertFalse(self.payment.move_id.activity_ids)
 
+    def test_validation_success_closes_error_activities(self):
+        """Successful XML validation closes any prior CFDI error activities."""
+        move = self.payment.move_id
+        summary = move._get_cfdi_error_activity_summary()
+
+        # First: invalid XML → error state + activity
+        bad_xml = self._build_cfdi_xml(
+            payment_uuid=self.payment_uuid,
+            payment_date=fields.Date.today(),
+            amount=5000.0,
+            invoice_uuids=[self.invoice_uuid],
+            forma_pago="01",
+        )
+        self._attach_xml(move, bad_xml, filename="bad.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "error")
+        self.assertTrue(
+            move.activity_ids.filtered(lambda a: a.summary == summary),
+            "Expected an error activity after invalid XML",
+        )
+
+        # Reset UUID so the new XML is treated as a fresh validation
+        move.write({"l10n_mx_edi_cfdi_uuid": False})
+
+        # Second: valid XML → validated, error activity should be closed
+        good_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-TEST-9999",
+            payment_date=fields.Date.today(),
+            amount=5000.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, good_xml, filename="good.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+        self.assertFalse(
+            move.activity_ids.filtered(lambda a: a.summary == summary),
+            "Error activity should have been closed after successful validation",
+        )
+
     def test_configurable_date_tolerance(self):
         """Override tolerance to 0 days: date same as payment is ok, +1 day is error."""
         self.env["ir.config_parameter"].set_param(

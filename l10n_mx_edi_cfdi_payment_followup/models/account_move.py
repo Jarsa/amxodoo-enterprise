@@ -68,19 +68,9 @@ class AccountMove(models.Model):
     )
     def _compute_l10n_mx_edi_cfdi_payment_state(self):
         for record in self:
-            # Read the stored state from DB to avoid reading the field being
-            # computed (which would cause circular evaluation issues).
-            self.env.cr.execute(
-                "SELECT l10n_mx_edi_cfdi_payment_state "
-                "FROM account_move WHERE id = %s",
-                [record.id],
-            )
-            row = self.env.cr.fetchone()
-            stored_state = row[0] if row else False
-
-            # Preserve manually-set states that should not be overwritten
-            if stored_state in ("error", "requested"):
-                continue
+            # Eligibility rules first: a record that no longer qualifies must
+            # fall back to "not_required" even if it was previously in
+            # 'error' or 'requested' (e.g. on un-reconcile from a PPD invoice).
 
             # Rule 1: Only process payment-type entries
             if record.move_type != "entry":
@@ -103,6 +93,20 @@ class AccountMove(models.Model):
             )
             if not has_ppd:
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
+                continue
+
+            # Read the stored state from DB to avoid reading the field being
+            # computed (which would cause circular evaluation issues).
+            self.env.cr.execute(
+                "SELECT l10n_mx_edi_cfdi_payment_state "
+                "FROM account_move WHERE id = %s",
+                [record.id],
+            )
+            row = self.env.cr.fetchone()
+            stored_state = row[0] if row else False
+
+            # Preserve manually-set states only when eligibility still holds
+            if stored_state in ("error", "requested"):
                 continue
 
             # Rule 4: A validated complement document exists
@@ -133,10 +137,11 @@ class AccountMove(models.Model):
         for record in self:
             prev_uuid = uuid_before.get(record.id)
             prev_state = state_before.get(record.id)
+            new_state = record.l10n_mx_edi_cfdi_payment_state
             if (
                 prev_uuid
                 and prev_state == "validated"
-                and record.l10n_mx_edi_cfdi_payment_state in ("pending", "not_required")
+                and new_state in ("pending", "not_required")
             ):
                 record.with_context(cfdi_followup_skip_notify=True).message_post(
                     body=_(
@@ -148,6 +153,17 @@ class AccountMove(models.Model):
                     message_type="comment",
                     subtype_xmlid="mail.mt_note",
                 )
+            # Re-reconciliation: when the state transitions into 'pending'
+            # (typically after a reconciliation is applied), reprocess any
+            # XML attachment already present so the state recovers to
+            # 'validated' (or 'error') without manual intervention.
+            if new_state == "pending" and prev_state != "pending":
+                xml_attachments = record.attachment_ids.filtered(
+                    lambda a: (a.name or "").lower().endswith(".xml")
+                    or "xml" in (a.mimetype or "").lower()
+                )
+                for attachment in xml_attachments:
+                    record._process_cfdi_payment_xml(attachment)
         return res
 
     # -------------------------------------------------------------------------
@@ -259,15 +275,32 @@ class AccountMove(models.Model):
             )
         return user
 
+    @api.model
+    def _get_cfdi_error_activity_summary(self):
+        """Return the canonical summary used for CFDI error activities.
+
+        Centralized to keep create/close paths in sync regardless of locale.
+        """
+        return _("CFDI Complement Error")
+
     def _create_cfdi_payment_activity(self, error_message):
         """Create a To-Do activity assigned to the responsible user."""
         responsible_user = self._get_cfdi_responsible_user()
         self.activity_schedule(
             "mail.mail_activity_data_todo",
-            summary=_("CFDI Complement Error"),
+            summary=self._get_cfdi_error_activity_summary(),
             note=error_message,
             user_id=responsible_user.id,
         )
+
+    def _close_cfdi_payment_error_activities(self):
+        """Mark open CFDI error activities on this record as done."""
+        summary = self._get_cfdi_error_activity_summary()
+        activities = self.activity_ids.filtered(lambda a: a.summary == summary)
+        if activities:
+            activities.action_feedback(
+                feedback=_("CFDI payment complement validated successfully.")
+            )
 
     def _process_cfdi_payment_xml(self, attachment):
         """Parse and validate a CFDI payment complement XML attachment.
@@ -300,8 +333,14 @@ class AccountMove(models.Model):
             self._on_cfdi_xml_error(_("UUID not found in XML"))
             return
 
-        # Idempotency: same UUID already validated in an existing document
-        if self.l10n_mx_edi_cfdi_uuid and self.l10n_mx_edi_cfdi_uuid == uuid:
+        # Idempotency: same UUID already processed AND state still 'validated'.
+        # If the state was lost (e.g., un-reconcile + re-reconcile cycle), fall
+        # through so the document and state are recovered automatically.
+        if (
+            self.l10n_mx_edi_cfdi_uuid
+            and self.l10n_mx_edi_cfdi_uuid == uuid
+            and self.l10n_mx_edi_cfdi_payment_state == "validated"
+        ):
             return
 
         # Replacement: different UUID while one already stored
@@ -341,6 +380,9 @@ class AccountMove(models.Model):
         self.with_context(cfdi_followup_skip_notify=True).write(
             {"l10n_mx_edi_cfdi_payment_state": "validated"}
         )
+
+        # Close any prior error activities now that validation succeeded
+        self._close_cfdi_payment_error_activities()
 
         if is_replacement:
             self.message_post(
@@ -478,7 +520,6 @@ class AccountMove(models.Model):
     # -------------------------------------------------------------------------
 
     def _message_post_after_hook(self, new_message, message_values):
-        # EXTENDS account AccountMove
         res = super()._message_post_after_hook(new_message, message_values)
         for attachment in new_message.attachment_ids:
             self._process_cfdi_payment_xml(attachment)

@@ -11,6 +11,15 @@
             ref="account_accountant.view_bank_statement_line_tree_bank_rec_widget"
         />
         <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <header>
+                    <button
+                        name="action_request_cfdi_complement_mass"
+                        type="object"
+                        string="Send CFDI Reminders"
+                    />
+                </header>
+            </xpath>
             <xpath expr="//field[@name='id']" position="before">
                 <field
                     name="l10n_mx_edi_cfdi_payment_state"
@@ -29,8 +38,47 @@
                     type="object"
                     string="Request Complement"
                     icon="fa-envelope-o"
-                    invisible="l10n_mx_edi_cfdi_payment_state not in ('pending', 'error')"
+                    invisible="l10n_mx_edi_cfdi_payment_state not in ('pending', 'requested', 'error')"
                 />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Bank reconciliation kanban view: show CFDI state badge -->
+    <record id="view_bank_statement_line_kanban_cfdi_followup" model="ir.ui.view">
+        <field name="name">
+            account.bank.statement.line.kanban.cfdi.payment.followup
+        </field>
+        <field name="model">account.bank.statement.line</field>
+        <field
+            name="inherit_id"
+            ref="account_accountant.view_bank_statement_line_kanban_bank_rec_widget"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='to_check']" position="after">
+                <field name="l10n_mx_edi_cfdi_payment_state" />
+            </xpath>
+            <xpath expr="//div[@id='row2_col2']/div" position="inside">
+                <span
+                    t-if="record.l10n_mx_edi_cfdi_payment_state.raw_value == 'pending'"
+                    class="badge text-bg-warning fw-normal"
+                    title="CFDI Pending"
+                >CFDI Pending</span>
+                <span
+                    t-if="record.l10n_mx_edi_cfdi_payment_state.raw_value == 'requested'"
+                    class="badge text-bg-info fw-normal"
+                    title="CFDI Requested"
+                >CFDI Requested</span>
+                <span
+                    t-if="record.l10n_mx_edi_cfdi_payment_state.raw_value == 'validated'"
+                    class="badge text-bg-success fw-normal"
+                    title="CFDI Validated"
+                >CFDI <i class="fa fa-check" /></span>
+                <span
+                    t-if="record.l10n_mx_edi_cfdi_payment_state.raw_value == 'error'"
+                    class="badge text-bg-danger fw-normal"
+                    title="CFDI Error"
+                >CFDI Error</span>
             </xpath>
         </field>
     </record>

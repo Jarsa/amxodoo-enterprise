@@ -1,4 +1,5 @@
-from odoo import models
+from odoo import _, models
+from odoo.exceptions import UserError
 
 
 class AccountBankStatementLine(models.Model):
@@ -9,3 +10,27 @@ class AccountBankStatementLine(models.Model):
 
     def action_cfdi_payment_followup(self):
         return self.move_id.action_cfdi_payment_followup()
+
+    def action_request_cfdi_complement_mass(self):
+        targets = self.filtered(
+            lambda r: r.l10n_mx_edi_cfdi_payment_state in ("pending", "requested")
+        )
+        if not targets:
+            raise UserError(
+                _(
+                    "No selected bank statement lines are in 'Pending' or "
+                    "'Requested' state. Mass reminders can only be sent for "
+                    "lines awaiting a CFDI payment complement."
+                )
+            )
+        targets.move_id.action_request_cfdi_complement()
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "type": "success",
+                "message": _("CFDI complement reminders sent for %d payment(s).")
+                % len(targets),
+                "sticky": False,
+            },
+        }
