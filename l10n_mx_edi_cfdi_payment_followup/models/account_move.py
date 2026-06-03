@@ -35,6 +35,33 @@ class AccountMove(models.Model):
         copy=False,
         readonly=True,
     )
+    l10n_mx_edi_cfdi_payment_receipt = fields.Binary(
+        string="Payment Receipt",
+        attachment=True,
+        copy=False,
+        help="Bank transfer receipt (PDF) attached to the complement request "
+        "email sent to the vendor.",
+    )
+    l10n_mx_edi_cfdi_payment_receipt_filename = fields.Char(
+        string="Payment Receipt Filename",
+        copy=False,
+    )
+    l10n_mx_edi_cfdi_is_supplier_payment = fields.Boolean(
+        string="Is Supplier Payment",
+        compute="_compute_l10n_mx_edi_cfdi_is_supplier_payment",
+        store=True,
+        help="Technical flag: True when the payment is reconciled against at "
+        "least one vendor bill/refund. The complement request only applies to "
+        "vendor payments, so the request button is hidden for customer payments.",
+    )
+    l10n_mx_edi_cfdi_payment_manual_ignore = fields.Boolean(
+        string="Ignore CFDI Complement",
+        copy=False,
+        help="When enabled, this payment is treated as Not Required and the "
+        "follow-up is skipped, even if it is reconciled against a PPD vendor "
+        "bill. A received and valid CFDI complement XML still overrides this "
+        "flag. Use the related server actions to set or revert it.",
+    )
 
     # -------------------------------------------------------------------------
     # Compute
@@ -53,6 +80,32 @@ class AccountMove(models.Model):
                 if counterpart.move_id != self:
                     invoices |= counterpart.move_id
         return invoices
+
+    def _get_cfdi_reconciled_invoice_details(self):
+        """Return reconciled invoices with the partial amount applied to each.
+
+        Unlike :meth:`_get_cfdi_reconciled_invoices`, this accumulates the
+        reconciled amount per invoice so the request email shows the value the
+        payment actually applied (a partial amount when the invoice is only
+        partially paid), not the invoice total.
+
+        :return: list of dicts ``{"invoice": move, "amount": applied_amount}``
+        """
+        details = {}
+        for line in self.line_ids:
+            for partial in line.matched_debit_ids | line.matched_credit_ids:
+                if partial.credit_move_id == line:
+                    counterpart = partial.debit_move_id
+                    amount = partial.debit_amount_currency
+                else:
+                    counterpart = partial.credit_move_id
+                    amount = partial.credit_amount_currency
+                invoice = counterpart.move_id
+                if invoice == self:
+                    continue
+                details.setdefault(invoice, 0.0)
+                details[invoice] += amount
+        return [{"invoice": inv, "amount": amount} for inv, amount in details.items()]
 
     def _get_cfdi_payment_start_date(self):
         """Return the configured start date for the current company (or False)."""
@@ -85,6 +138,7 @@ class AccountMove(models.Model):
         "line_ids.matched_debit_ids",
         "line_ids.matched_credit_ids",
         "l10n_mx_edi_payment_document_ids.state",
+        "l10n_mx_edi_cfdi_payment_manual_ignore",
         "attachment_ids",
     )
     def _compute_l10n_mx_edi_cfdi_payment_state(self):
@@ -118,6 +172,20 @@ class AccountMove(models.Model):
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
                 continue
 
+            # A validated complement document always wins, even over a manual
+            # ignore (a received and valid XML must never be discarded).
+            has_sent_document = any(
+                doc.state == "payment_sent"
+                for doc in record.l10n_mx_edi_payment_document_ids
+            )
+
+            # Manual ignore: user explicitly marked this payment as not
+            # requiring a complement. Respect it (reversible via server action)
+            # unless a validated complement document exists.
+            if record.l10n_mx_edi_cfdi_payment_manual_ignore and not has_sent_document:
+                record.l10n_mx_edi_cfdi_payment_state = "not_required"
+                continue
+
             # Read the stored state from DB to avoid reading the field being
             # computed (which would cause circular evaluation issues).
             self.env.cr.execute(
@@ -133,16 +201,24 @@ class AccountMove(models.Model):
                 continue
 
             # Rule 4: A validated complement document exists
-            has_sent_document = any(
-                doc.state == "payment_sent"
-                for doc in record.l10n_mx_edi_payment_document_ids
-            )
             if has_sent_document:
                 record.l10n_mx_edi_cfdi_payment_state = "validated"
                 continue
 
             # Default: pending
             record.l10n_mx_edi_cfdi_payment_state = "pending"
+
+    @api.depends(
+        "line_ids.matched_debit_ids",
+        "line_ids.matched_credit_ids",
+    )
+    def _compute_l10n_mx_edi_cfdi_is_supplier_payment(self):
+        for record in self:
+            reconciled_invoices = record._get_cfdi_reconciled_invoices()
+            record.l10n_mx_edi_cfdi_is_supplier_payment = any(
+                inv.move_type in ("in_invoice", "in_refund")
+                for inv in reconciled_invoices
+            )
 
     # -------------------------------------------------------------------------
     # Write override — detect un-reconcile with existing UUID
@@ -235,10 +311,27 @@ class AccountMove(models.Model):
                 raise_if_not_found=False,
             )
             if template:
+                email_values = {"email_to": recipient_email}
+                # Attach only the bank transfer receipt (uploaded in the
+                # dedicated field), not arbitrary chatter attachments.
+                if record.l10n_mx_edi_cfdi_payment_receipt:
+                    receipt_attachment = self.env["ir.attachment"].create(
+                        {
+                            "name": (
+                                record.l10n_mx_edi_cfdi_payment_receipt_filename
+                                or _("Payment Receipt.pdf")
+                            ),
+                            "datas": record.l10n_mx_edi_cfdi_payment_receipt,
+                            "mimetype": "application/pdf",
+                        }
+                    )
+                    email_values["attachment_ids"] = [
+                        Command.set(receipt_attachment.ids)
+                    ]
                 template.send_mail(
                     record.id,
                     force_send=False,
-                    email_values={"email_to": recipient_email},
+                    email_values=email_values,
                 )
 
             # Update state
@@ -252,6 +345,36 @@ class AccountMove(models.Model):
             )
             record.message_post(
                 body=_("Complement request email sent to %s.") % recipient_email,
+                message_type="comment",
+                subtype_xmlid="mail.mt_note",
+            )
+
+    def action_cfdi_ignore(self):
+        """Mark the payment as Not Required (ignore the complement follow-up).
+
+        Reversible via :meth:`action_cfdi_unignore`. A validated complement
+        document still overrides this flag in the state computation.
+        """
+        for record in self:
+            if record.l10n_mx_edi_cfdi_payment_manual_ignore:
+                continue
+            record.l10n_mx_edi_cfdi_payment_manual_ignore = True
+            record.message_post(
+                body=_("CFDI payment complement marked as Not Required (ignored)."),
+                message_type="comment",
+                subtype_xmlid="mail.mt_note",
+            )
+
+    def action_cfdi_unignore(self):
+        """Revert the manual ignore so the follow-up state is recomputed."""
+        for record in self:
+            if not record.l10n_mx_edi_cfdi_payment_manual_ignore:
+                continue
+            record.l10n_mx_edi_cfdi_payment_manual_ignore = False
+            record.message_post(
+                body=_(
+                    "CFDI payment complement follow-up re-enabled " "(ignore reverted)."
+                ),
                 message_type="comment",
                 subtype_xmlid="mail.mt_note",
             )
@@ -284,19 +407,19 @@ class AccountMove(models.Model):
     # XML processing
     # -------------------------------------------------------------------------
 
-    def _get_cfdi_responsible_user(self):
-        """Return the configured responsible user for CFDI follow-up."""
-        user = self.company_id.l10n_mx_edi_cfdi_responsible_user_id
-        if not user:
+    def _get_cfdi_responsible_team(self):
+        """Return the configured responsible team for CFDI follow-up."""
+        team = self.company_id.l10n_mx_edi_cfdi_responsible_team_id
+        if not team:
             raise UserError(
                 _(
-                    "CFDI responsible user is not configured for company %s. "
+                    "CFDI responsible team is not configured for company %s. "
                     "Please go to Accounting > Settings and set the "
-                    "CFDI Follow-up Responsible User."
+                    "CFDI Follow-up Responsible Team."
                 )
                 % self.company_id.name
             )
-        return user
+        return team
 
     @api.model
     def _get_cfdi_error_activity_summary(self):
@@ -307,13 +430,16 @@ class AccountMove(models.Model):
         return _("CFDI Complement Error")
 
     def _create_cfdi_payment_activity(self, error_message):
-        """Create a To-Do activity assigned to the responsible user."""
-        responsible_user = self._get_cfdi_responsible_user()
-        self.activity_schedule(
-            "mail.mail_activity_data_todo",
+        """Create a follow-up activity for the configured responsible team.
+
+        Uses this module's dedicated activity type; the ``mail_activity_team``
+        mixin assigns the team (and its members) automatically.
+        """
+        team = self._get_cfdi_responsible_team()
+        self.with_context(force_activity_team=team).activity_schedule(
+            "l10n_mx_edi_cfdi_payment_followup.mail_activity_type_cfdi_complement",
             summary=self._get_cfdi_error_activity_summary(),
             note=error_message,
-            user_id=responsible_user.id,
         )
 
     def _close_cfdi_payment_error_activities(self):
@@ -399,9 +525,15 @@ class AccountMove(models.Model):
         self.env["l10n_mx_edi.document"]._create_update_payment_document(
             self, document_values
         )
-        # Explicitly set state (guard would block auto-compute for 'requested' state)
+        # Explicitly set state (guard would block auto-compute for 'requested'
+        # state). Also clear any manual ignore: a received and valid CFDI
+        # complement must never be discarded just because the payment was
+        # marked Not Required (ignored) beforehand.
         self.with_context(cfdi_followup_skip_notify=True).write(
-            {"l10n_mx_edi_cfdi_payment_state": "validated"}
+            {
+                "l10n_mx_edi_cfdi_payment_state": "validated",
+                "l10n_mx_edi_cfdi_payment_manual_ignore": False,
+            }
         )
 
         # Close any prior error activities now that validation succeeded

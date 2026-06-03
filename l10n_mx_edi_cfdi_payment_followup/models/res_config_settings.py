@@ -9,9 +9,9 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.l10n_mx_edi_cfdi_payment_start_date",
         readonly=False,
     )
-    l10n_mx_edi_cfdi_responsible_user_id = fields.Many2one(
-        comodel_name="res.users",
-        string="CFDI Follow-up Responsible User",
-        related="company_id.l10n_mx_edi_cfdi_responsible_user_id",
+    l10n_mx_edi_cfdi_responsible_team_id = fields.Many2one(
+        comodel_name="mail.activity.team",
+        string="CFDI Follow-up Responsible Team",
+        related="company_id.l10n_mx_edi_cfdi_responsible_team_id",
         readonly=False,
     )

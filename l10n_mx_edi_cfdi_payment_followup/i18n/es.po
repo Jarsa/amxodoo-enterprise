@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-15 22:03+0000\n"
+"POT-Creation-Date: 2026-06-03 20:35+0000\n"
 "PO-Revision-Date: 2026-05-15 22:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -50,14 +50,26 @@ msgid ""
 "                    </tr>\n"
 "                </table>\n"
 "                <p><strong>Related Invoices:</strong></p>\n"
-"                <ul>\n"
-"                    <t t-foreach=\"object._get_cfdi_reconciled_invoices()\" t-as=\"invoice\">\n"
-"                        <li>\n"
-"                            <t t-out=\"invoice.name or ''\"></t>\n"
-"                            — <t t-out=\"format_amount(invoice.amount_total, invoice.currency_id) or ''\"></t>\n"
-"                        </li>\n"
+"                <table style=\"border-collapse: collapse; width: 100%; margin-bottom: 16px;\">\n"
+"                    <tr style=\"background-color: #f5f5f5;\">\n"
+"                        <th style=\"border: 1px solid #ddd; padding: 8px; text-align: left;\">Invoice</th>\n"
+"                        <th style=\"border: 1px solid #ddd; padding: 8px; text-align: left;\">Vendor Reference</th>\n"
+"                        <th style=\"border: 1px solid #ddd; padding: 8px; text-align: left;\">Applied Amount</th>\n"
+"                    </tr>\n"
+"                    <t t-foreach=\"object._get_cfdi_reconciled_invoice_details()\" t-as=\"detail\">\n"
+"                        <tr>\n"
+"                            <td style=\"border: 1px solid #ddd; padding: 8px;\">\n"
+"                                <t t-out=\"detail['invoice'].name or ''\"></t>\n"
+"                            </td>\n"
+"                            <td style=\"border: 1px solid #ddd; padding: 8px;\">\n"
+"                                <t t-out=\"detail['invoice'].ref or ''\"></t>\n"
+"                            </td>\n"
+"                            <td style=\"border: 1px solid #ddd; padding: 8px;\">\n"
+"                                <t t-out=\"format_amount(detail['amount'], detail['invoice'].currency_id) or ''\"></t>\n"
+"                            </td>\n"
+"                        </tr>\n"
 "                    </t>\n"
-"                </ul>\n"
+"                </table>\n"
 "                <p>\n"
 "                    Please send the corresponding CFDI XML file at your earliest convenience.\n"
 "                </p>\n"
@@ -99,14 +111,26 @@ msgstr ""
 "                    </tr>\n"
 "                </table>\n"
 "                <p><strong>Facturas Relacionadas:</strong></p>\n"
-"                <ul>\n"
-"                    <t t-foreach=\"object._get_cfdi_reconciled_invoices()\" t-as=\"invoice\">\n"
-"                        <li>\n"
-"                            <t t-out=\"invoice.name or ''\"></t>\n"
-"                            — <t t-out=\"format_amount(invoice.amount_total, invoice.currency_id) or ''\"></t>\n"
-"                        </li>\n"
+"                <table style=\"border-collapse: collapse; width: 100%; margin-bottom: 16px;\">\n"
+"                    <tr style=\"background-color: #f5f5f5;\">\n"
+"                        <th style=\"border: 1px solid #ddd; padding: 8px; text-align: left;\">Factura</th>\n"
+"                        <th style=\"border: 1px solid #ddd; padding: 8px; text-align: left;\">Referencia del Proveedor</th>\n"
+"                        <th style=\"border: 1px solid #ddd; padding: 8px; text-align: left;\">Importe Aplicado</th>\n"
+"                    </tr>\n"
+"                    <t t-foreach=\"object._get_cfdi_reconciled_invoice_details()\" t-as=\"detail\">\n"
+"                        <tr>\n"
+"                            <td style=\"border: 1px solid #ddd; padding: 8px;\">\n"
+"                                <t t-out=\"detail['invoice'].name or ''\"></t>\n"
+"                            </td>\n"
+"                            <td style=\"border: 1px solid #ddd; padding: 8px;\">\n"
+"                                <t t-out=\"detail['invoice'].ref or ''\"></t>\n"
+"                            </td>\n"
+"                            <td style=\"border: 1px solid #ddd; padding: 8px;\">\n"
+"                                <t t-out=\"format_amount(detail['amount'], detail['invoice'].currency_id) or ''\"></t>\n"
+"                            </td>\n"
+"                        </tr>\n"
 "                    </t>\n"
-"                </ul>\n"
+"                </table>\n"
 "                <p>\n"
 "                    Por favor, envíe el archivo XML del CFDI correspondiente a la brevedad posible.\n"
 "                </p>\n"
@@ -131,6 +155,12 @@ msgstr ""
 "UUID nuevo: %(new)s"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_res_company__l10n_mx_edi_cfdi_responsible_team_id
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_res_config_settings__l10n_mx_edi_cfdi_responsible_team_id
+msgid "Activity team that receives the CFDI complement follow-up activities (errors, replacements). Its members pick up the activities."
+msgstr "Equipo de actividad que recibe las actividades de seguimiento de complementos de pago CFDI (errores, reemplazos). Sus miembros atienden las actividades."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
@@ -148,6 +178,13 @@ msgid "Bank Statement Line"
 msgstr "Línea de Estado de Cuenta Bancario"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_payment_receipt
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_payment_receipt
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_payment_receipt
+msgid "Bank transfer receipt (PDF) attached to the complement request email sent to the vendor."
+msgstr "Comprobante de la transferencia bancaria (PDF) que se anexa al correo de solicitud de complemento enviado al proveedor."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_kanban_cfdi_followup
 msgid "CFDI <i class=\"fa fa-check\"/>"
 msgstr "CFDI <i class=\"fa fa-check\"/>"
@@ -155,6 +192,7 @@ msgstr "CFDI <i class=\"fa fa-check\"/>"
 #. module: l10n_mx_edi_cfdi_payment_followup
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#: model:mail.activity.type,summary:l10n_mx_edi_cfdi_payment_followup.mail_activity_type_cfdi_complement
 #, python-format
 msgid "CFDI Complement Error"
 msgstr "Error en Complemento de Pago CFDI"
@@ -166,15 +204,20 @@ msgid "CFDI Error"
 msgstr "CFDI con Error"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
-#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_res_company__l10n_mx_edi_cfdi_responsible_user_id
-#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_res_config_settings__l10n_mx_edi_cfdi_responsible_user_id
-msgid "CFDI Follow-up Responsible User"
-msgstr "Usuario Responsable del Seguimiento CFDI"
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_res_company__l10n_mx_edi_cfdi_responsible_team_id
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_res_config_settings__l10n_mx_edi_cfdi_responsible_team_id
+msgid "CFDI Follow-up Responsible Team"
+msgstr "Equipo Responsable del Seguimiento CFDI"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_search_cfdi_followup
 msgid "CFDI Not Required"
 msgstr "CFDI No Requerido"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:mail.activity.type,name:l10n_mx_edi_cfdi_payment_followup.mail_activity_type_cfdi_complement
+msgid "CFDI Payment Complement"
+msgstr "Complemento de Pago CFDI"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.ir_cron_cfdi_payment_followup_ir_actions_server
@@ -186,6 +229,11 @@ msgstr "Seguimiento de Complementos de Pago CFDI"
 #: model:mail.template,name:l10n_mx_edi_cfdi_payment_followup.mail_template_cfdi_complement_request
 msgid "CFDI Payment Complement Request"
 msgstr "Solicitud de Complemento de Pago CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:mail.activity.team,name:l10n_mx_edi_cfdi_payment_followup.mail_activity_team_cfdi
+msgid "CFDI Payment Complement Team"
+msgstr "Equipo de Complemento de Pago CFDI"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model:res.groups,name:l10n_mx_edi_cfdi_payment_followup.group_cfdi_payment_followup
@@ -239,6 +287,20 @@ msgstr "Recordatorios de complemento CFDI enviados para %d pago(s)."
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
+msgid "CFDI payment complement follow-up re-enabled (ignore reverted)."
+msgstr "Seguimiento de complemento de pago CFDI reactivado (ignorar revertido)."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#. odoo-python
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "CFDI payment complement marked as Not Required (ignored)."
+msgstr "Complemento de pago CFDI marcado como No Requerido (ignorado)."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#. odoo-python
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
 msgid "CFDI payment complement validated successfully."
 msgstr "Complemento de pago CFDI validado exitosamente."
 
@@ -264,13 +326,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
-msgid ""
-"CFDI responsible user is not configured for company %s. Please go to "
-"Accounting > Settings and set the CFDI Follow-up Responsible User."
-msgstr ""
-"El usuario responsable del CFDI no está configurado para la compañía %s. Por"
-" favor, vaya a Contabilidad > Configuración y establezca el Usuario "
-"Responsable del Seguimiento CFDI."
+msgid "CFDI responsible team is not configured for company %s. Please go to Accounting > Settings and set the CFDI Follow-up Responsible Team."
+msgstr "El equipo responsable del CFDI no está configurado para la compañía %s. Por favor, vaya a Contabilidad > Configuración y establezca el Equipo Responsable del Seguimiento CFDI."
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model:ir.model,name:l10n_mx_edi_cfdi_payment_followup.model_res_company
@@ -281,12 +338,8 @@ msgstr "Compañías"
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
-msgid ""
-"Complement date %(fecha)s exceeds payment date %(date)s by more than "
-"%(days)d day(s)"
-msgstr ""
-"La fecha del complemento %(fecha)s excede la fecha de pago %(date)s por más "
-"de %(days)d día(s)"
+msgid "Complement date %(fecha)s exceeds payment date %(date)s by more than %(days)d day(s)"
+msgstr "La fecha del complemento %(fecha)s excede la fecha de pago %(date)s por más de %(days)d día(s)"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #. odoo-python
@@ -318,6 +371,15 @@ msgid "Error"
 msgstr "Error"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_ignore_payment
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_ignore_statement_line
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_payment_manual_ignore
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_payment_manual_ignore
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_payment_manual_ignore
+msgid "Ignore CFDI Complement"
+msgstr "Ignorar Complemento CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
@@ -330,6 +392,13 @@ msgstr "Formato de FechaPago inválido: %(fecha)s"
 #, python-format
 msgid "Invoice UUID %(uuid)s not found in reconciled invoices"
 msgstr "El UUID de factura %(uuid)s no se encontró entre las facturas conciliadas"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_is_supplier_payment
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_is_supplier_payment
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_is_supplier_payment
+msgid "Is Supplier Payment"
+msgstr "Es Pago a Proveedor"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model:ir.model,name:l10n_mx_edi_cfdi_payment_followup.model_account_move
@@ -354,25 +423,15 @@ msgstr "No se encontró el nodo Pago"
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
-msgid ""
-"No email address found for partner %s. Please configure a contact with the "
-"'cfdi_complement_contact' tag or a main email."
-msgstr ""
-"No se encontró una dirección de correo para el contacto %s. Por favor, "
-"configure un contacto con la etiqueta 'cfdi_complement_contact' o un correo "
-"principal."
+msgid "No email address found for partner %s. Please configure a contact with the 'cfdi_complement_contact' tag or a main email."
+msgstr "No se encontró una dirección de correo para el contacto %s. Por favor, configure un contacto con la etiqueta 'cfdi_complement_contact' o un correo principal."
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_bank_statement_line.py:0
 #, python-format
-msgid ""
-"No selected bank statement lines are in 'Pending' or 'Requested' state. Mass"
-" reminders can only be sent for lines awaiting a CFDI payment complement."
-msgstr ""
-"Ninguna de las líneas de estado de cuenta bancario seleccionadas está en "
-"estado 'Pendiente' o 'Solicitado'. Los recordatorios masivos sólo pueden "
-"enviarse para líneas que esperan un complemento de pago CFDI."
+msgid "No selected bank statement lines are in 'Pending' or 'Requested' state. Mass reminders can only be sent for lines awaiting a CFDI payment complement."
+msgstr "Ninguna de las líneas de estado de cuenta bancario seleccionadas está en estado 'Pendiente' o 'Solicitado'. Los recordatorios masivos sólo pueden enviarse para líneas que esperan un complemento de pago CFDI."
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model:ir.model.fields.selection,name:l10n_mx_edi_cfdi_payment_followup.selection__account_move__l10n_mx_edi_cfdi_payment_state__not_required
@@ -390,6 +449,27 @@ msgstr "El saldo insoluto no es cero para la factura %(uuid)s: %(saldo)s"
 #: model:mail.template,subject:l10n_mx_edi_cfdi_payment_followup.mail_template_cfdi_complement_request
 msgid "Payment Complement Request — {{ object.name }}"
 msgstr "Solicitud de Complemento de Pago — {{ object.name }}"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_payment_receipt
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_payment_receipt
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_payment_receipt
+msgid "Payment Receipt"
+msgstr "Comprobante de Pago"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_payment_receipt_filename
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_payment_receipt_filename
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_payment_receipt_filename
+msgid "Payment Receipt Filename"
+msgstr "Nombre del Comprobante de Pago"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#. odoo-python
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "Payment Receipt.pdf"
+msgstr "Comprobante de Pago.pdf"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #. odoo-python
@@ -417,13 +497,8 @@ msgstr "Recibido"
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
-msgid ""
-"Replacement CFDI payment complement received. Previous UUID: %(prev)s — New "
-"UUID: %(new)s. Please verify the fiscal status of both documents."
-msgstr ""
-"Se recibió un complemento de pago CFDI de reemplazo. UUID anterior: "
-"%(prev)s — UUID nuevo: %(new)s. Por favor, verifique el estado fiscal de "
-"ambos documentos."
+msgid "Replacement CFDI payment complement received. Previous UUID: %(prev)s — New UUID: %(new)s. Please verify the fiscal status of both documents."
+msgstr "Se recibió un complemento de pago CFDI de reemplazo. UUID anterior: %(prev)s — UUID nuevo: %(new)s. Por favor, verifique el estado fiscal de ambos documentos."
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_account_payment_form_cfdi_followup
@@ -437,9 +512,22 @@ msgid "Requested"
 msgstr "Solicitado"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_unignore_payment
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_unignore_statement_line
+msgid "Revert CFDI Complement Ignore"
+msgstr "Revertir Ignorar Complemento CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_tree_cfdi_followup
 msgid "Send CFDI Reminders"
 msgstr "Enviar Recordatorios CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_is_supplier_payment
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_is_supplier_payment
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_is_supplier_payment
+msgid "Technical flag: True when the payment is reconciled against at least one vendor bill/refund. The complement request only applies to vendor payments, so the request button is hidden for customer payments."
+msgstr "Indicador técnico: Verdadero cuando el pago está conciliado contra al menos una factura/nota de crédito de proveedor. La solicitud de complemento solo aplica a pagos a proveedor, por lo que el botón de solicitud se oculta en los pagos de clientes."
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #. odoo-python
@@ -457,11 +545,12 @@ msgstr "Validado"
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
-msgid ""
-"Warning: This payment was un-reconciled from a PPD invoice but a validated "
-"CFDI payment complement already existed (UUID: %s). Please review the fiscal"
-" situation."
-msgstr ""
-"Advertencia: Este pago fue des-conciliado de una factura PPD pero ya existía"
-" un complemento de pago CFDI validado (UUID: %s). Por favor, revise la "
-"situación fiscal."
+msgid "Warning: This payment was un-reconciled from a PPD invoice but a validated CFDI payment complement already existed (UUID: %s). Please review the fiscal situation."
+msgstr "Advertencia: Este pago fue des-conciliado de una factura PPD pero ya existía un complemento de pago CFDI validado (UUID: %s). Por favor, revise la situación fiscal."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_payment_manual_ignore
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_payment_manual_ignore
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_payment_manual_ignore
+msgid "When enabled, this payment is treated as Not Required and the follow-up is skipped, even if it is reconciled against a PPD vendor bill. A received and valid CFDI complement XML still overrides this flag. Use the related server actions to set or revert it."
+msgstr "Cuando se activa, este pago se trata como No Requerido y se omite el seguimiento, aunque esté conciliado contra una factura de proveedor PPD. Un XML de complemento de pago CFDI recibido y válido aún tiene prioridad sobre este indicador. Use las acciones de servidor relacionadas para activarlo o revertirlo."

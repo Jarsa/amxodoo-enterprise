@@ -22,6 +22,10 @@
             </xpath>
             <xpath expr="//field[@name='id']" position="before">
                 <field
+                    name="l10n_mx_edi_cfdi_is_supplier_payment"
+                    column_invisible="1"
+                />
+                <field
                     name="l10n_mx_edi_cfdi_payment_state"
                     optional="show"
                     widget="badge"
@@ -38,7 +42,7 @@
                     type="object"
                     string="Request Complement"
                     icon="fa-envelope-o"
-                    invisible="l10n_mx_edi_cfdi_payment_state not in ('pending', 'requested', 'error')"
+                    invisible="not l10n_mx_edi_cfdi_is_supplier_payment or l10n_mx_edi_cfdi_payment_state not in ('pending', 'requested', 'error')"
                 />
             </xpath>
         </field>

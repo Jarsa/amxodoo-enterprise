@@ -2,7 +2,7 @@ from datetime import date
 
 from lxml import etree
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.tests.common import TransactionCase
 
 
@@ -186,9 +186,18 @@ class TestCfdiPaymentFollowupCommon(TransactionCase):
 
         # ---- Settings -------------------------------------------------------
         cls.responsible_user = cls.env.ref("base.user_admin")
+        cls.responsible_team = cls.env["mail.activity.team"].create(
+            {
+                "name": "CFDI Test Team",
+                "member_ids": [Command.set(cls.responsible_user.ids)],
+                "res_model_ids": [
+                    Command.link(cls.env.ref("account.model_account_move").id)
+                ],
+            }
+        )
         cls.company_mx.write(
             {
-                "l10n_mx_edi_cfdi_responsible_user_id": cls.responsible_user.id,
+                "l10n_mx_edi_cfdi_responsible_team_id": cls.responsible_team.id,
                 "l10n_mx_edi_cfdi_payment_start_date": "2020-01-01",
             }
         )

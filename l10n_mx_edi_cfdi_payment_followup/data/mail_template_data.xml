@@ -5,6 +5,7 @@
         <field name="model_id" ref="account.model_account_move" />
         <field name="subject">Payment Complement Request — {{ object.name }}</field>
         <field name="email_to">{{ object.partner_id.email }}</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
         <field name="auto_delete" eval="False" />
         <field name="body_html" type="html">
             <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
@@ -50,19 +51,39 @@
                     </tr>
                 </table>
                 <p><strong>Related Invoices:</strong></p>
-                <ul>
+                <table
+                    style="border-collapse: collapse; width: 100%; margin-bottom: 16px;"
+                >
+                    <tr style="background-color: #f5f5f5;">
+                        <th
+                            style="border: 1px solid #ddd; padding: 8px; text-align: left;"
+                        >Invoice</th>
+                        <th
+                            style="border: 1px solid #ddd; padding: 8px; text-align: left;"
+                        >Vendor Reference</th>
+                        <th
+                            style="border: 1px solid #ddd; padding: 8px; text-align: left;"
+                        >Applied Amount</th>
+                    </tr>
                     <t
-                        t-foreach="object._get_cfdi_reconciled_invoices()"
-                        t-as="invoice"
+                        t-foreach="object._get_cfdi_reconciled_invoice_details()"
+                        t-as="detail"
                     >
-                        <li>
-                            <t t-out="invoice.name or ''" />
-                            — <t
-                                t-out="format_amount(invoice.amount_total, invoice.currency_id) or ''"
-                            />
-                        </li>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">
+                                <t t-out="detail['invoice'].name or ''" />
+                            </td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">
+                                <t t-out="detail['invoice'].ref or ''" />
+                            </td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">
+                                <t
+                                    t-out="format_amount(detail['amount'], detail['invoice'].currency_id) or ''"
+                                />
+                            </td>
+                        </tr>
                     </t>
-                </ul>
+                </table>
                 <p>
                     Please send the corresponding CFDI XML file at your earliest convenience.
                 </p>

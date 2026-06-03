@@ -7,9 +7,11 @@ class ResCompany(models.Model):
     l10n_mx_edi_cfdi_payment_start_date = fields.Date(
         string="CFDI Payment Follow-up Start Date",
     )
-    l10n_mx_edi_cfdi_responsible_user_id = fields.Many2one(
-        comodel_name="res.users",
-        string="CFDI Follow-up Responsible User",
+    l10n_mx_edi_cfdi_responsible_team_id = fields.Many2one(
+        comodel_name="mail.activity.team",
+        string="CFDI Follow-up Responsible Team",
+        help="Activity team that receives the CFDI complement follow-up "
+        "activities (errors, replacements). Its members pick up the activities.",
     )
 
     def write(self, vals):

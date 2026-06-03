@@ -1,0 +1,3 @@
+- [Jarsa](https://www.jarsa.com):
+  - Alan Ramos (<alan.ramos@jarsa.com>)
+- Odoo Mexican Association (AMOdoo)

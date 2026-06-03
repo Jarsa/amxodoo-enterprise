@@ -142,7 +142,7 @@ class TestFollowupButton(TestCfdiPaymentFollowupCommon):
         self.assertTrue(activities[0].summary)
 
     def test_activity_assigned_to_responsible(self):
-        """Activity is assigned to the configured responsible user."""
+        """Activity is assigned to the configured responsible team."""
         xml = self._build_cfdi_xml(
             payment_uuid="PAY-UUID-ERR-0002",
             payment_date=fields.Date.today(),
@@ -153,7 +153,14 @@ class TestFollowupButton(TestCfdiPaymentFollowupCommon):
         self._attach_xml(self.payment.move_id, xml)
         activities = self.payment.move_id.activity_ids
         self.assertTrue(activities)
-        self.assertEqual(activities[0].user_id, self.responsible_user)
+        self.assertEqual(activities[0].team_id, self.responsible_team)
+        self.assertEqual(
+            activities[0].activity_type_id,
+            self.env.ref(
+                "l10n_mx_edi_cfdi_payment_followup."
+                "mail_activity_type_cfdi_complement"
+            ),
+        )
 
     def test_pre_init_hook_initializes_state_without_compute(self):
         """pre_init_hook pre-fills the column with 'not_required' so Odoo does

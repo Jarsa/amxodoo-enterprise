@@ -21,10 +21,10 @@
                     </div>
                     <div class="row">
                         <label
-                            for="l10n_mx_edi_cfdi_responsible_user_id"
+                            for="l10n_mx_edi_cfdi_responsible_team_id"
                             class="col-lg-3 o_light_label"
                         />
-                        <field name="l10n_mx_edi_cfdi_responsible_user_id" />
+                        <field name="l10n_mx_edi_cfdi_responsible_team_id" />
                     </div>
                 </setting>
             </xpath>
