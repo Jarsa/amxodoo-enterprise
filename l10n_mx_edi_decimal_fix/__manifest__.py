@@ -1,8 +1,8 @@
 {
     "name": "MX EDI Decimal Fix",
-    "version": "17.0.1.0.8",
+    "version": "17.0.1.0.9",
     "summary": "Fix EDI Documents when decimal precision of currency is greater than 2",
-    "author": "Jarsa",
+    "author": "Jarsa, Odoo Mexican Association (AMOdoo)",
     "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "category": "Localization/Mexico",
