@@ -44,8 +44,8 @@
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">Amount</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">
-                            <t
-                                t-out="format_amount(object.amount_total, object.currency_id) or ''"
+                            $<t t-out="'{:,.2f}'.format(abs(object.amount_total))" /> <t
+                                t-out="object.currency_id.name or ''"
                             />
                         </td>
                     </tr>
@@ -77,15 +77,19 @@
                                 <t t-out="detail['invoice'].ref or ''" />
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px;">
-                                <t
-                                    t-out="format_amount(detail['amount'], detail['invoice'].currency_id) or ''"
+                                $<t
+                                    t-out="'{:,.2f}'.format(abs(detail['amount']))"
+                                /> <t
+                                    t-out="detail['invoice'].currency_id.name or ''"
                                 />
                             </td>
                         </tr>
                     </t>
                 </table>
                 <p>
-                    Please send the corresponding CFDI XML file at your earliest convenience.
+                    Please send your Payment Complement, XML and PDF files, at your earliest convenience, either by replying to this email and attaching them, or by sending them to <t
+                        t-out="', '.join(object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids.mapped('email'))"
+                    />
                 </p>
                 <p>
                     Thank you,<br />

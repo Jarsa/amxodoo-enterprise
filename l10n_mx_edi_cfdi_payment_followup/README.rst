@@ -94,6 +94,9 @@ To configure this module you need to:
    - **CFDI Follow-up Responsible Team** — the activity team whose
      members receive the follow-up activities (validation errors,
      replacements).
+   - **CFDI Payment Request CC Users** — (optional) select internal
+     users whose emails will be included in the request email body to
+     ask the vendor to CC them.
 
 2. Define the responsible team and its members. Activate the developer
    mode and go to *Settings / Technical / Email / Activity Teams*. The
@@ -143,12 +146,13 @@ Requesting the complement
 1. Open a vendor payment (or a bank reconciliation line) in *Pending*,
    *Requested* or *Error* state.
 2. (Optional) Upload the bank transfer voucher in the **Payment
-   Receipt** field so it is attached to the email.
-3. Press **Request Complement**. An email is sent to the vendor contact,
-   in the partner's language, listing each related invoice with its
-   vendor reference and the partial amount applied; the state moves to
-   *Requested*. From the bank reconciliation list you can use **Send
-   CFDI Reminders** to do this in batch.
+   Receipt** field (available in both the payment form and the bank
+   reconciliation view) so it is attached to the email.
+3. Press **Request Complement** (or **Request Complements** for batch
+   processing from the bank reconciliation header). An email is sent to
+   the vendor contact, in the partner's language, listing each related
+   invoice with its currency and vendor reference and the partial amount
+   applied; the state moves to *Requested*.
 
 The button is only visible for **vendor** payments (those reconciled
 against a vendor bill or refund); it is hidden for customer collections.

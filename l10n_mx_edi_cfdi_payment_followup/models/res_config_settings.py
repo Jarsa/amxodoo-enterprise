@@ -15,3 +15,8 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.l10n_mx_edi_cfdi_responsible_team_id",
         readonly=False,
     )
+    l10n_mx_edi_cfdi_payment_cc_user_ids = fields.Many2many(
+        comodel_name="res.users",
+        related="company_id.l10n_mx_edi_cfdi_payment_cc_user_ids",
+        readonly=False,
+    )

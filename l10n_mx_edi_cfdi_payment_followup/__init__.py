@@ -22,3 +22,16 @@ def pre_init_hook(env):
         WHERE l10n_mx_edi_cfdi_payment_state IS NULL
         """
     )
+    env.cr.execute(
+        """
+        ALTER TABLE account_move
+        ADD COLUMN IF NOT EXISTS l10n_mx_edi_cfdi_is_supplier_payment BOOLEAN
+        """
+    )
+    env.cr.execute(
+        """
+        UPDATE account_move
+        SET l10n_mx_edi_cfdi_is_supplier_payment = false
+        WHERE l10n_mx_edi_cfdi_is_supplier_payment IS NULL
+        """
+    )

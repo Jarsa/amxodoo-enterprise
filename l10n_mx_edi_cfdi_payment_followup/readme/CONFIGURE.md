@@ -8,6 +8,8 @@ To configure this module you need to:
       installing the module on a database with years of history is fast.
     - **CFDI Follow-up Responsible Team** — the activity team whose members
       receive the follow-up activities (validation errors, replacements).
+    - **CFDI Payment Request CC Users** — (optional) select internal users whose
+      emails will be included in the request email body to ask the vendor to CC them.
 
 2.  Define the responsible team and its members. Activate the developer mode
     and go to *Settings / Technical / Email / Activity Teams*. The module ships

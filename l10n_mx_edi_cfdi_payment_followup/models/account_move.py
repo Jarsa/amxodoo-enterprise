@@ -130,6 +130,9 @@ class AccountMove(models.Model):
             self.env.add_to_compute(
                 self._fields["l10n_mx_edi_cfdi_payment_state"], moves
             )
+            self.env.add_to_compute(
+                self._fields["l10n_mx_edi_cfdi_is_supplier_payment"], moves
+            )
 
     @api.depends(
         "payment_state",
@@ -198,6 +201,7 @@ class AccountMove(models.Model):
 
             # Preserve manually-set states only when eligibility still holds
             if stored_state in ("error", "requested"):
+                record.l10n_mx_edi_cfdi_payment_state = stored_state
                 continue
 
             # Rule 4: A validated complement document exists

@@ -16,7 +16,7 @@
                     <button
                         name="action_request_cfdi_complement_mass"
                         type="object"
-                        string="Send CFDI Reminders"
+                        string="Request Complements"
                     />
                 </header>
             </xpath>
@@ -30,19 +30,32 @@
                     optional="show"
                     widget="badge"
                     decoration-success="l10n_mx_edi_cfdi_payment_state == 'validated'"
-                    decoration-warning="l10n_mx_edi_cfdi_payment_state in ('pending', 'requested')"
+                    decoration-warning="l10n_mx_edi_cfdi_payment_state == 'pending'"
+                    decoration-info="l10n_mx_edi_cfdi_payment_state == 'requested'"
                     decoration-danger="l10n_mx_edi_cfdi_payment_state == 'error'"
                 />
                 <field
                     name="l10n_mx_edi_cfdi_payment_last_followup_date"
                     optional="hide"
                 />
+                <field
+                    name="l10n_mx_edi_cfdi_payment_receipt_filename"
+                    column_invisible="1"
+                />
+                <field
+                    name="l10n_mx_edi_cfdi_payment_receipt"
+                    widget="binary"
+                    filename="l10n_mx_edi_cfdi_payment_receipt_filename"
+                    invisible="not l10n_mx_edi_cfdi_is_supplier_payment or l10n_mx_edi_cfdi_payment_state == 'not_required'"
+                    optional="show"
+                />
                 <button
-                    name="action_request_cfdi_complement"
+                    name="action_open_receipt_wizard"
                     type="object"
-                    string="Request Complement"
-                    icon="fa-envelope-o"
-                    invisible="not l10n_mx_edi_cfdi_is_supplier_payment or l10n_mx_edi_cfdi_payment_state not in ('pending', 'requested', 'error')"
+                    icon="fa-upload"
+                    title="Upload Receipt"
+                    invisible="not l10n_mx_edi_cfdi_is_supplier_payment or l10n_mx_edi_cfdi_payment_state == 'not_required'"
+                    class="btn btn-secondary"
                 />
             </xpath>
         </field>
@@ -60,7 +73,9 @@
         />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='to_check']" position="after">
+                <field name="l10n_mx_edi_cfdi_is_supplier_payment" invisible="1" />
                 <field name="l10n_mx_edi_cfdi_payment_state" />
+                <field name="l10n_mx_edi_cfdi_payment_receipt_filename" invisible="1" />
             </xpath>
             <xpath expr="//div[@id='row2_col2']/div" position="inside">
                 <span
@@ -83,6 +98,22 @@
                     class="badge text-bg-danger fw-normal"
                     title="CFDI Error"
                 >CFDI Error</span>
+                <a
+                    t-if="record.l10n_mx_edi_cfdi_payment_receipt_filename.raw_value"
+                    t-att-href="'/web/content/account.bank.statement.line/' + record.id.raw_value + '/l10n_mx_edi_cfdi_payment_receipt?download=true'"
+                    class="btn btn-secondary ms-1 me-1"
+                    title="Download Receipt"
+                >
+                    <i class="fa fa-download" />
+                </a>
+                <button
+                    name="action_open_receipt_wizard"
+                    type="object"
+                    icon="fa-upload"
+                    title="Upload/View Receipt"
+                    invisible="not l10n_mx_edi_cfdi_is_supplier_payment or l10n_mx_edi_cfdi_payment_state == 'not_required'"
+                    class="btn btn-secondary"
+                />
             </xpath>
         </field>
     </record>
@@ -131,6 +162,31 @@
                     context="{'group_by': 'l10n_mx_edi_cfdi_payment_state'}"
                 />
             </xpath>
+        </field>
+    </record>
+
+    <!-- Form view: Popup to upload the CFDI receipt -->
+    <record id="view_bank_statement_line_form_receipt_upload" model="ir.ui.view">
+        <field name="name">account.bank.statement.line.receipt.upload</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <form string="Upload Receipt">
+                <group>
+                    <field
+                        name="l10n_mx_edi_cfdi_payment_receipt_filename"
+                        invisible="1"
+                    />
+                    <field
+                        name="l10n_mx_edi_cfdi_payment_receipt"
+                        widget="binary"
+                        filename="l10n_mx_edi_cfdi_payment_receipt_filename"
+                    />
+                </group>
+                <footer>
+                    <button string="Save" special="save" class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
         </field>
     </record>
 </odoo>

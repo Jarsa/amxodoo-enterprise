@@ -13,6 +13,13 @@ class ResCompany(models.Model):
         help="Activity team that receives the CFDI complement follow-up "
         "activities (errors, replacements). Its members pick up the activities.",
     )
+    l10n_mx_edi_cfdi_payment_cc_user_ids = fields.Many2many(
+        comodel_name="res.users",
+        relation="res_company_cfdi_payment_cc_user_rel",
+        string="CFDI Payment Request CC Users",
+        help="Users whose emails will be included in the "
+        "complement request email text.",
+    )
 
     def write(self, vals):
         start_date_changed = "l10n_mx_edi_cfdi_payment_start_date" in vals

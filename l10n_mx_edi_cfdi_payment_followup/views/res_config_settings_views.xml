@@ -26,6 +26,16 @@
                         />
                         <field name="l10n_mx_edi_cfdi_responsible_team_id" />
                     </div>
+                    <div class="row">
+                        <label
+                            for="l10n_mx_edi_cfdi_payment_cc_user_ids"
+                            class="col-lg-3 o_light_label"
+                        />
+                        <field
+                            name="l10n_mx_edi_cfdi_payment_cc_user_ids"
+                            widget="many2many_tags"
+                        />
+                    </div>
                 </setting>
             </xpath>
         </field>

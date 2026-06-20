@@ -1,9 +1,33 @@
-from odoo import _, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 
 class AccountBankStatementLine(models.Model):
     _inherit = "account.bank.statement.line"
+
+    l10n_mx_edi_cfdi_payment_receipt = fields.Binary(
+        related="move_id.l10n_mx_edi_cfdi_payment_receipt",
+        readonly=False,
+    )
+    l10n_mx_edi_cfdi_payment_receipt_filename = fields.Char(
+        string="Payment Receipt Filename",
+        related="move_id.l10n_mx_edi_cfdi_payment_receipt_filename",
+        readonly=False,
+    )
+
+    def action_open_receipt_wizard(self):
+        self.ensure_one()
+        return {
+            "name": "Upload Payment Receipt",
+            "type": "ir.actions.act_window",
+            "res_model": "account.bank.statement.line",
+            "res_id": self.id,
+            "view_mode": "form",
+            "view_id": self.env.ref(
+                "l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_form_receipt_upload"
+            ).id,
+            "target": "new",
+        }
 
     def action_request_cfdi_complement(self):
         return self.move_id.action_request_cfdi_complement()

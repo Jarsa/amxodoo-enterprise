@@ -45,7 +45,8 @@
                     optional="show"
                     widget="badge"
                     decoration-success="l10n_mx_edi_cfdi_payment_state == 'validated'"
-                    decoration-warning="l10n_mx_edi_cfdi_payment_state in ('pending', 'requested')"
+                    decoration-warning="l10n_mx_edi_cfdi_payment_state == 'pending'"
+                    decoration-info="l10n_mx_edi_cfdi_payment_state == 'requested'"
                     decoration-danger="l10n_mx_edi_cfdi_payment_state == 'error'"
                 />
             </xpath>
