@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Server actions: ignore / revert CFDI complement follow-up -->
+    <record id="action_cfdi_ignore_payment" model="ir.actions.server">
+        <field name="name">Ignore CFDI Complement</field>
+        <field name="model_id" ref="account.model_account_payment" />
+        <field name="binding_model_id" ref="account.model_account_payment" />
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_cfdi_ignore()</field>
+    </record>
+
+    <record id="action_cfdi_unignore_payment" model="ir.actions.server">
+        <field name="name">Revert CFDI Complement Ignore</field>
+        <field name="model_id" ref="account.model_account_payment" />
+        <field name="binding_model_id" ref="account.model_account_payment" />
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_cfdi_unignore()</field>
+    </record>
+
+    <record id="action_cfdi_ignore_statement_line" model="ir.actions.server">
+        <field name="name">Ignore CFDI Complement</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line" />
+        <field
+            name="binding_model_id"
+            ref="account.model_account_bank_statement_line"
+        />
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_cfdi_ignore()</field>
+    </record>
+
+    <record id="action_cfdi_unignore_statement_line" model="ir.actions.server">
+        <field name="name">Revert CFDI Complement Ignore</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line" />
+        <field
+            name="binding_model_id"
+            ref="account.model_account_bank_statement_line"
+        />
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_cfdi_unignore()</field>
+    </record>
+</odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Responsible team for CFDI payment complement activities.
+         noupdate so the customer can configure its members without losing
+         them on module upgrades. Add the team members in
+         Settings > Technical > Activity Teams (or via the module settings). -->
+    <data noupdate="1">
+        <record id="mail_activity_team_cfdi" model="mail.activity.team">
+            <field name="name">CFDI Payment Complement Team</field>
+            <field
+                name="res_model_ids"
+                eval="[(4, ref('account.model_account_move'))]"
+            />
+        </record>
+    </data>
+
+    <!-- Dedicated activity type for this module, linked to the responsible
+         team so its members pick up the activities. -->
+    <record id="mail_activity_type_cfdi_complement" model="mail.activity.type">
+        <field name="name">CFDI Payment Complement</field>
+        <field name="summary">CFDI Complement Error</field>
+        <field name="category">default</field>
+        <field name="res_model">account.move</field>
+        <field name="default_team_id" ref="mail_activity_team_cfdi" />
+        <field name="delay_count">3</field>
+        <field name="delay_unit">days</field>
+    </record>
+</odoo>
