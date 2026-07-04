@@ -221,7 +221,8 @@ class TestDecimalFix(TestDecimalFixCommon):
                 pay_doc = self._get_payment_document(payment.move_id)
                 self.assertTrue(
                     pay_doc,
-                    f"CFDI payment document not created for USD→MXN ({rounding_method})",
+                    "CFDI payment document not created for USD→MXN "
+                    f"({rounding_method})",
                 )
 
         self._test_cfdi_rounding(run)
@@ -359,7 +360,8 @@ class TestDecimalFix(TestDecimalFixCommon):
                     self.assertEqual(
                         Decimal(base_p_str),
                         base_dr_total,
-                        f"BaseP must equal sum(BaseDR/EquivalenciaDR) ({rounding_method})",
+                        "BaseP must equal sum(BaseDR/EquivalenciaDR) "
+                        f"({rounding_method})",
                     )
 
         self._test_cfdi_rounding(run)
@@ -559,24 +561,29 @@ class TestDecimalFix(TestDecimalFixCommon):
         ns = "http://www.sat.gob.mx/cfd/4"
 
         self.assertEqual(
-            cfdi.get("SubTotal"), subtotal,
-            f"Incorrect SubTotal ({rounding_method})"
+            cfdi.get("SubTotal"), subtotal, f"Incorrect SubTotal ({rounding_method})"
         )
         self.assertEqual(
-            cfdi.get("Total"), total,
-            f"Incorrect Total ({rounding_method})"
+            cfdi.get("Total"), total, f"Incorrect Total ({rounding_method})"
         )
 
         impuestos = cfdi.find(f"{{{ns}}}Impuestos")
-        actual = impuestos.get("TotalImpuestosTrasladados") if impuestos is not None else None
+        actual = (
+            impuestos.get("TotalImpuestosTrasladados")
+            if impuestos is not None
+            else None
+        )
         self.assertEqual(
-            actual, total_impuestos,
-            f"Incorrect TotalImpuestosTrasladados ({rounding_method})"
+            actual,
+            total_impuestos,
+            f"Incorrect TotalImpuestosTrasladados ({rounding_method})",
         )
 
         expected_total = round(float(subtotal) + float(total_impuestos), 2)
         self.assertAlmostEqual(
-            float(total), expected_total, places=2,
+            float(total),
+            expected_total,
+            places=2,
             msg=(
                 f"Total arithmetically inconsistent: "
                 f"{subtotal} + {total_impuestos} = {expected_total:.2f} ≠ {total} "
@@ -590,9 +597,9 @@ class TestDecimalFix(TestDecimalFixCommon):
     # -------------------------------------------------------------------------
 
     _FCJ_A08414_LINES = [
-        (1.0, 5957.70),   # Office network node max height 3m:  5957.70
-        (7.0,  135.90),   # Infrastructure supply conduit:       951.30
-        (1.0, 1349.60),   # Professional services:              1349.60
+        (1.0, 5957.70),  # Office network node max height 3m:  5957.70
+        (7.0, 135.90),  # Infrastructure supply conduit:       951.30
+        (1.0, 1349.60),  # Professional services:              1349.60
     ]
 
     def test_total_arithmetic_consistency_mxn_3lines(self):
@@ -645,25 +652,25 @@ class TestDecimalFix(TestDecimalFixCommon):
     # -------------------------------------------------------------------------
 
     _FCJ_A08415_LINES = [
-        (7.0,  3702.88),   # Category 6 plenum cable:            25920.16
-        (7.0,   251.30),   # RJ45 Cat6 jack:                      1759.10
-        (7.0,    46.30),   # Face plate 2/4 ports:                  324.10
-        (7.0,   247.45),   # Patch cord 5FT:                      1732.15
-        (7.0,   299.39),   # Patch cord 7FT:                      2095.73
-        (7.0,    33.58),   # Labeled face plate & patch panel:      235.06
-        (7.0,    33.58),   # Labeled both sides cable:              235.06
-        (7.0,    33.58),   # Labeled patchcords:                    235.06
-        (7.0,    44.65),   # Wiring management:                     312.55
-        (7.0,   111.00),   # Scanner test:                          777.00
-        (7.0,    44.44),   # Updates:                               311.08
-        (7.0,    66.65),   # FS box:                                466.55
-        (7.0,   177.74),   # Operational costs:                   1244.18
-        (7.0,  2558.56),   # Network node max height 9m:         17909.92
-        (1.0,  2295.00),   # Single node relocation:              2295.00
-        (35.0,  165.00),   # Flexible conduit 3/4":               5775.00
-        (24.0,  331.00),   # Flexible conduit 2":                 7944.00
-        (1.0, 10335.00),   # Infrastructure implementation:      10335.00
-        (1.0,  6809.00),   # Professional services:               6809.00
+        (7.0, 3702.88),  # Category 6 plenum cable:            25920.16
+        (7.0, 251.30),  # RJ45 Cat6 jack:                      1759.10
+        (7.0, 46.30),  # Face plate 2/4 ports:                  324.10
+        (7.0, 247.45),  # Patch cord 5FT:                      1732.15
+        (7.0, 299.39),  # Patch cord 7FT:                      2095.73
+        (7.0, 33.58),  # Labeled face plate & patch panel:      235.06
+        (7.0, 33.58),  # Labeled both sides cable:              235.06
+        (7.0, 33.58),  # Labeled patchcords:                    235.06
+        (7.0, 44.65),  # Wiring management:                     312.55
+        (7.0, 111.00),  # Scanner test:                          777.00
+        (7.0, 44.44),  # Updates:                               311.08
+        (7.0, 66.65),  # FS box:                                466.55
+        (7.0, 177.74),  # Operational costs:                   1244.18
+        (7.0, 2558.56),  # Network node max height 9m:         17909.92
+        (1.0, 2295.00),  # Single node relocation:              2295.00
+        (35.0, 165.00),  # Flexible conduit 3/4":               5775.00
+        (24.0, 331.00),  # Flexible conduit 2":                 7944.00
+        (1.0, 10335.00),  # Infrastructure implementation:      10335.00
+        (1.0, 6809.00),  # Professional services:               6809.00
     ]
 
     def test_total_arithmetic_consistency_mxn_19lines(self):
@@ -701,10 +708,12 @@ class TestDecimalFix(TestDecimalFixCommon):
                 )
                 cfdi = self._get_cfdi_tree(document)
                 self.assertEqual(
-                    len(cfdi.findall(
-                        "{http://www.sat.gob.mx/cfd/4}Conceptos"
-                        "/{http://www.sat.gob.mx/cfd/4}Concepto"
-                    )),
+                    len(
+                        cfdi.findall(
+                            "{http://www.sat.gob.mx/cfd/4}Conceptos"
+                            "/{http://www.sat.gob.mx/cfd/4}Concepto"
+                        )
+                    ),
                     len(self._FCJ_A08415_LINES),
                 )
                 self._assert_total_arithmetic_consistency(
@@ -723,10 +732,10 @@ class TestDecimalFix(TestDecimalFixCommon):
     # -------------------------------------------------------------------------
 
     _FCG_G10028403_LINES = [
-        (1.0, 5074.09),   # SP IFI Security cameras:    5074.09
-        (1.0,  948.53),   # Genetec update:               948.53
-        (1.0, 1064.98),   # Security Center license:     1064.98
-        (1.0,   62.50),   # Genetec SDK connection:        62.50
+        (1.0, 5074.09),  # SP IFI Security cameras:    5074.09
+        (1.0, 948.53),  # Genetec update:               948.53
+        (1.0, 1064.98),  # Security Center license:     1064.98
+        (1.0, 62.50),  # Genetec SDK connection:        62.50
     ]
 
     def test_total_arithmetic_consistency_usd_tipocambio(self):
@@ -773,5 +782,70 @@ class TestDecimalFix(TestDecimalFixCommon):
                     total="8294.12",
                     rounding_method=rounding_method,
                 )
+
+        self._test_cfdi_rounding(run)
+
+    # -------------------------------------------------------------------------
+    # Case: CRP20217 — one payment covering several invoices whose 6dp residuals
+    # round up individually: sum(ImpPagado) must stay <= Monto.
+    # -------------------------------------------------------------------------
+
+    def test_payment_monto_covers_rounded_imp_pagado_sum(self):
+        """
+        Real case BPCJ5/2026/00916: residuals 954776.4656 + 33925.5456 + 25566.40
+        = 1014268.4112. Rounding the raw sum gives Monto=1014268.41 while each
+        ImpPagado rounds up (954776.47 + 33925.55 + 25566.40 = 1014268.42),
+        triggering CRP20217. Monto must be built from the per-document rounded
+        ImpPagado values instead.
+        """
+
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoices = self.env["account.move"]
+                for price_unit in (823083.16, 29246.16, 22040.00):
+                    invoices |= self._create_invoice(
+                        currency_id=self.mxn_currency.id,
+                        invoice_line_ids=[
+                            Command.create(
+                                {
+                                    "product_id": self.product.id,
+                                    "quantity": 1,
+                                    "price_unit": price_unit,
+                                    "tax_ids": [Command.set(self.tax_16.ids)],
+                                }
+                            ),
+                        ],
+                    )
+                with self.with_mocked_pac_sign_success():
+                    for invoice in invoices:
+                        invoice._l10n_mx_edi_cfdi_invoice_try_send()
+
+                payment = self._create_payment(invoices)
+                with self.with_mocked_pac_sign_success():
+                    payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+
+                pay_doc = self._get_payment_document(payment.move_id)
+                self.assertTrue(
+                    pay_doc,
+                    f"CFDI payment document not created ({rounding_method})",
+                )
+
+                pay_cfdi = self._get_cfdi_tree(pay_doc)
+                ns_pago = "http://www.sat.gob.mx/Pagos20"
+                pago = pay_cfdi.find(f".//{{{ns_pago}}}Pago")
+                monto = Decimal(pago.get("Monto"))
+                imp_pagado_sum = sum(
+                    Decimal(docto.get("ImpPagado"))
+                    for docto in pago.findall(f"{{{ns_pago}}}DoctoRelacionado")
+                )
+                self.assertLessEqual(
+                    imp_pagado_sum,
+                    monto,
+                    f"CRP20217: sum(ImpPagado)={imp_pagado_sum} exceeds "
+                    f"Monto={monto} ({rounding_method})",
+                )
+                self.assertEqual(pago.get("Monto"), "1014268.42")
+                totales = pay_cfdi.find(f".//{{{ns_pago}}}Totales")
+                self.assertEqual(totales.get("MontoTotalPagos"), pago.get("Monto"))
 
         self._test_cfdi_rounding(run)

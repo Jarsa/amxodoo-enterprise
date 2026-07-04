@@ -111,7 +111,7 @@
                 format_float(
                     float(format_float(
                         sum(
-                            docto['imp_pagado'] if docto['moneda'] == moneda else docto['imp_pagado'] / (docto['equivalencia'] or 1)
+                            float(format_float(docto['imp_pagado'], precision=2)) if docto['moneda'] == moneda else float(format_float(docto['imp_pagado'], precision=2)) / (docto['equivalencia'] or 1)
                             for docto in docto_relationado_list
                         ),
                         precision=2
@@ -126,10 +126,13 @@
             expr="//*[local-name()='Pago' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
             position="attributes"
         >
+            <!-- Round each imp_pagado to 2 decimals BEFORE summing so Monto matches
+                 the sum of the ImpPagado values reported per DoctoRelacionado
+                 (rounding the raw 6-decimal sum can fall 1 cent short: CRP20217) -->
             <attribute name="t-att-Monto">
                 format_float(
                     sum(
-                        docto['imp_pagado'] if docto['moneda'] == moneda else docto['imp_pagado'] / (docto['equivalencia'] or 1)
+                        float(format_float(docto['imp_pagado'], precision=2)) if docto['moneda'] == moneda else float(format_float(docto['imp_pagado'], precision=2)) / (docto['equivalencia'] or 1)
                         for docto in docto_relationado_list
                     ),
                     precision=2
