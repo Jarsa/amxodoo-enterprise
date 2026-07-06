@@ -1,9 +1,10 @@
-from odoo import models
 import math
+
+from odoo import models
 
 
 class MexicanAccountReportCustomHandler(models.AbstractModel):
-    _inherit = 'l10n_mx.report.handler'
+    _inherit = "l10n_mx.report.handler"
 
     def l10n_mx_diot_get_values(self, values, data, partner):
         res = super().l10n_mx_diot_get_values(values, data, partner)

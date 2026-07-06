@@ -5,8 +5,8 @@
     "name": "Add Related Folios to invoices",
     "version": "17.0.1.0.0",
     "category": "Report",
-    "author": "Jarsa",
-    "website": "https://www.jarsa.com",
+    "author": "Jarsa, Odoo Mexican Association (AMOdoo)",
+    "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "depends": [
         "account",

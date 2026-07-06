@@ -5,8 +5,8 @@
     "name": "Payment Receipt on Invoice",
     "version": "17.0.1.0.2",
     "category": "Report",
-    "author": "Jarsa",
-    "website": "https://www.jarsa.com",
+    "author": "Jarsa, Odoo Mexican Association (AMOdoo)",
+    "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "depends": [
         "account",
