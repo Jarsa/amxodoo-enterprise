@@ -3,14 +3,13 @@
 
 {
     "name": "Payment Method on Statement Line",
-    "summary": "Adds payment method to bank statement lines for use in CFDI payment complement",
-    "version": "17.0.1.0.1",
+    "summary": "Payment method on bank statement lines for the CFDI payment",
+    "version": "19.0.1.0.0",
     "category": "Report",
-    "author": "Jarsa",
+    "author": "Jarsa, Odoo Mexican Association (AMOdoo)",
     "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "depends": [
-        "account",
         "l10n_mx_edi",
     ],
     "data": [

@@ -1,27 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="view_bank_statement_line_form_inherit_payment_method" model="ir.ui.view">
-        <field name="name">account.bank.statement.line.form.inherit.payment.method</field>
+    <!-- Since Odoo 19.0, l10n_mx_edi already adds l10n_mx_edi_payment_method_id to the
+    bank reconciliation form and list views, so this module only tweaks the field
+    attributes to keep the previous behavior (no creation/edition of payment methods
+    and field always available in the list view). -->
+    <record
+        id="view_bank_statement_line_form_inherit_payment_method"
+        model="ir.ui.view"
+    >
+        <field
+            name="name"
+        >account.bank.statement.line.form.inherit.payment.method</field>
         <field name="model">account.bank.statement.line</field>
-        <field name="inherit_id" ref="account_accountant.view_bank_statement_line_form_bank_rec_widget"/>
+        <field
+            name="inherit_id"
+            ref="l10n_mx_edi.account_accountant_view_bank_statement_line_form_bank_rec_widget_inherit_l10n_mx_edi"
+        />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="l10n_mx_edi_payment_method_id" options="{'no_create': 1, 'no_open': 1}"/>
-            </xpath>
+            <field name="l10n_mx_edi_payment_method_id" position="attributes">
+                <attribute name="options">{'no_create': 1, 'no_open': 1}</attribute>
+            </field>
         </field>
     </record>
-    
-    <record id="view_bank_statement_line_search_inherit_payment_method" model="ir.ui.view">
-        <field name="name">account.bank.statement.line.search.inherit.payment.method</field>
+
+    <record
+        id="view_bank_statement_line_search_inherit_payment_method"
+        model="ir.ui.view"
+    >
+        <field
+            name="name"
+        >account.bank.statement.line.search.inherit.payment.method</field>
         <field name="model">account.bank.statement.line</field>
-        <field name="inherit_id" ref="account_accountant.view_bank_statement_line_tree_bank_rec_widget"/>
+        <field
+            name="inherit_id"
+            ref="l10n_mx_edi.view_bank_statement_line_tree_bank_rec_widget_inherit_l10n_mx_edi"
+        />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='running_balance']" position="before">
-                <field name="l10n_mx_edi_payment_method_id" optional="show" options="{'no_create': 1, 'no_open': 1}" />
-            </xpath>
+            <field name="l10n_mx_edi_payment_method_id" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="options">{'no_create': 1, 'no_open': 1}</attribute>
+            </field>
         </field>
     </record>
-
-
-
 </odoo>
