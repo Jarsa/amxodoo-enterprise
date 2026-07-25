@@ -6,6 +6,7 @@ class TestStatementLinePaymentMethod(TransactionCase):
     def test_payment_method_delegation(self):
         """The payment method set on the statement line must reach its journal entry,
         which is the value used to render the CFDI payment complement."""
+        self.env.company.account_fiscal_country_id = self.env.ref("base.mx")
         journal = self.env["account.journal"].search(
             [("type", "=", "bank"), ("company_id", "=", self.env.company.id)],
             limit=1,
