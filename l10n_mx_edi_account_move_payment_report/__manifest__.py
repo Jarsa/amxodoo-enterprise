@@ -3,13 +3,12 @@
 
 {
     "name": "Payment Receipt on Invoice",
-    "version": "17.0.1.0.2",
+    "version": "19.0.1.0.0",
     "category": "Report",
-    "author": "Jarsa",
+    "author": "Jarsa, Odoo Mexican Association (AMOdoo)",
     "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "depends": [
-        "account",
         "l10n_mx_edi",
     ],
     "data": [
