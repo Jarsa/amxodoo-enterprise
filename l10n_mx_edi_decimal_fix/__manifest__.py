@@ -3,7 +3,7 @@
     "version": "17.0.1.0.4",
     "summary": "Fix EDI Documents when decimal precision of currency is greater than 2",
     "author": "Jarsa",
-    "website": "https://www.jarsa.com",
+    "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "category": "Localization/Mexico",
     "depends": [
