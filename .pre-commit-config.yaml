@@ -52,7 +52,7 @@ repos:
       - id: oca-gen-addon-readme
         args:
           - --addons-dir=.
-          - --branch=17.0
+          - --branch=19.0
           - --org-name=OCA
           - --repo-name=l10n-mexico
           - --if-source-changed
