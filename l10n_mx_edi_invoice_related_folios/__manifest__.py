@@ -3,9 +3,10 @@
 
 {
     "name": "Add Related Folios to invoices",
-    "version": "17.0.1.0.0",
+    "summary": "Show the related CFDI UUID (folio) on the invoice report",
+    "version": "19.0.1.0.0",
     "category": "Report",
-    "author": "Jarsa",
+    "author": "Jarsa, Odoo Mexican Association (AMOdoo)",
     "website": "https://github.com/amxodoo/enterprise",
     "license": "LGPL-3",
     "depends": [
