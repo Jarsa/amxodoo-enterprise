@@ -1,5 +1,7 @@
 from odoo import models
 
+DISABLE_PARAM = "l10n_mx_edi_sale_cfdi_to_public_manual.disable"
+
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
@@ -14,5 +16,10 @@ class SaleOrder(models.Model):
         # "PUBLICO EN GENERAL" by mistake forces a cancel and a re-stamp, so the
         # box is left to the user: new orders start unticked and a manual tick
         # is kept when the customer changes.
+        disabled = self.env["ir.config_parameter"].sudo().get_param(DISABLE_PARAM, "")
+        if disabled.strip().lower() in ("1", "true", "yes"):
+            # Kill switch: give the standard Odoo behaviour back without
+            # uninstalling the module.
+            return super()._compute_l10n_mx_edi_cfdi_to_public()
         for order in self:
             order.l10n_mx_edi_cfdi_to_public = order.l10n_mx_edi_cfdi_to_public
