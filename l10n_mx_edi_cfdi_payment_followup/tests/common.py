@@ -119,6 +119,7 @@ class TestCfdiPaymentFollowupCommon(TransactionCase):
                 "code": "BNKT",
                 "company_id": cls.company_mx.id,
                 "default_account_id": cls.account_bank.id,
+                "l10n_mx_edi_cfdi_payment_followup": True,
             }
         )
         cls.sale_journal = cls.env["account.journal"].create(

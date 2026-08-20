@@ -611,3 +611,21 @@ msgstr "Advertencia: Este pago fue des-conciliado de una factura PPD pero ya exi
 #: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_payment_manual_ignore
 msgid "When enabled, this payment is treated as Not Required and the follow-up is skipped, even if it is reconciled against a PPD vendor bill. A received and valid CFDI complement XML still overrides this flag. Use the related server actions to set or revert it."
 msgstr "Cuando se activa, este pago se trata como No Requerido y se omite el seguimiento, aunque esté conciliado contra una factura de proveedor PPD. Un XML de complemento de pago CFDI recibido y válido aún tiene prioridad sobre este indicador. Use las acciones de servidor relacionadas para activarlo o revertirlo."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_journal__l10n_mx_edi_cfdi_payment_followup
+msgid "Requires CFDI Payment Complement"
+msgstr "Requiere Complemento de Pago CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_account_journal__l10n_mx_edi_cfdi_payment_followup
+msgid ""
+"Only payments registered in journals with this option enabled are tracked "
+"for the CFDI payment complement follow-up. Leave it off for credit cards, "
+"clearing journals or any other journal whose payments never require a "
+"complement."
+msgstr ""
+"Solo se da seguimiento al complemento de pago CFDI de los pagos registrados "
+"en diarios con esta opción activada. Déjela desactivada para tarjetas de "
+"crédito, diarios de compensación o cualquier otro diario cuyos pagos nunca "
+"requieren complemento."

@@ -88,6 +88,32 @@ class TestCfdiStateComputation(TestCfdiPaymentFollowupCommon):
         state = move.l10n_mx_edi_cfdi_payment_state
         self.assertEqual(state, "pending")
 
+    def test_state_not_required_journal_out_of_scope(self):
+        """Payments in a journal without the follow-up flag get 'not_required'."""
+        move = self._get_payment_move()
+        move.write({"l10n_mx_edi_cfdi_uuid": False})
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "pending")
+        self.bank_journal.l10n_mx_edi_cfdi_payment_followup = False
+        try:
+            self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "not_required")
+        finally:
+            self.bank_journal.l10n_mx_edi_cfdi_payment_followup = True
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "pending")
+
+    def test_state_not_required_foreign_partner(self):
+        """Non-Mexican partners never issue a CFDI → 'not_required'."""
+        move = self._get_payment_move()
+        move.write({"l10n_mx_edi_cfdi_uuid": False})
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "pending")
+        self.customer.country_id = self.env.ref("base.us")
+        try:
+            self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "not_required")
+            # A Mexican partner (or one without country) stays in scope.
+            self.customer.country_id = self.env.ref("base.mx")
+            self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "pending")
+        finally:
+            self.customer.country_id = False
+
     def test_state_validated_has_uuid(self):
         """payment_sent document exists → state 'validated'."""
         move = self._get_payment_move()
