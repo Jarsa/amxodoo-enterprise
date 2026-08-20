@@ -143,6 +143,8 @@ class AccountMove(models.Model):
         "l10n_mx_edi_payment_document_ids.state",
         "l10n_mx_edi_cfdi_payment_manual_ignore",
         "attachment_ids",
+        "journal_id.l10n_mx_edi_cfdi_payment_followup",
+        "partner_id.country_id",
     )
     def _compute_l10n_mx_edi_cfdi_payment_state(self):
         for record in self:
@@ -163,6 +165,20 @@ class AccountMove(models.Model):
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
                 continue
             if not record.payment_id and not record.statement_line_id:
+                record.l10n_mx_edi_cfdi_payment_state = "not_required"
+                continue
+
+            # Rule 1.1: Only journals flagged as requiring the complement.
+            # Credit cards and other clearing journals are out of scope.
+            if not record.journal_id.l10n_mx_edi_cfdi_payment_followup:
+                record.l10n_mx_edi_cfdi_payment_state = "not_required"
+                continue
+
+            # Rule 1.2: Only Mexican vendors issue a CFDI. A partner without a
+            # country is kept in scope so a missing country never hides a
+            # payment that does need the complement.
+            country = record.partner_id.commercial_partner_id.country_id
+            if country and country.code != "MX":
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
                 continue
 
