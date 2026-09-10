@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from lxml import etree
 
@@ -286,7 +286,8 @@ class TestDecimalFix(TestDecimalFixCommon):
           "El campo BaseP... no es igual a la suma de los importes de las bases
            registrados en los documentos relacionados..."
 
-        Fix: TrasladoDR is overridden to use 6dp so both sides match exactly.
+        Fix: TrasladoDR is overridden to use 6dp and BaseP is the 2dp rounding
+        of sum(BaseDR / EquivalenciaDR), which the SAT accepts (2 to 6dp).
         Tested for both round_per_line and round_globally.
         """
         rate = 1.0 / 17.0
@@ -347,22 +348,128 @@ class TestDecimalFix(TestDecimalFixCommon):
                         )
                         base_dr_total += Decimal(base_dr_str) / equivalencia
 
-                # BaseP must equal sum(BaseDR / EquivalenciaDR) exactly at 6dp.
+                # BaseP must equal sum(BaseDR / EquivalenciaDR) rounded to 2dp.
                 traslados_p = pay_cfdi.findall(f".//{{{ns_pago}}}TrasladoP")
                 self.assertTrue(traslados_p, f"No TrasladoP found ({rounding_method})")
                 for tp in traslados_p:
                     base_p_str = tp.get("BaseP", "0")
                     self.assertRegex(
                         base_p_str,
-                        r"^\d+\.\d{6}$",
-                        f"BaseP must have 6 decimal places ({rounding_method})",
+                        r"^\d+\.\d{2}$",
+                        f"BaseP must have 2 decimal places ({rounding_method})",
                     )
                     self.assertEqual(
                         Decimal(base_p_str),
-                        base_dr_total,
-                        "BaseP must equal sum(BaseDR/EquivalenciaDR) "
+                        base_dr_total.quantize(Decimal("0.01"), ROUND_HALF_UP),
+                        "BaseP must equal round2(sum(BaseDR/EquivalenciaDR)) "
                         f"({rounding_method})",
                     )
+
+        self._test_cfdi_rounding(run)
+
+    # -------------------------------------------------------------------------
+    # Case 5b: CRPER654 — the PAC counts the literal decimals of BaseP against
+    # MonedaP: "1122.280000" (USD) and "76000.000000" (MXN) were rejected with
+    # "El importe del campo BaseP que corresponde a Traslado, no tiene la
+    # cantidad de decimales que soporta la moneda (MonedaP)".
+    # -------------------------------------------------------------------------
+
+    def _assert_traslado_p_2dp(self, pay_cfdi, rounding_method):
+        """BaseP/ImporteP have 2dp and Totales == round2(BaseP * TipoCambioP)."""
+        ns_pago = "http://www.sat.gob.mx/Pagos20"
+        two = Decimal("0.01")
+        pago = pay_cfdi.find(f".//{{{ns_pago}}}Pago")
+        tipo_cambio = Decimal(pago.get("TipoCambioP") or "1")
+        traslados_p = pago.findall(f".//{{{ns_pago}}}TrasladoP")
+        self.assertTrue(traslados_p, f"No TrasladoP found ({rounding_method})")
+        for tp in traslados_p:
+            for attr in ("BaseP", "ImporteP"):
+                self.assertRegex(
+                    tp.get(attr),
+                    r"^\d+\.\d{2}$",
+                    f"{attr} must have 2 decimal places ({rounding_method})",
+                )
+        totales = pay_cfdi.find(f".//{{{ns_pago}}}Totales")
+        tp16 = [tp for tp in traslados_p if tp.get("TasaOCuotaP") == "0.160000"]
+        self.assertEqual(len(tp16), 1)
+        self.assertEqual(
+            Decimal(totales.get("TotalTrasladosBaseIVA16")),
+            (Decimal(tp16[0].get("BaseP")) * tipo_cambio).quantize(two, ROUND_HALF_UP),
+            "TotalTrasladosBaseIVA16 != round2(BaseP * TipoCambioP) "
+            f"({rounding_method})",
+        )
+        self.assertEqual(
+            Decimal(totales.get("TotalTrasladosImpuestoIVA16")),
+            (Decimal(tp16[0].get("ImporteP")) * tipo_cambio).quantize(
+                two, ROUND_HALF_UP
+            ),
+            "TotalTrasladosImpuestoIVA16 != round2(ImporteP * TipoCambioP) "
+            f"({rounding_method})",
+        )
+        return tp16[0]
+
+    def test_traslado_p_currency_decimals(self):
+        """
+        Real cases BDCJ3/2026/00278 (USD 1122.28 base, tax 179.5648) and
+        BPCJ5/2026/01074 (MXN partial payment of 88160 on a 616471.966 invoice):
+        BaseP/ImporteP must be printed with the 2 decimals MonedaP supports.
+        """
+        rate = 1.0 / 16.9237
+        self.setup_rates(self.usd_currency, (self.frozen_today, rate))
+
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                usd_invoice = self._create_invoice(
+                    currency_id=self.usd_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 1,
+                                "price_unit": 1122.28,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                mxn_invoice = self._create_invoice(
+                    currency_id=self.mxn_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 1,
+                                "price_unit": 531441.35,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    usd_invoice._l10n_mx_edi_cfdi_invoice_try_send()
+                    mxn_invoice._l10n_mx_edi_cfdi_invoice_try_send()
+
+                usd_payment = self._create_payment(
+                    usd_invoice, currency_id=self.usd_currency.id
+                )
+                mxn_payment = self._create_payment(mxn_invoice, amount=88160.0)
+                with self.with_mocked_pac_sign_success():
+                    usd_payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+                    mxn_payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+
+                usd_cfdi = self._get_cfdi_tree(
+                    self._get_payment_document(usd_payment.move_id)
+                )
+                tp = self._assert_traslado_p_2dp(usd_cfdi, rounding_method)
+                self.assertEqual(tp.get("BaseP"), "1122.28")
+                self.assertEqual(tp.get("ImporteP"), "179.56")
+
+                mxn_cfdi = self._get_cfdi_tree(
+                    self._get_payment_document(mxn_payment.move_id)
+                )
+                tp = self._assert_traslado_p_2dp(mxn_cfdi, rounding_method)
+                self.assertEqual(tp.get("BaseP"), "76000.00")
+                self.assertEqual(tp.get("ImporteP"), "12160.00")
 
         self._test_cfdi_rounding(run)
 
