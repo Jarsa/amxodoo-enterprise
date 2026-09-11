@@ -15,7 +15,7 @@
                             for docto in docto_relationado_list
                             for traslado in docto['traslados_list']
                         ),
-                        precision=2
+                        precision=2, rounding='DOWN'
                     )) * (tipo_cambio or 1),
                     precision=2
                 ) if sum(
@@ -39,7 +39,7 @@
                             for docto in docto_relationado_list
                             for traslado in docto['traslados_list']
                         ),
-                        precision=2
+                        precision=2, rounding='DOWN'
                     )) * (tipo_cambio or 1),
                     precision=2
                 ) if sum(
@@ -56,7 +56,7 @@
                             for docto in docto_relationado_list
                             for traslado in docto['traslados_list']
                         ),
-                        precision=2
+                        precision=2, rounding='DOWN'
                     )) * (tipo_cambio or 1),
                     precision=2
                 ) if sum(
@@ -73,7 +73,7 @@
                             for docto in docto_relationado_list
                             for traslado in docto['traslados_list']
                         ),
-                        precision=2
+                        precision=2, rounding='DOWN'
                     )) * (tipo_cambio or 1),
                     precision=2
                 ) if sum(
@@ -90,7 +90,7 @@
                             for docto in docto_relationado_list
                             for traslado in docto['traslados_list']
                         ),
-                        precision=2
+                        precision=2, rounding='DOWN'
                     )) * (tipo_cambio or 1),
                     precision=2
                 ) if sum(
@@ -107,7 +107,7 @@
                             for docto in docto_relationado_list
                             for traslado in docto['traslados_list']
                         ),
-                        precision=2
+                        precision=2, rounding='DOWN'
                     )) * (tipo_cambio or 1),
                     precision=2
                 ) if sum(
@@ -189,16 +189,16 @@
             >invoice_values['format_float'](tax_values['importe'], precision=6)</attribute>
         </xpath>
 
-        <!-- RetencionP / TrasladoP: the PAC checks the literal number of decimals
-             of ImporteP/BaseP against MonedaP (2 for MXN/USD). SAT accepts BaseP and
-             ImporteP rounded between 2 and 6dp, so round the 6dp sums to 2dp. -->
+        <!-- RetencionP / TrasladoP: since 2026-09-04 Finkok requires BaseP/ImporteP
+             "truncado a la cantidad de decimales que soporte la moneda del Pago"
+             (CRP20268/CRP20274/CRPER654), so truncate the 6dp sums to 2dp. -->
         <xpath
             expr="//*[local-name()='RetencionP' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
             position="attributes"
         >
             <attribute
                 name="t-att-ImporteP"
-            >format_float(tax_values['importe'], precision=2)</attribute>
+            >format_float(tax_values['importe'], precision=2, rounding='DOWN')</attribute>
         </xpath>
 
         <xpath
@@ -215,7 +215,7 @@
                         and traslado['tipo_factor'] == tax_values['tipo_factor']
                         and traslado['tasa_o_cuota'] == tax_values['tasa_o_cuota']
                     ),
-                    precision=2
+                    precision=2, rounding='DOWN'
                 )
             </attribute>
             <attribute name="t-att-ImporteP">
@@ -228,7 +228,7 @@
                         and traslado['tipo_factor'] == tax_values['tipo_factor']
                         and traslado['tasa_o_cuota'] == tax_values['tasa_o_cuota']
                     ),
-                    precision=2
+                    precision=2, rounding='DOWN'
                 )
             </attribute>
         </xpath>

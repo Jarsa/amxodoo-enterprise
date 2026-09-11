@@ -10,11 +10,17 @@ class L10nMxEdiDocument(models.Model):
         res = super()._add_currency_cfdi_values(cfdi_values, currency)
         currency_precision = currency.l10n_mx_edi_decimal_places
 
-        def format_float(amount, precision=currency_precision):
+        def format_float(amount, precision=currency_precision, rounding="HALF-UP"):
             if amount is None or amount is False:
                 return None
+            if rounding == "DOWN":
+                # Truncate the 6dp value, not the raw float: 1122.279999999
+                # is 1122.28, not 1122.27.
+                amount = float_round(
+                    amount, precision_digits=6, rounding_method="HALF-UP"
+                )
             rounded = float_round(
-                amount, precision_digits=precision, rounding_method="HALF-UP"
+                amount, precision_digits=precision, rounding_method=rounding
             )
             if float_is_zero(rounded, precision_digits=precision):
                 rounded = 0.0

@@ -1,4 +1,4 @@
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 
 from lxml import etree
 
@@ -165,6 +165,12 @@ class TestDecimalFix(TestDecimalFixCommon):
                 self.assertEqual(imp_saldo_ant, imp_pagado)
                 self.assertRegex(imp_pagado, r"^\d+\.\d{2}$")
 
+                # BaseDR is the 6dp base (41753.115); BaseP/ImporteP are truncated,
+                # not rounded, to the 2dp of MonedaP (Finkok, 2026-09-04).
+                traslado_p = pay_cfdi.find(f".//{{{ns_pago}}}TrasladoP")
+                self.assertEqual(traslado_p.get("BaseP"), "41753.11")
+                self.assertEqual(traslado_p.get("ImporteP"), "6680.49")
+
         self._test_cfdi_rounding(run)
 
     # -------------------------------------------------------------------------
@@ -286,8 +292,8 @@ class TestDecimalFix(TestDecimalFixCommon):
           "El campo BaseP... no es igual a la suma de los importes de las bases
            registrados en los documentos relacionados..."
 
-        Fix: TrasladoDR is overridden to use 6dp and BaseP is the 2dp rounding
-        of sum(BaseDR / EquivalenciaDR), which the SAT accepts (2 to 6dp).
+        Fix: TrasladoDR is overridden to use 6dp and BaseP is the 2dp truncation
+        of sum(BaseDR / EquivalenciaDR), as Finkok requires since 2026-09-04.
         Tested for both round_per_line and round_globally.
         """
         rate = 1.0 / 17.0
@@ -348,7 +354,7 @@ class TestDecimalFix(TestDecimalFixCommon):
                         )
                         base_dr_total += Decimal(base_dr_str) / equivalencia
 
-                # BaseP must equal sum(BaseDR / EquivalenciaDR) rounded to 2dp.
+                # BaseP must equal sum(BaseDR / EquivalenciaDR) truncated to 2dp.
                 traslados_p = pay_cfdi.findall(f".//{{{ns_pago}}}TrasladoP")
                 self.assertTrue(traslados_p, f"No TrasladoP found ({rounding_method})")
                 for tp in traslados_p:
@@ -360,8 +366,8 @@ class TestDecimalFix(TestDecimalFixCommon):
                     )
                     self.assertEqual(
                         Decimal(base_p_str),
-                        base_dr_total.quantize(Decimal("0.01"), ROUND_HALF_UP),
-                        "BaseP must equal round2(sum(BaseDR/EquivalenciaDR)) "
+                        base_dr_total.quantize(Decimal("0.01"), ROUND_DOWN),
+                        "BaseP must equal trunc2(sum(BaseDR/EquivalenciaDR)) "
                         f"({rounding_method})",
                     )
 
@@ -371,7 +377,8 @@ class TestDecimalFix(TestDecimalFixCommon):
     # Case 5b: CRPER654 — the PAC counts the literal decimals of BaseP against
     # MonedaP: "1122.280000" (USD) and "76000.000000" (MXN) were rejected with
     # "El importe del campo BaseP que corresponde a Traslado, no tiene la
-    # cantidad de decimales que soporta la moneda (MonedaP)".
+    # cantidad de decimales que soporta la moneda (MonedaP)". Finkok's notice
+    # (2026-09-04) requires the value truncated to the currency decimals.
     # -------------------------------------------------------------------------
 
     def _assert_traslado_p_2dp(self, pay_cfdi, rounding_method):
