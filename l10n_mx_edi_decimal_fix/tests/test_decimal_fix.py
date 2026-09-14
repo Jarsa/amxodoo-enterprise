@@ -963,3 +963,54 @@ class TestDecimalFix(TestDecimalFixCommon):
                 self.assertEqual(totales.get("MontoTotalPagos"), pago.get("Monto"))
 
         self._test_cfdi_rounding(run)
+
+    # -------------------------------------------------------------------------
+    # Case 8: CRP20261 — 2dp currency (Real, BAF/2026/08/1642). ImporteDR printed
+    # at 6dp ("3276.250000") falls outside [trunc6, ceil6] of BaseDR * Tasa
+    # (20476.55 * 0.16 = 3276.248), so BaseDR/ImporteDR must use the decimals of
+    # MonedaDR (l10n_mx_edi_decimal_places), not a fixed 6.
+    # -------------------------------------------------------------------------
+
+    def test_traslado_dr_currency_decimals(self):
+        # ORM forbids reducing the decimals of a currency with journal entries.
+        self.env.cr.execute(
+            "UPDATE res_currency SET rounding = 0.01, decimal_places = 2,"
+            " l10n_mx_edi_decimal_places = 2"
+            " WHERE id = %s",
+            [self.mxn_currency.id],
+        )
+        self.mxn_currency.invalidate_recordset()
+
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.mxn_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 1,
+                                "price_unit": 20476.55,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
+                payment = self._create_payment(invoice)
+                with self.with_mocked_pac_sign_success():
+                    payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+
+                pay_cfdi = self._get_cfdi_tree(
+                    self._get_payment_document(payment.move_id)
+                )
+                ns_pago = "http://www.sat.gob.mx/Pagos20"
+                tdr = pay_cfdi.find(f".//{{{ns_pago}}}TrasladoDR")
+                self.assertEqual(tdr.get("BaseDR"), "20476.55")
+                self.assertEqual(tdr.get("ImporteDR"), "3276.25")
+                tp = pay_cfdi.find(f".//{{{ns_pago}}}TrasladoP")
+                self.assertEqual(tp.get("BaseP"), "20476.55")
+                self.assertEqual(tp.get("ImporteP"), "3276.25")
+
+        self._test_cfdi_rounding(run)
