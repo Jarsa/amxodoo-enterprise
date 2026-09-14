@@ -175,20 +175,6 @@
 
         </xpath>
 
-        <!-- TrasladoDR: format BaseDR/ImporteDR to 6dp so SAT validation
-             BaseP == sum(BaseDR/EquivalenciaDR) holds at 6dp precision -->
-        <xpath
-            expr="//*[local-name()='TrasladoDR' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
-            position="attributes"
-        >
-            <attribute
-                name="t-att-BaseDR"
-            >invoice_values['format_float'](tax_values['base'], precision=6)</attribute>
-            <attribute
-                name="t-att-ImporteDR"
-            >invoice_values['format_float'](tax_values['importe'], precision=6)</attribute>
-        </xpath>
-
         <!-- RetencionP / TrasladoP: since 2026-09-04 Finkok requires BaseP/ImporteP
              "truncado a la cantidad de decimales que soporte la moneda del Pago"
              (CRP20268/CRP20274/CRPER654), so truncate the 6dp sums to 2dp. -->
