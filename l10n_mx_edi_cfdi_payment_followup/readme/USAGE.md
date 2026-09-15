@@ -49,8 +49,9 @@ in the chatter for review.
 ## Ignoring a payment
 
 When a payment should not be followed up (e.g. a complement will never arrive),
-select it and use *Action ⚙️ / Ignore CFDI Complement* to set it to *Not
-Required*; the choice persists across recomputations. Use *Action ⚙️ / Revert
-CFDI Complement Ignore* to resume the follow-up. These actions are available on
-both payments and bank statement lines. A received and valid XML always
-overrides the ignore and validates the complement anyway.
+select it in the payments list or in the bank reconciliation list and press
+**CFDI Not Required** (also available as *Action ⚙️ / Mark as CFDI Not
+Required*) to set it to *Not Required*; the choice persists across
+recomputations. Press **Resume CFDI Follow-up** to put it back in scope. A
+received and valid XML always overrides the ignore and validates the complement
+anyway.

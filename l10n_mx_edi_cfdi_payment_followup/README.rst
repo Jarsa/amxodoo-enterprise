@@ -87,16 +87,15 @@ To configure this module you need to:
 1. Go to *Accounting / Configuration / Settings*, section **CFDI Payment
    Complement Follow-up**, and set:
 
-   - **CFDI Payment Follow-up Start Date** — only payments dated on or
-     after this date are tracked. Payments before it stay *Not
-     Required*, so installing the module on a database with years of
-     history is fast.
-   - **CFDI Follow-up Responsible Team** — the activity team whose
-     members receive the follow-up activities (validation errors,
-     replacements).
-   - **CFDI Payment Request CC Users** — (optional) select internal
-     users whose emails will be included in the request email body to
-     ask the vendor to CC them.
+   - **Follow-up Start Date** — only payments dated on or after this
+     date are tracked. Payments before it stay *Not Required*, so
+     installing the module on a database with years of history is fast.
+   - **Responsible Team** — the activity team whose members receive the
+     follow-up activities (validation errors, replacements).
+   - **Users Receiving Complements by Email** — (optional) internal
+     users whose email addresses are shown in the request email as an
+     alternative address where the vendor can send the complement XML
+     and PDF.
 
 2. Go to *Accounting / Configuration / Journals* and tick **Requires
    CFDI Payment Complement** on every bank or cash journal whose
@@ -192,12 +191,12 @@ Ignoring a payment
 ------------------
 
 When a payment should not be followed up (e.g. a complement will never
-arrive), select it and use *Action ⚙️ / Ignore CFDI Complement* to set
-it to *Not Required*; the choice persists across recomputations. Use
-*Action ⚙️ / Revert CFDI Complement Ignore* to resume the follow-up.
-These actions are available on both payments and bank statement lines. A
-received and valid XML always overrides the ignore and validates the
-complement anyway.
+arrive), select it in the payments list or in the bank reconciliation
+list and press **CFDI Not Required** (also available as *Action ⚙️ /
+Mark as CFDI Not Required*) to set it to *Not Required*; the choice
+persists across recomputations. Press **Resume CFDI Follow-up** to put
+it back in scope. A received and valid XML always overrides the ignore
+and validates the complement anyway.
 
 Known issues / Roadmap
 ======================

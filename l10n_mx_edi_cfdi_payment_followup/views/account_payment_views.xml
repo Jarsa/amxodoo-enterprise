@@ -39,6 +39,18 @@
         <field name="model">account.payment</field>
         <field name="inherit_id" ref="account.view_account_payment_tree" />
         <field name="arch" type="xml">
+            <xpath expr="//tree/header" position="inside">
+                <button
+                    name="action_cfdi_ignore"
+                    type="object"
+                    string="CFDI Not Required"
+                />
+                <button
+                    name="action_cfdi_unignore"
+                    type="object"
+                    string="Resume CFDI Follow-up"
+                />
+            </xpath>
             <xpath expr="//field[@name='activity_ids']" position="before">
                 <field
                     name="l10n_mx_edi_cfdi_payment_state"
