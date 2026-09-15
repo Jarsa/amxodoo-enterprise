@@ -87,9 +87,11 @@
                     </t>
                 </table>
                 <p>
-                    Please send your Payment Complement, XML and PDF files, at your earliest convenience, either by replying to this email and attaching them, or by sending them to <t
-                        t-out="', '.join(object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids.mapped('email'))"
-                    />
+                    Please send your Payment Complement, XML and PDF files, at your earliest convenience, by replying to this email and attaching them<t
+                        t-if="object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids"
+                    >, or by sending them to <t
+                            t-out="', '.join(object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids.mapped('email'))"
+                        /></t>.
                 </p>
                 <p>
                     Thank you,<br />

@@ -18,6 +18,16 @@
                         type="object"
                         string="Request Complements"
                     />
+                    <button
+                        name="action_cfdi_ignore"
+                        type="object"
+                        string="CFDI Not Required"
+                    />
+                    <button
+                        name="action_cfdi_unignore"
+                        type="object"
+                        string="Resume CFDI Follow-up"
+                    />
                 </header>
             </xpath>
             <xpath expr="//field[@name='id']" position="before">

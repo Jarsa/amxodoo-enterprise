@@ -1,30 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8"/>
-    <title>Mexico - CFDI Payment Complement Follow-up</title>
+    <title>México - Seguimiento de Complementos de Pago CFDI</title>
 </head>
 <body>
     <section class="oe_container">
         <div class="oe_row oe_spaced">
-            <h2 class="oe_slogan">Mexico - CFDI Payment Complement Follow-up</h2>
+            <h2 class="oe_slogan">México - Seguimiento de Complementos de Pago CFDI</h2>
             <h3 class="oe_slogan">
-                Track and validate CFDI payment complements for PPD invoices
+                Solicita, recibe y valida los complementos de pago (PPD) de tus proveedores
             </h3>
             <div class="oe_span12">
                 <p>
-                    This module automates the tracking, validation, and operational
-                    control of CFDI Payment Complements (Complementos de Pago PPD) for
-                    vendor payments and customer collections.
+                    Cada pago a proveedor conciliado contra una factura PPD debe recibir un
+                    Complemento de Pago CFDI. Este módulo lleva el control de ese proceso:
+                    detecta los pagos que lo necesitan, envía la solicitud al proveedor por
+                    correo, recibe el XML, lo valida contra los datos de Odoo y avisa al
+                    equipo responsable cuando algo está mal.
                 </p>
                 <ul>
-                    <li>Automatic CFDI payment state on reconciled payments</li>
-                    <li>Manual button to request complement from vendors</li>
-                    <li>Automatic XML complement validation (8 rules)</li>
-                    <li>Activity creation on validation errors</li>
-                    <li>Scheduled follow-up reminders</li>
-                    <li>Per-company start date configuration</li>
+                    <li>Estado del complemento en cada pago y en la conciliación bancaria.</li>
+                    <li>Correo de solicitud al proveedor con las facturas y montos aplicados.</li>
+                    <li>Validación automática del XML recibido (8 reglas).</li>
+                    <li>Actividades al equipo responsable cuando hay errores.</li>
+                    <li>Recordatorios automáticos a los proveedores que no responden.</li>
+                    <li>Filtro por diario y por país del proveedor.</li>
                 </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="oe_container oe_dark">
+        <div class="oe_row oe_spaced">
+            <h2 class="oe_slogan">Configuración</h2>
+            <div class="oe_span12">
+                <h3>1. Ajustes generales</h3>
+                <p>
+                    En <b>Contabilidad / Configuración / Ajustes</b>, sección
+                    <b>Seguimiento de Complementos de Pago CFDI</b>, configura por compañía:
+                </p>
+                <ul>
+                    <li>
+                        <b>Fecha de Inicio del Seguimiento</b>: solo se da seguimiento a los
+                        pagos con fecha igual o posterior. Los anteriores quedan como
+                        <i>No Requerido</i>.
+                    </li>
+                    <li>
+                        <b>Equipo Responsable</b>: equipo cuyos integrantes reciben las
+                        actividades cuando un XML tiene errores o es reemplazado. El módulo
+                        crea el equipo <i>Equipo de Complemento de Pago CFDI</i>; agrega sus
+                        integrantes en <b>Ajustes / Técnico / Equipos de Actividades</b>
+                        (con modo desarrollador).
+                    </li>
+                    <li>
+                        <b>Usuarios que Reciben Complementos por Correo</b>: sus correos
+                        aparecen al final del correo de solicitud, como dirección alternativa a
+                        la que el proveedor puede enviar el XML y PDF en lugar de responder.
+                    </li>
+                </ul>
+
+                <h3>2. Diarios que requieren complemento</h3>
+                <p>
+                    En <b>Contabilidad / Configuración / Diarios</b>, abre cada diario de
+                    banco o efectivo y marca la casilla <b>Requiere Complemento de Pago CFDI</b>.
+                    Solo los pagos registrados en diarios marcados entran al seguimiento; los
+                    demás (tarjetas de crédito, cajas chicas, diarios de conciliación)
+                    quedan como <i>No Requerido</i>.
+                </p>
+                <p>
+                    Los proveedores cuyo país no es México se excluyen automáticamente, ya que
+                    no emiten CFDI. Un proveedor sin país capturado sí se considera.
+                </p>
+
+                <h3>3. Contacto del proveedor (opcional)</h3>
+                <p>
+                    El correo de solicitud se envía al contacto hijo del proveedor que tenga la
+                    etiqueta <b>cfdi_complement_contact</b>; si no existe, se envía al correo
+                    principal del proveedor. Si el proveedor no tiene ninguno de los dos, el
+                    sistema avisa que falta el correo y no envía nada.
+                </p>
+
+                <h3>4. Parámetros opcionales</h3>
+                <p>
+                    En <b>Ajustes / Técnico / Parámetros del sistema</b>:
+                </p>
+                <ul>
+                    <li>
+                        <code>l10n_mx_edi_cfdi_payment_followup_interval_days</code>: días
+                        entre recordatorios a un proveedor con solicitud pendiente (5 por
+                        defecto).
+                    </li>
+                    <li>
+                        <code>l10n_mx_edi_cfdi_payment_date_tolerance_days</code>: días que la
+                        <i>FechaPago</i> del complemento puede exceder la fecha del pago (2
+                        por defecto).
+                    </li>
+                </ul>
+                <p>
+                    Los recordatorios automáticos los envía la acción planificada
+                    <b>Seguimiento de Complementos de Pago CFDI</b>
+                    (<b>Ajustes / Técnico / Acciones planificadas</b>).
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="oe_container">
+        <div class="oe_row oe_spaced">
+            <h2 class="oe_slogan">Manual de uso</h2>
+            <div class="oe_span12">
+                <h3>Estados del complemento</h3>
+                <p>
+                    Cada pago muestra el campo <b>Estado del Complemento CFDI</b>, visible en
+                    el formulario del pago, en la lista de pagos y en la conciliación bancaria:
+                </p>
+                <ul>
+                    <li><b>No Requerido</b>: no se espera complemento (factura PUE, pago anterior a la fecha de inicio, diario no marcado, proveedor extranjero, cobro de cliente o pago marcado manualmente).</li>
+                    <li><b>Pendiente</b>: el pago está conciliado contra una factura PPD y aún no se ha solicitado el complemento.</li>
+                    <li><b>Solicitado</b>: ya se envió el correo de solicitud y se espera el XML.</li>
+                    <li><b>Validado</b>: se recibió un XML correcto y quedó registrado en el pago.</li>
+                    <li><b>Error</b>: el XML recibido no pasó la validación; se creó una actividad para el equipo responsable.</li>
+                </ul>
+
+                <h3>Solicitar el complemento</h3>
+                <ol>
+                    <li>Abre el pago a proveedor (o la línea de conciliación bancaria) en estado <i>Pendiente</i>, <i>Solicitado</i> o <i>Error</i>.</li>
+                    <li>Opcional: sube el comprobante de la transferencia en el campo <b>Comprobante de Pago</b> para que se anexe al correo.</li>
+                    <li>Presiona <b>Solicitar Complemento</b>. En la conciliación bancaria puedes seleccionar varias líneas y usar <b>Solicitar Complementos</b> para enviarlas en lote.</li>
+                </ol>
+                <p>
+                    El correo sale en el idioma del proveedor e incluye la referencia del pago,
+                    la fecha, el monto y cada factura relacionada con su folio de proveedor,
+                    moneda y monto parcial aplicado. El estado pasa a <i>Solicitado</i>.
+                    El botón solo aparece en pagos a proveedor; en cobros de cliente se oculta.
+                </p>
+
+                <h3>Recibir y validar el XML</h3>
+                <p>
+                    Adjunta el XML del complemento en el chatter del pago (o directamente en el
+                    pago). El módulo lo procesa de inmediato y valida que:
+                </p>
+                <ol>
+                    <li>Sea un complemento de pago (<i>TipoDeComprobante = P</i>).</li>
+                    <li>Tenga Timbre Fiscal (UUID).</li>
+                    <li>La <i>FormaDePagoP</i> sea transferencia (03).</li>
+                    <li>La <i>FechaPago</i> tenga un formato válido.</li>
+                    <li>La <i>FechaPago</i> no sea anterior a la fecha del pago ni la exceda más de la tolerancia configurada.</li>
+                    <li>Cada documento relacionado corresponda a una factura conciliada con el pago.</li>
+                    <li>El saldo insoluto quede en cero.</li>
+                    <li>La suma de los montos coincida con el monto del pago (±1.00).</li>
+                </ol>
+                <p>
+                    Si todo es correcto el estado pasa a <i>Validado</i> y se cierran las
+                    actividades de error anteriores. Si algo falla pasa a <i>Error</i> y se
+                    crea una actividad para el equipo responsable con el detalle. Un XML de
+                    reemplazo (UUID distinto) se acepta y se registra en el chatter.
+                </p>
+
+                <h3>Marcar un pago como No Requerido</h3>
+                <p>
+                    Cuando un pago no recibirá complemento, selecciónalo en la lista de pagos o
+                    en la conciliación bancaria y presiona el botón <b>CFDI No Requerido</b>
+                    (también disponible en el menú <b>Acción / Marcar como CFDI No Requerido</b>).
+                    El pago queda como <i>No Requerido</i> aunque se recalcule. Para regresarlo
+                    al seguimiento usa <b>Reanudar Seguimiento CFDI</b>. Si después llega un
+                    XML válido, el pago se valida de todas formas.
+                </p>
+
+                <h3>Recordatorios automáticos</h3>
+                <p>
+                    Los pagos en <i>Solicitado</i> sin respuesta reciben un recordatorio cada
+                    5 días (configurable). Puedes revisar los correos enviados en el chatter
+                    del pago y en <b>Última Fecha de Seguimiento</b>.
+                </p>
             </div>
         </div>
     </section>

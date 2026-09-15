@@ -98,9 +98,11 @@ msgid ""
 "                    </t>\n"
 "                </table>\n"
 "                <p>\n"
-"                    Please send your Payment Complement, XML and PDF files, at your earliest convenience, either by replying to this email and attaching them, or by sending them to <t\n"
-"                        t-out=\"', '.join(object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids.mapped('email'))\"\n"
-"                    />\n"
+"                    Please send your Payment Complement, XML and PDF files, at your earliest convenience, by replying to this email and attaching them<t\n"
+"                        t-if=\"object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids\"\n"
+"                    >, or by sending them to <t\n"
+"                            t-out=\"', '.join(object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids.mapped('email'))\"\n"
+"                        /></t>.\n"
 "                </p>\n"
 "                <p>\n"
 "                    Thank you,<br />\n"
@@ -187,9 +189,11 @@ msgstr ""
 "                    </t>\n"
 "                </table>\n"
 "                <p>\n"
-"                    Por favor envíe su Complemento de Pago, en formato XML y PDF, a la mayor brevedad posible, ya sea respondiendo a este correo y adjuntándolos, o enviándolos a <t\n"
-"                        t-out=\"', '.join(object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids.mapped('email'))\"\n"
-"                    />\n"
+"                    Por favor envíe su Complemento de Pago, en formato XML y PDF, a la mayor brevedad posible, respondiendo a este correo y adjuntándolos<t\n"
+"                        t-if=\"object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids\"\n"
+"                    >, o enviándolos a <t\n"
+"                            t-out=\"', '.join(object.company_id.l10n_mx_edi_cfdi_payment_cc_user_ids.mapped('email'))\"\n"
+"                        /></t>.\n"
 "                </p>\n"
 "                <p>\n"
 "                    Gracias,<br />\n"
@@ -267,7 +271,9 @@ msgid "CFDI Follow-up Responsible Team"
 msgstr "Equipo Responsable del Seguimiento CFDI"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_account_payment_tree_cfdi_followup
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_search_cfdi_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_tree_cfdi_followup
 msgid "CFDI Not Required"
 msgstr "CFDI No Requerido"
 
@@ -428,8 +434,6 @@ msgid "Error"
 msgstr "Error"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
-#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_ignore_payment
-#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_ignore_statement_line
 #: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_bank_statement_line__l10n_mx_edi_cfdi_payment_manual_ignore
 #: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_move__l10n_mx_edi_cfdi_payment_manual_ignore
 #: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_account_payment__l10n_mx_edi_cfdi_payment_manual_ignore
@@ -569,12 +573,6 @@ msgid "Requested"
 msgstr "Solicitado"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
-#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_unignore_payment
-#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_unignore_statement_line
-msgid "Revert CFDI Complement Ignore"
-msgstr "Revertir Ignorar Complemento CFDI"
-
-#. module: l10n_mx_edi_cfdi_payment_followup
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_tree_cfdi_followup
 msgid "Request Complements"
 msgstr "Solicitar Complementos"
@@ -629,3 +627,55 @@ msgstr ""
 "en diarios con esta opción activada. Déjela desactivada para tarjetas de "
 "crédito, diarios de compensación o cualquier otro diario cuyos pagos nunca "
 "requieren complemento."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_ignore_payment
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_ignore_statement_line
+msgid "Mark as CFDI Not Required"
+msgstr "Marcar como CFDI No Requerido"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_unignore_payment
+#: model:ir.actions.server,name:l10n_mx_edi_cfdi_payment_followup.action_cfdi_unignore_statement_line
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_account_payment_tree_cfdi_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_tree_cfdi_followup
+msgid "Resume CFDI Follow-up"
+msgstr "Reanudar Seguimiento CFDI"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.res_config_settings_view_form_cfdi_followup
+msgid "Follow-up Start Date"
+msgstr "Fecha de Inicio del Seguimiento"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.res_config_settings_view_form_cfdi_followup
+msgid "Responsible Team"
+msgstr "Equipo Responsable"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_res_company__l10n_mx_edi_cfdi_payment_cc_user_ids
+#: model:ir.model.fields,field_description:l10n_mx_edi_cfdi_payment_followup.field_res_config_settings__l10n_mx_edi_cfdi_payment_cc_user_ids
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.res_config_settings_view_form_cfdi_followup
+msgid "Users Receiving Complements by Email"
+msgstr "Usuarios que Reciben Complementos por Correo"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.res_config_settings_view_form_cfdi_followup
+msgid "Only vendor payments dated on or after this date are tracked. Older payments stay as Not Required."
+msgstr "Solo se da seguimiento a los pagos a proveedor con fecha igual o posterior a esta. Los pagos anteriores quedan como No Requerido."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.res_config_settings_view_form_cfdi_followup
+msgid "Team whose members receive the follow-up activities when a received XML has errors or is replaced."
+msgstr "Equipo cuyos integrantes reciben las actividades de seguimiento cuando un XML recibido tiene errores o es reemplazado."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.res_config_settings_view_form_cfdi_followup
+msgid "Their email addresses are shown in the request email, so the vendor can send the complement XML and PDF to them instead of replying."
+msgstr "Sus correos aparecen en el correo de solicitud, para que el proveedor pueda enviarles el XML y PDF del complemento en lugar de responder."
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_res_company__l10n_mx_edi_cfdi_payment_cc_user_ids
+#: model:ir.model.fields,help:l10n_mx_edi_cfdi_payment_followup.field_res_config_settings__l10n_mx_edi_cfdi_payment_cc_user_ids
+msgid "Internal users whose email addresses are shown in the complement request email as an alternative address where the vendor can send the complement XML and PDF."
+msgstr "Usuarios internos cuyos correos aparecen en el correo de solicitud del complemento como dirección alternativa a la que el proveedor puede enviar el XML y PDF del complemento."

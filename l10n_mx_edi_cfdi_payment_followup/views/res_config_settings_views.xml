@@ -7,36 +7,34 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="l10n_mx_edi.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//block[@id='l10n_mx_edi_settings']" position="inside">
-                <setting
-                    string="CFDI Payment Complement Follow-up"
-                    help="Configure tracking of CFDI payment complements for PPD invoices."
+            <xpath expr="//block[@id='l10n_mx_edi_settings']" position="after">
+                <block
+                    id="l10n_mx_edi_cfdi_payment_followup_settings"
+                    title="CFDI Payment Complement Follow-up"
+                    invisible="country_code != 'MX'"
                 >
-                    <div class="row mt16">
-                        <label
-                            for="l10n_mx_edi_cfdi_payment_start_date"
-                            class="col-lg-3 o_light_label"
-                        />
+                    <setting
+                        string="Follow-up Start Date"
+                        help="Only vendor payments dated on or after this date are tracked. Older payments stay as Not Required."
+                    >
                         <field name="l10n_mx_edi_cfdi_payment_start_date" />
-                    </div>
-                    <div class="row">
-                        <label
-                            for="l10n_mx_edi_cfdi_responsible_team_id"
-                            class="col-lg-3 o_light_label"
-                        />
+                    </setting>
+                    <setting
+                        string="Responsible Team"
+                        help="Team whose members receive the follow-up activities when a received XML has errors or is replaced."
+                    >
                         <field name="l10n_mx_edi_cfdi_responsible_team_id" />
-                    </div>
-                    <div class="row">
-                        <label
-                            for="l10n_mx_edi_cfdi_payment_cc_user_ids"
-                            class="col-lg-3 o_light_label"
-                        />
+                    </setting>
+                    <setting
+                        string="Users Receiving Complements by Email"
+                        help="Their email addresses are shown in the request email, so the vendor can send the complement XML and PDF to them instead of replying."
+                    >
                         <field
                             name="l10n_mx_edi_cfdi_payment_cc_user_ids"
                             widget="many2many_tags"
                         />
-                    </div>
-                </setting>
+                    </setting>
+                </block>
             </xpath>
         </field>
     </record>
