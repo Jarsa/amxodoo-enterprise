@@ -59,11 +59,16 @@ class L10nMxEdiDocument(models.Model):
                 "delta_tax_amount": 0.0,
             }
 
+        # HALF-UP, never UP: the SAT accepts ImporteDR only within
+        # [trunc(BaseDR * Tasa), ceil(BaseDR * Tasa)] (CRP20261). Rounding the
+        # base up moves up to one unit from importe to base, which can push
+        # importe below the lower limit (7793.24 / 1.16 = 6718.3103 -> UP gives
+        # 6718.32 / 1074.92 but 6718.32 * 0.16 = 1074.9312 -> min 1074.93).
         total = base_amount + tax_amount
         new_base_amount = float_round(
             total / (1 + tax_rate),
             precision_digits=precision_digits,
-            rounding_method="UP",
+            rounding_method="HALF-UP",
         )
         new_tax_amount = total - new_base_amount
         return {

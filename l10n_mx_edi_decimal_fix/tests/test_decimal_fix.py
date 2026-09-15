@@ -1,4 +1,4 @@
-from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
+from decimal import ROUND_DOWN, ROUND_HALF_UP, ROUND_UP, Decimal
 
 from lxml import etree
 
@@ -971,15 +971,48 @@ class TestDecimalFix(TestDecimalFixCommon):
     # MonedaDR (l10n_mx_edi_decimal_places), not a fixed 6.
     # -------------------------------------------------------------------------
 
-    def test_traslado_dr_currency_decimals(self):
+    def _set_currency_2dp(self, currency):
         # ORM forbids reducing the decimals of a currency with journal entries.
         self.env.cr.execute(
             "UPDATE res_currency SET rounding = 0.01, decimal_places = 2,"
             " l10n_mx_edi_decimal_places = 2"
             " WHERE id = %s",
-            [self.mxn_currency.id],
+            [currency.id],
         )
-        self.mxn_currency.invalidate_recordset()
+        currency.invalidate_recordset()
+
+    def _assert_traslados_dr_within_sat_limits(self, pay_cfdi, rounding_method):
+        """CRP20261: trunc(BaseDR * Tasa) <= ImporteDR <= ceil(BaseDR * Tasa),
+        at the decimals of MonedaDR, and BaseDR + ImporteDR == ImpPagado."""
+        ns_pago = "http://www.sat.gob.mx/Pagos20"
+        doctos = pay_cfdi.findall(f".//{{{ns_pago}}}DoctoRelacionado")
+        self.assertTrue(doctos, f"No DoctoRelacionado found ({rounding_method})")
+        for docto in doctos:
+            currency = self.env["res.currency"].search(
+                [("name", "=", docto.get("MonedaDR"))]
+            )
+            unit = Decimal(1).scaleb(-currency.l10n_mx_edi_decimal_places)
+            paid = Decimal(0)
+            for tdr in docto.findall(f".//{{{ns_pago}}}TrasladoDR"):
+                base = Decimal(tdr.get("BaseDR"))
+                importe = Decimal(tdr.get("ImporteDR"))
+                expected = base * Decimal(tdr.get("TasaOCuotaDR"))
+                lower = expected.quantize(unit, ROUND_DOWN)
+                upper = expected.quantize(unit, ROUND_UP)
+                self.assertTrue(
+                    lower <= importe <= upper,
+                    f"CRP20261: ImporteDR={importe} outside [{lower}, {upper}] "
+                    f"for BaseDR={base} ({rounding_method})",
+                )
+                paid += base + importe
+            self.assertEqual(
+                paid,
+                Decimal(docto.get("ImpPagado")),
+                f"BaseDR + ImporteDR must equal ImpPagado ({rounding_method})",
+            )
+
+    def test_traslado_dr_currency_decimals(self):
+        self._set_currency_2dp(self.mxn_currency)
 
         def run(rounding_method):
             with self.mx_external_setup(self.frozen_today):
@@ -1014,3 +1047,104 @@ class TestDecimalFix(TestDecimalFixCommon):
                 self.assertEqual(tp.get("ImporteP"), "3276.25")
 
         self._test_cfdi_rounding(run)
+
+    # -------------------------------------------------------------------------
+    # Case 9: CRP20261 — 2dp currency, round_per_line (Real, BAF/2026/09/0489,
+    # reproduced in staging with BAF/2026/09/0204 / F40280). The per-line taxes
+    # sum to 1074.94 while 6718.30 * 0.16 = 1074.928, so the payment post-fix
+    # recomputes the base from the paid total: 7793.24 / 1.16 = 6718.3103.
+    # Rounding that base UP gave BaseDR=6718.32 / ImporteDR=1074.92, below the
+    # lower limit trunc(6718.32 * 0.16) = 1074.93. HALF-UP gives 6718.31 /
+    # 1074.93, inside [1074.92, 1074.93].
+    # -------------------------------------------------------------------------
+
+    def test_traslado_dr_post_fix_half_up_2dp(self):
+        self._set_currency_2dp(self.mxn_currency)
+
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.mxn_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": quantity,
+                                "price_unit": price_unit,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        )
+                        for quantity, price_unit in (
+                            (25, 83.24),
+                            (40, 87.84),
+                            (5, 112.37),
+                            (5, 112.37),
+                        )
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
+                payment = self._create_payment(invoice)
+                with self.with_mocked_pac_sign_success():
+                    payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+
+                pay_doc = self._get_payment_document(payment.move_id)
+                self.assertTrue(
+                    pay_doc, f"CFDI payment document not created ({rounding_method})"
+                )
+                pay_cfdi = self._get_cfdi_tree(pay_doc)
+                self._assert_traslados_dr_within_sat_limits(pay_cfdi, rounding_method)
+                if rounding_method == "round_per_line":
+                    self.assertEqual(invoice.amount_total, 7793.24)
+                    ns_pago = "http://www.sat.gob.mx/Pagos20"
+                    tdr = pay_cfdi.find(f".//{{{ns_pago}}}TrasladoDR")
+                    self.assertEqual(tdr.get("BaseDR"), "6718.31")
+                    self.assertEqual(tdr.get("ImporteDR"), "1074.93")
+
+        self._test_cfdi_rounding(run)
+
+    def test_post_fix_tax_amounts_within_sat_limits(self):
+        """_get_post_fix_tax_amounts_map must keep base + importe and return an
+        importe inside [trunc(base * rate), ceil(base * rate)] at 2dp and 6dp."""
+        document = self.env["l10n_mx_edi.document"]
+        rate = 0.16
+        cases = [
+            # Real staging: F40280 (BAF/2026/09/0204) and the paid totals of
+            # BAF/2026/09/0060, BAF/2026/09/0291 and BAF/2026/01/0696.
+            (6718.30, 1074.94, 2),
+            (17566.00, 2810.55, 2),
+            (118133.19, 18901.30, 2),
+            (9413.63, 1506.17, 2),
+        ]
+        for dp in (2, 6):
+            unit = 10**-dp
+            for i in range(400):
+                base = float_round(1000.0 + i * 0.7 * unit, dp)
+                for drift in (-2, -1, 0, 1, 2):
+                    cases.append(
+                        (base, float_round(base * rate + drift * unit, dp), dp)
+                    )
+        for base, importe, dp in cases:
+            with self.subTest(base=base, importe=importe, dp=dp):
+                res = document._get_post_fix_tax_amounts_map(base, importe, rate, dp)
+                unit = Decimal(1).scaleb(-dp)
+                new_base = Decimal(f"{res['new_base_amount']:.{dp}f}")
+                new_tax = Decimal(f"{res['new_tax_amount']:.{dp}f}")
+                expected = new_base * Decimal(str(rate))
+                self.assertTrue(
+                    expected.quantize(unit, ROUND_DOWN)
+                    <= new_tax
+                    <= expected.quantize(unit, ROUND_UP),
+                    f"CRP20261: {new_tax} outside limits of {new_base} * {rate}",
+                )
+                self.assertEqual(
+                    new_base + new_tax,
+                    Decimal(f"{base:.{dp}f}") + Decimal(f"{importe:.{dp}f}"),
+                    "base + importe must be preserved",
+                )
+                self.assertAlmostEqual(
+                    res["delta_base_amount"], res["new_base_amount"] - base
+                )
+                self.assertAlmostEqual(
+                    res["delta_tax_amount"], res["new_tax_amount"] - importe
+                )
