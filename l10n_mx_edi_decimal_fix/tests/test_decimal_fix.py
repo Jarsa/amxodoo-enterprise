@@ -165,11 +165,13 @@ class TestDecimalFix(TestDecimalFixCommon):
                 self.assertEqual(imp_saldo_ant, imp_pagado)
                 self.assertRegex(imp_pagado, r"^\d+\.\d{2}$")
 
-                # BaseDR is the 6dp base (41753.115); BaseP/ImporteP are truncated,
-                # not rounded, to the 2dp of MonedaP (Finkok, 2026-09-04).
+                # The 6dp base (41753.115) is rounded to BaseDR=41753.12 and
+                # ImporteDR is what is left of the paid 48433.61; BaseP/ImporteP
+                # are the sum of those DR amounts.
                 traslado_p = pay_cfdi.find(f".//{{{ns_pago}}}TrasladoP")
-                self.assertEqual(traslado_p.get("BaseP"), "41753.11")
+                self.assertEqual(traslado_p.get("BaseP"), "41753.12")
                 self.assertEqual(traslado_p.get("ImporteP"), "6680.49")
+                self._assert_traslados_dr_within_sat_limits(pay_cfdi, rounding_method)
 
         self._test_cfdi_rounding(run)
 
@@ -292,8 +294,8 @@ class TestDecimalFix(TestDecimalFixCommon):
           "El campo BaseP... no es igual a la suma de los importes de las bases
            registrados en los documentos relacionados..."
 
-        Fix: TrasladoDR is overridden to use 6dp and BaseP is the 2dp truncation
-        of sum(BaseDR / EquivalenciaDR), as Finkok requires since 2026-09-04.
+        Fix: BaseDR is rounded to 2dp and BaseP is the 2dp truncation of
+        sum(BaseDR / EquivalenciaDR), as Finkok requires since 2026-09-04.
         Tested for both round_per_line and round_globally.
         """
         rate = 1.0 / 17.0
@@ -332,7 +334,7 @@ class TestDecimalFix(TestDecimalFixCommon):
                 pay_cfdi = self._get_cfdi_tree(pay_doc)
                 ns_pago = "http://www.sat.gob.mx/Pagos20"
 
-                # Collect BaseDR values per DoctoRelacionado and verify 6dp.
+                # Collect BaseDR values per DoctoRelacionado and verify 2dp.
                 docto_list = pay_cfdi.findall(f".//{{{ns_pago}}}DoctoRelacionado")
                 self.assertTrue(
                     docto_list, f"No DoctoRelacionado found ({rounding_method})"
@@ -349,8 +351,8 @@ class TestDecimalFix(TestDecimalFixCommon):
                         base_dr_str = tdr.get("BaseDR", "0")
                         self.assertRegex(
                             base_dr_str,
-                            r"^\d+\.\d{6}$",
-                            f"BaseDR must have 6 decimal places ({rounding_method})",
+                            r"^\d+\.\d{2}$",
+                            f"BaseDR must have 2 decimal places ({rounding_method})",
                         )
                         base_dr_total += Decimal(base_dr_str) / equivalencia
 
@@ -988,10 +990,7 @@ class TestDecimalFix(TestDecimalFixCommon):
         doctos = pay_cfdi.findall(f".//{{{ns_pago}}}DoctoRelacionado")
         self.assertTrue(doctos, f"No DoctoRelacionado found ({rounding_method})")
         for docto in doctos:
-            currency = self.env["res.currency"].search(
-                [("name", "=", docto.get("MonedaDR"))]
-            )
-            unit = Decimal(1).scaleb(-currency.l10n_mx_edi_decimal_places)
+            unit = Decimal("0.01")
             paid = Decimal(0)
             for tdr in docto.findall(f".//{{{ns_pago}}}TrasladoDR"):
                 base = Decimal(tdr.get("BaseDR"))
@@ -1148,3 +1147,59 @@ class TestDecimalFix(TestDecimalFixCommon):
                 self.assertAlmostEqual(
                     res["delta_tax_amount"], res["new_tax_amount"] - importe
                 )
+
+    # -------------------------------------------------------------------------
+    # Case 11: CRP20274 / CRP20268 — 6dp currency (MTNMX, BDCJ3/2026/00288,
+    # 00289 and 00290). ImporteDR="181.048000" with ImporteP="181.04" and
+    # BaseDR="34370.009400" with BaseP="34370.00" are rejected by Finkok since
+    # 2026-09-15: the DR amounts must carry 2 decimals and P must be their sum.
+    # -------------------------------------------------------------------------
+
+    def test_traslado_dr_2dp_with_6dp_currency(self):
+        rate = 1.0 / 16.9707
+        self.setup_rates(self.usd_currency, (self.frozen_today, rate))
+        cases = [
+            (1131.55, "1131.55", "181.05"),
+            (233.33, "233.33", "37.33"),
+            (34370.0094, "34370.01", "5499.20"),
+        ]
+
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                for price_unit, base, importe in cases:
+                    invoice = self._create_invoice(
+                        currency_id=self.usd_currency.id,
+                        invoice_line_ids=[
+                            Command.create(
+                                {
+                                    "product_id": self.product.id,
+                                    "quantity": 1,
+                                    "price_unit": price_unit,
+                                    "tax_ids": [Command.set(self.tax_16.ids)],
+                                }
+                            ),
+                        ],
+                    )
+                    with self.with_mocked_pac_sign_success():
+                        invoice._l10n_mx_edi_cfdi_invoice_try_send()
+                    payment = self._create_payment(
+                        invoice, currency_id=self.usd_currency.id
+                    )
+                    with self.with_mocked_pac_sign_success():
+                        payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+
+                    pay_cfdi = self._get_cfdi_tree(
+                        self._get_payment_document(payment.move_id)
+                    )
+                    ns_pago = "http://www.sat.gob.mx/Pagos20"
+                    tdr = pay_cfdi.find(f".//{{{ns_pago}}}TrasladoDR")
+                    self.assertEqual(tdr.get("BaseDR"), base)
+                    self.assertEqual(tdr.get("ImporteDR"), importe)
+                    tp = self._assert_traslado_p_2dp(pay_cfdi, rounding_method)
+                    self.assertEqual(tp.get("BaseP"), base)
+                    self.assertEqual(tp.get("ImporteP"), importe)
+                    self._assert_traslados_dr_within_sat_limits(
+                        pay_cfdi, rounding_method
+                    )
+
+        self._test_cfdi_rounding(run)
