@@ -175,6 +175,32 @@
 
         </xpath>
 
+        <!-- RetencionDR / TrasladoDR: amounts are already rounded to 2 decimals in
+             _l10n_mx_edi_add_payment_cfdi_values; print them as such even when
+             the currency is configured with more decimals. -->
+        <xpath
+            expr="//*[local-name()='RetencionDR' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
+            position="attributes"
+        >
+            <attribute
+                name="t-att-BaseDR"
+            >invoice_values['format_float'](tax_values['base'], precision=2)</attribute>
+            <attribute
+                name="t-att-ImporteDR"
+            >invoice_values['format_float'](tax_values['importe'], precision=2)</attribute>
+        </xpath>
+        <xpath
+            expr="//*[local-name()='TrasladoDR' and namespace-uri()='http://www.sat.gob.mx/Pagos20']"
+            position="attributes"
+        >
+            <attribute
+                name="t-att-BaseDR"
+            >invoice_values['format_float'](tax_values['base'], precision=2)</attribute>
+            <attribute
+                name="t-att-ImporteDR"
+            >invoice_values['format_float'](tax_values['importe'], precision=2)</attribute>
+        </xpath>
+
         <!-- RetencionP / TrasladoP: since 2026-09-04 Finkok requires BaseP/ImporteP
              "truncado a la cantidad de decimales que soporte la moneda del Pago"
              (CRP20268/CRP20274/CRPER654), so truncate the 6dp sums to 2dp. -->
