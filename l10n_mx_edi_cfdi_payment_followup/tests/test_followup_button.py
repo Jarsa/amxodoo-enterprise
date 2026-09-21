@@ -167,23 +167,24 @@ class TestFollowupButton(TestCfdiPaymentFollowupCommon):
         not queue a recompute over historical data when the stored compute
         field is registered.
         """
-        AccountMove = self.env["account.move"]
-        # Wipe the column to simulate the state right before the module is
-        # installed for the first time.
+        # Drop the columns to simulate the state right before the module is
+        # installed for the first time (DDL is rolled back with the test).
+        self.env.flush_all()
         self.env.cr.execute(
-            "UPDATE account_move SET l10n_mx_edi_cfdi_payment_state = NULL "
-            "WHERE id = %s",
-            [self.payment.move_id.id],
+            "ALTER TABLE account_move "
+            "DROP COLUMN l10n_mx_edi_cfdi_payment_state, "
+            "DROP COLUMN l10n_mx_edi_cfdi_is_supplier_payment"
         )
-        AccountMove.invalidate_model(["l10n_mx_edi_cfdi_payment_state"])
 
         pre_init_hook(self.env)
 
         self.env.cr.execute(
-            "SELECT l10n_mx_edi_cfdi_payment_state FROM account_move WHERE id = %s",
+            "SELECT l10n_mx_edi_cfdi_payment_state, "
+            "l10n_mx_edi_cfdi_is_supplier_payment FROM account_move WHERE id = %s",
             [self.payment.move_id.id],
         )
-        self.assertEqual(self.env.cr.fetchone()[0], "not_required")
+        self.assertEqual(self.env.cr.fetchone(), ("not_required", False))
+        self.env.invalidate_all()
 
     def test_set_start_date_recomputes_in_range(self):
         """Setting start_date on the company triggers a bounded recompute

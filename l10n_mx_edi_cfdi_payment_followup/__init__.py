@@ -8,30 +8,18 @@ def pre_init_hook(env):
     recompute over the whole history. Users opt-in by setting the start date
     in Accounting > Settings, which triggers a bounded recompute for moves
     from that date onwards (see res_company.write).
+
+    The value is set through the column DEFAULT instead of an UPDATE: since
+    PostgreSQL 11 that is a metadata-only change, while an UPDATE rewrites
+    every row of account_move and leaves a dead copy of the table behind
+    (one per install attempt when the install is retried).
     """
     env.cr.execute(
         """
         ALTER TABLE account_move
         ADD COLUMN IF NOT EXISTS l10n_mx_edi_cfdi_payment_state VARCHAR
-        """
-    )
-    env.cr.execute(
-        """
-        UPDATE account_move
-        SET l10n_mx_edi_cfdi_payment_state = 'not_required'
-        WHERE l10n_mx_edi_cfdi_payment_state IS NULL
-        """
-    )
-    env.cr.execute(
-        """
-        ALTER TABLE account_move
+            DEFAULT 'not_required',
         ADD COLUMN IF NOT EXISTS l10n_mx_edi_cfdi_is_supplier_payment BOOLEAN
-        """
-    )
-    env.cr.execute(
-        """
-        UPDATE account_move
-        SET l10n_mx_edi_cfdi_is_supplier_payment = false
-        WHERE l10n_mx_edi_cfdi_is_supplier_payment IS NULL
+            DEFAULT false
         """
     )
