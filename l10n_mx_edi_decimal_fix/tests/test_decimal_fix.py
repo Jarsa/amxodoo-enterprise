@@ -294,8 +294,8 @@ class TestDecimalFix(TestDecimalFixCommon):
           "El campo BaseP... no es igual a la suma de los importes de las bases
            registrados en los documentos relacionados..."
 
-        Fix: BaseDR is rounded to 2dp and BaseP is the 2dp truncation of
-        sum(BaseDR / EquivalenciaDR), as Finkok requires since 2026-09-04.
+        Fix: BaseDR is rounded to 2dp and BaseP is sum(BaseDR / EquivalenciaDR),
+        which has 2 decimals too when both currencies are the same.
         Tested for both round_per_line and round_globally.
         """
         rate = 1.0 / 17.0
@@ -356,7 +356,7 @@ class TestDecimalFix(TestDecimalFixCommon):
                         )
                         base_dr_total += Decimal(base_dr_str) / equivalencia
 
-                # BaseP must equal sum(BaseDR / EquivalenciaDR) truncated to 2dp.
+                # BaseP must equal sum(BaseDR / EquivalenciaDR), exact at 2dp here.
                 traslados_p = pay_cfdi.findall(f".//{{{ns_pago}}}TrasladoP")
                 self.assertTrue(traslados_p, f"No TrasladoP found ({rounding_method})")
                 for tp in traslados_p:
@@ -379,8 +379,8 @@ class TestDecimalFix(TestDecimalFixCommon):
     # Case 5b: CRPER654 — the PAC counts the literal decimals of BaseP against
     # MonedaP: "1122.280000" (USD) and "76000.000000" (MXN) were rejected with
     # "El importe del campo BaseP que corresponde a Traslado, no tiene la
-    # cantidad de decimales que soporta la moneda (MonedaP)". Finkok's notice
-    # (2026-09-04) requires the value truncated to the currency decimals.
+    # cantidad de decimales que soporta la moneda (MonedaP)": no trailing zeros
+    # beyond the currency decimals.
     # -------------------------------------------------------------------------
 
     def _assert_traslado_p_2dp(self, pay_cfdi, rounding_method):
@@ -1200,6 +1200,70 @@ class TestDecimalFix(TestDecimalFixCommon):
                     self.assertEqual(tp.get("ImporteP"), importe)
                     self._assert_traslados_dr_within_sat_limits(
                         pay_cfdi, rounding_method
+                    )
+
+        self._test_cfdi_rounding(run)
+
+    # -------------------------------------------------------------------------
+    # Case 12: CRP20268 — MXN payment of a USD invoice (MTNMX, BPTJ8/2026/00234).
+    # BaseDR="1202.99" / EquivalenciaDR="0.0582998595" = 20634.526572...: Finkok
+    # rejects BaseP="20634.52" and "20634.53" and only accepts the quotient
+    # rounded to 6 decimals without trailing zeros ("20634.526572").
+    # -------------------------------------------------------------------------
+
+    def test_traslado_p_6dp_with_equivalencia(self):
+        rate = 1.0 / 17.152701
+        self.setup_rates(self.usd_currency, (self.frozen_today, rate))
+        ns_pago = "http://www.sat.gob.mx/Pagos20"
+        six = Decimal("0.000001")
+
+        def run(rounding_method):
+            with self.mx_external_setup(self.frozen_today):
+                invoice = self._create_invoice(
+                    currency_id=self.usd_currency.id,
+                    invoice_line_ids=[
+                        Command.create(
+                            {
+                                "product_id": self.product.id,
+                                "quantity": 1,
+                                "price_unit": 1202.99,
+                                "tax_ids": [Command.set(self.tax_16.ids)],
+                            }
+                        ),
+                    ],
+                )
+                with self.with_mocked_pac_sign_success():
+                    invoice._l10n_mx_edi_cfdi_invoice_try_send()
+                payment = self._create_payment(
+                    invoice, currency_id=self.mxn_currency.id
+                )
+                with self.with_mocked_pac_sign_success():
+                    payment.move_id._l10n_mx_edi_cfdi_payment_try_send()
+
+                pay_cfdi = self._get_cfdi_tree(
+                    self._get_payment_document(payment.move_id)
+                )
+                docto = pay_cfdi.find(f".//{{{ns_pago}}}DoctoRelacionado")
+                equivalencia = Decimal(docto.get("EquivalenciaDR"))
+                self.assertNotEqual(equivalencia, 1)
+                tdr = docto.find(f".//{{{ns_pago}}}TrasladoDR")
+                tp = pay_cfdi.find(f".//{{{ns_pago}}}TrasladoP")
+                totales = pay_cfdi.find(f".//{{{ns_pago}}}Totales")
+                for attr_dr, attr_p, attr_total in (
+                    ("BaseDR", "BaseP", "TotalTrasladosBaseIVA16"),
+                    ("ImporteDR", "ImporteP", "TotalTrasladosImpuestoIVA16"),
+                ):
+                    expected = (Decimal(tdr.get(attr_dr)) / equivalencia).quantize(
+                        six, ROUND_HALF_UP
+                    )
+                    value = tp.get(attr_p)
+                    self.assertEqual(Decimal(value), expected, rounding_method)
+                    # More than 2 decimals, none of them a trailing zero.
+                    self.assertRegex(value, r"^\d+\.\d{2,5}[1-9]$", rounding_method)
+                    self.assertEqual(
+                        Decimal(totales.get(attr_total)),
+                        expected.quantize(Decimal("0.01"), ROUND_HALF_UP),
+                        rounding_method,
                     )
 
         self._test_cfdi_rounding(run)
