@@ -107,6 +107,26 @@ class AccountMove(models.Model):
                 details[invoice] += amount
         return [{"invoice": inv, "amount": amount} for inv, amount in details.items()]
 
+    def _get_cfdi_payment_policy(self):
+        """Return the payment policy (PUE/PPD) of an invoice for the follow-up.
+
+        A vendor bill takes it from the ``MetodoPago`` of its own CFDI: the
+        vendor's XML is the source of truth, while the computed field is only
+        inferred from the dates (and stays empty on vendor bills in standard
+        ``l10n_mx_edi``). Without a CFDI the computed field is used.
+        """
+        self.ensure_one()
+        if self.is_purchase_document() and self.l10n_mx_edi_cfdi_attachment_id:
+            cfdi_node = (
+                self.env["l10n_mx_edi.document"]
+                ._decode_cfdi_attachment(self.l10n_mx_edi_cfdi_attachment_id.raw)
+                .get("cfdi_node")
+            )
+            policy = cfdi_node.get("MetodoPago") if cfdi_node is not None else None
+            if policy in ("PUE", "PPD"):
+                return policy
+        return self.l10n_mx_edi_payment_policy
+
     def _get_cfdi_payment_start_date(self):
         """Return the configured start date for the current company (or False)."""
         return self.company_id.l10n_mx_edi_cfdi_payment_start_date or False
@@ -140,6 +160,11 @@ class AccountMove(models.Model):
         "l10n_mx_edi_payment_policy",
         "line_ids.matched_debit_ids",
         "line_ids.matched_credit_ids",
+        # CFDI attached to a reconciled invoice after the reconciliation
+        "line_ids.matched_debit_ids.debit_move_id.move_id"
+        ".l10n_mx_edi_cfdi_attachment_id",
+        "line_ids.matched_credit_ids.credit_move_id.move_id"
+        ".l10n_mx_edi_cfdi_attachment_id",
         "l10n_mx_edi_payment_document_ids.state",
         "l10n_mx_edi_cfdi_payment_manual_ignore",
         "attachment_ids",
@@ -185,7 +210,7 @@ class AccountMove(models.Model):
             # Rule 2: Must have at least one PPD reconciled invoice
             reconciled_invoices = record._get_cfdi_reconciled_invoices()
             has_ppd = any(
-                inv.l10n_mx_edi_payment_policy == "PPD" for inv in reconciled_invoices
+                inv._get_cfdi_payment_policy() == "PPD" for inv in reconciled_invoices
             )
             if not has_ppd:
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
