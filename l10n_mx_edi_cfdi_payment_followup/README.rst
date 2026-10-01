@@ -147,6 +147,11 @@ Every payment shows a **CFDI Payment State**:
 - **Error** — a received XML failed validation; a follow-up activity is
   raised.
 
+Whether a vendor bill is **PPD** is read from the ``MetodoPago`` of its
+own CFDI (the XML received from the vendor), which is the source of
+truth. Only when the bill has no CFDI attached the *Payment Policy*
+field of the bill is used instead.
+
 Requesting the complement
 -------------------------
 
