@@ -9,6 +9,13 @@ def migrate(cr, version):
     Only entries of follow-up journals from each company's start date are
     recomputed: any other move is Not Required whatever the policy is, and
     rewriting those rows would only bloat ``account_move``.
+
+    This must be an ``end`` script: the state depends on
+    ``l10n_mx_edi_payment_policy``, which other modules loaded after this one
+    extend (e.g. to store it or to compute it another way). In a ``post``
+    script their models are not in the registry yet, so the field would be
+    evaluated with the standard rule and payments would wrongly end up as Not
+    Required.
     """
     env = api.Environment(cr, SUPERUSER_ID, {})
     move_model = env["account.move"]
