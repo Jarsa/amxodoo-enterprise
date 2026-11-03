@@ -1,13 +1,18 @@
 from datetime import timedelta
 
+from lxml import etree
+
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools.misc import formatLang
 
 _CFDI_NSMAP = {
     "cfdi": "http://www.sat.gob.mx/cfd/4",
     "pago20": "http://www.sat.gob.mx/Pagos20",
     "tfd": "http://www.sat.gob.mx/TimbreFiscalDigital",
 }
+# Accepted difference between the complements and the Odoo payment amount
+_CFDI_AMOUNT_TOLERANCE = 1.00
 
 
 class AccountMove(models.Model):
@@ -131,6 +136,89 @@ class AccountMove(models.Model):
         """Return the configured start date for the current company (or False)."""
         return self.company_id.l10n_mx_edi_cfdi_payment_start_date or False
 
+    def _is_cfdi_payment_in_scope(self):
+        """Return whether this move is a payment that needs a CFDI complement.
+
+        Shared by the state computation and the XML processing, so a complement
+        attached to an invoice or to a payment out of scope is never validated
+        (nor turned into an error). The manual ignore is not part of the scope:
+        a received and valid XML still overrides it.
+        """
+        self.ensure_one()
+        # Fast-path: if the company has no follow-up start date configured,
+        # the feature is disabled for this record. This avoids loading
+        # related lines / reconciled invoices for the whole history when
+        # the module is installed on a database with years of data.
+        start_date = self._get_cfdi_payment_start_date()
+        if not start_date or (self.date and self.date < start_date):
+            return False
+
+        # Rule 1: Only process payment-type entries
+        if self.move_type != "entry":
+            return False
+        if not self.payment_id and not self.statement_line_id:
+            return False
+
+        # Rule 1.1: Only journals flagged as requiring the complement.
+        # Credit cards and other clearing journals are out of scope.
+        if not self.journal_id.l10n_mx_edi_cfdi_payment_followup:
+            return False
+
+        # Rule 1.2: Only Mexican vendors issue a CFDI. A partner without a
+        # country is kept in scope so a missing country never hides a
+        # payment that does need the complement.
+        country = self.partner_id.commercial_partner_id.country_id
+        if country and country.code != "MX":
+            return False
+
+        # Rule 2: Must have at least one PPD reconciled invoice
+        return any(
+            inv._get_cfdi_payment_policy() == "PPD"
+            for inv in self._get_cfdi_reconciled_invoices()
+        )
+
+    def _get_cfdi_payment_sent_documents(self):
+        """Return the complement documents accepted for this payment."""
+        return self.l10n_mx_edi_payment_document_ids.filtered(
+            lambda doc: doc.state == "payment_sent"
+        )
+
+    @api.model
+    def _get_cfdi_xml_payment_amount(self, xml_raw):
+        """Return the sum of ``Monto`` of a complement XML, or None if unreadable."""
+        if not xml_raw:
+            return None
+        try:
+            tree = etree.fromstring(xml_raw)
+        except (etree.XMLSyntaxError, ValueError):
+            return None
+        pago_nodes = tree.findall(".//pago20:Pago", _CFDI_NSMAP)
+        if not pago_nodes:
+            return None
+        return sum(float(pago.get("Monto", 0)) for pago in pago_nodes)
+
+    def _get_cfdi_complements_amount(self, documents):
+        """Return the amount of this payment covered by the given complements.
+
+        A payment may be covered by several complements (e.g. CFE issues one
+        per tax object for a single bank transfer), so their amounts are added,
+        counting each UUID once. A document whose XML carries no ``Pago`` node
+        (or cannot be read) is assumed to cover the whole payment, as before
+        several complements were supported.
+        """
+        self.ensure_one()
+        payment_amount = abs(self.amount_total)
+        total = 0.0
+        seen_uuids = set()
+        for document in documents:
+            uuid = (document.attachment_uuid or "").upper()
+            if uuid and uuid in seen_uuids:
+                continue
+            seen_uuids.add(uuid)
+            amount = self._get_cfdi_xml_payment_amount(document.attachment_id.raw)
+            total += payment_amount if amount is None else amount
+        return total
+
     @api.model
     def _l10n_mx_edi_cfdi_recompute_for_company(self, company, start_date):
         """Recompute the CFDI payment state for moves in scope of the company.
@@ -166,6 +254,8 @@ class AccountMove(models.Model):
         "line_ids.matched_credit_ids.credit_move_id.move_id"
         ".l10n_mx_edi_cfdi_attachment_id",
         "l10n_mx_edi_payment_document_ids.state",
+        "l10n_mx_edi_payment_document_ids.attachment_id",
+        "amount_total",
         "l10n_mx_edi_cfdi_payment_manual_ignore",
         "attachment_ids",
         "journal_id.l10n_mx_edi_cfdi_payment_followup",
@@ -173,60 +263,27 @@ class AccountMove(models.Model):
     )
     def _compute_l10n_mx_edi_cfdi_payment_state(self):
         for record in self:
-            # Fast-path: if the company has no follow-up start date configured,
-            # the feature is disabled for this record. This avoids loading
-            # related lines / reconciled invoices for the whole history when
-            # the module is installed on a database with years of data.
-            start_date = record._get_cfdi_payment_start_date()
-            if not start_date:
-                record.l10n_mx_edi_cfdi_payment_state = "not_required"
-                continue
-            if record.date and record.date < start_date:
+            if not record._is_cfdi_payment_in_scope():
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
                 continue
 
-            # Rule 1: Only process payment-type entries
-            if record.move_type != "entry":
-                record.l10n_mx_edi_cfdi_payment_state = "not_required"
+            # Received complement documents always win, even over a manual
+            # ignore (a received and valid XML must never be discarded) or a
+            # stored error/requested state (a payment that already has its
+            # complement must not be requested again). Validated once they
+            # cover the payment, Received while some complement is missing.
+            sent_documents = record._get_cfdi_payment_sent_documents()
+            if sent_documents:
+                covered = record._get_cfdi_complements_amount(sent_documents)
+                if covered >= abs(record.amount_total) - _CFDI_AMOUNT_TOLERANCE:
+                    record.l10n_mx_edi_cfdi_payment_state = "validated"
+                else:
+                    record.l10n_mx_edi_cfdi_payment_state = "received"
                 continue
-            if not record.payment_id and not record.statement_line_id:
-                record.l10n_mx_edi_cfdi_payment_state = "not_required"
-                continue
-
-            # Rule 1.1: Only journals flagged as requiring the complement.
-            # Credit cards and other clearing journals are out of scope.
-            if not record.journal_id.l10n_mx_edi_cfdi_payment_followup:
-                record.l10n_mx_edi_cfdi_payment_state = "not_required"
-                continue
-
-            # Rule 1.2: Only Mexican vendors issue a CFDI. A partner without a
-            # country is kept in scope so a missing country never hides a
-            # payment that does need the complement.
-            country = record.partner_id.commercial_partner_id.country_id
-            if country and country.code != "MX":
-                record.l10n_mx_edi_cfdi_payment_state = "not_required"
-                continue
-
-            # Rule 2: Must have at least one PPD reconciled invoice
-            reconciled_invoices = record._get_cfdi_reconciled_invoices()
-            has_ppd = any(
-                inv._get_cfdi_payment_policy() == "PPD" for inv in reconciled_invoices
-            )
-            if not has_ppd:
-                record.l10n_mx_edi_cfdi_payment_state = "not_required"
-                continue
-
-            # A validated complement document always wins, even over a manual
-            # ignore (a received and valid XML must never be discarded).
-            has_sent_document = any(
-                doc.state == "payment_sent"
-                for doc in record.l10n_mx_edi_payment_document_ids
-            )
 
             # Manual ignore: user explicitly marked this payment as not
-            # requiring a complement. Respect it (reversible via server action)
-            # unless a validated complement document exists.
-            if record.l10n_mx_edi_cfdi_payment_manual_ignore and not has_sent_document:
+            # requiring a complement. Respect it (reversible via server action).
+            if record.l10n_mx_edi_cfdi_payment_manual_ignore:
                 record.l10n_mx_edi_cfdi_payment_state = "not_required"
                 continue
 
@@ -243,11 +300,6 @@ class AccountMove(models.Model):
             # Preserve manually-set states only when eligibility still holds
             if stored_state in ("error", "requested"):
                 record.l10n_mx_edi_cfdi_payment_state = stored_state
-                continue
-
-            # Rule 4: A validated complement document exists
-            if has_sent_document:
-                record.l10n_mx_edi_cfdi_payment_state = "validated"
                 continue
 
             # Default: pending
@@ -317,12 +369,14 @@ class AccountMove(models.Model):
     def action_request_cfdi_complement(self):
         """Send a complement request email to the vendor contact.
 
-        Active only when state is 'pending', 'error', or 'requested' (cron resend).
+        Active only when state is 'pending', 'error', 'received' (a complement
+        is still missing) or 'requested' (cron resend).
         """
         for record in self:
             if record.l10n_mx_edi_cfdi_payment_state not in (
                 "pending",
                 "error",
+                "received",
                 "requested",
             ):
                 continue
@@ -499,10 +553,13 @@ class AccountMove(models.Model):
     def _process_cfdi_payment_xml(self, attachment):
         """Parse and validate a CFDI payment complement XML attachment.
 
+        A payment may be covered by several complements: each XML is validated
+        on its own and its amount is added to the complements already accepted
+        for the payment, which becomes Validated once they cover it and
+        Received while some complement is still missing.
+
         Called from _message_post_after_hook when an XML attachment is posted.
         """
-        from lxml import etree  # noqa: PLC0415
-
         # Step 1: filter by extension / mimetype
         filename = (attachment.name or "").lower()
         mimetype = (attachment.mimetype or "").lower()
@@ -520,6 +577,11 @@ class AccountMove(models.Model):
         if tipo != "P":
             return
 
+        # Only payments that need a complement are validated: an XML attached
+        # to an invoice or to a payment out of scope is kept as a plain file.
+        if not self._is_cfdi_payment_in_scope():
+            return
+
         # Step 4: extract UUID
         tfd_node = tree.find(".//tfd:TimbreFiscalDigital", _CFDI_NSMAP)
         uuid = tfd_node.get("UUID") if tfd_node is not None else None
@@ -527,21 +589,13 @@ class AccountMove(models.Model):
             self._on_cfdi_xml_error(_("UUID not found in XML"))
             return
 
-        # Idempotency: same UUID already processed AND state still 'validated'.
-        # If the state was lost (e.g., un-reconcile + re-reconcile cycle), fall
-        # through so the document and state are recovered automatically.
-        if (
-            self.l10n_mx_edi_cfdi_uuid
-            and self.l10n_mx_edi_cfdi_uuid == uuid
-            and self.l10n_mx_edi_cfdi_payment_state == "validated"
-        ):
+        # Idempotency: this complement was already accepted for the payment.
+        # Its document drives the state, which is recovered by the compute if
+        # it was lost (e.g., un-reconcile + re-reconcile cycle).
+        sent_documents = self._get_cfdi_payment_sent_documents()
+        accepted_uuids = {(doc.attachment_uuid or "").upper() for doc in sent_documents}
+        if uuid.upper() in accepted_uuids:
             return
-
-        # Replacement: different UUID while one already stored
-        is_replacement = bool(
-            self.l10n_mx_edi_cfdi_uuid and self.l10n_mx_edi_cfdi_uuid != uuid
-        )
-        previous_uuid = self.l10n_mx_edi_cfdi_uuid if is_replacement else None
 
         # Step 5: extract Pago nodes
         pago_nodes = tree.findall(".//pago20:Pago", _CFDI_NSMAP)
@@ -557,7 +611,31 @@ class AccountMove(models.Model):
             self._on_cfdi_xml_error(combined)
             return
 
-        # Step 7: success — create l10n_mx_edi.document so UUID is auto-computed
+        # Step 7: sum of Monto plus the complements already accepted must not
+        # exceed the Odoo payment amount (tolerance ±1.00). When it does, this
+        # XML is a replacement if it covers the payment by itself.
+        payment_amount = abs(self.amount_total)
+        xml_amount = sum(float(pago.get("Monto", 0)) for pago in pago_nodes)
+        covered = self._get_cfdi_complements_amount(sent_documents) + xml_amount
+        replaced_documents = self.env["l10n_mx_edi.document"]
+        if covered > payment_amount + _CFDI_AMOUNT_TOLERANCE:
+            if abs(xml_amount - payment_amount) > _CFDI_AMOUNT_TOLERANCE:
+                if sent_documents:
+                    error = _(
+                        "Amount mismatch: complements total %(total)s vs Odoo %(odoo)s"
+                    ) % {"total": covered, "odoo": payment_amount}
+                else:
+                    error = _("Amount mismatch: XML total %(xml)s vs Odoo %(odoo)s") % {
+                        "xml": xml_amount,
+                        "odoo": payment_amount,
+                    }
+                self._on_cfdi_xml_error("- %s" % error)
+                return
+            replaced_documents = sent_documents
+            covered = xml_amount
+        is_complete = covered >= payment_amount - _CFDI_AMOUNT_TOLERANCE
+
+        # Step 8: success — create l10n_mx_edi.document so UUID is auto-computed
         reconciled_invoices = self._get_cfdi_reconciled_invoices()
         document_values = {
             "move_id": self.id,
@@ -576,15 +654,43 @@ class AccountMove(models.Model):
         # marked Not Required (ignored) beforehand.
         self.with_context(cfdi_followup_skip_notify=True).write(
             {
-                "l10n_mx_edi_cfdi_payment_state": "validated",
+                "l10n_mx_edi_cfdi_payment_state": (
+                    "validated" if is_complete else "received"
+                ),
                 "l10n_mx_edi_cfdi_payment_manual_ignore": False,
             }
         )
 
+        if not is_complete:
+            # Amounts with the 2 decimals of the CFDI, not the currency's: some
+            # databases raise the currency precision (e.g. to 6 decimals).
+            currency = self.currency_id.name
+            self.message_post(
+                body=_(
+                    "Partial CFDI payment complement received. UUID: %(uuid)s. "
+                    "The complements received cover %(covered)s of %(total)s; "
+                    "%(missing)s is still missing."
+                )
+                % {
+                    "uuid": uuid,
+                    "covered": f"{formatLang(self.env, covered)} {currency}",
+                    "total": f"{formatLang(self.env, payment_amount)} {currency}",
+                    "missing": (
+                        f"{formatLang(self.env, payment_amount - covered)} {currency}"
+                    ),
+                },
+                message_type="comment",
+                subtype_xmlid="mail.mt_note",
+            )
+            return
+
         # Close any prior error activities now that validation succeeded
         self._close_cfdi_payment_error_activities()
 
-        if is_replacement:
+        if replaced_documents:
+            previous_uuid = ", ".join(
+                filter(None, replaced_documents.mapped("attachment_uuid"))
+            )
             self.message_post(
                 body=_(
                     "Replacement CFDI payment complement received. "
@@ -623,7 +729,11 @@ class AccountMove(models.Model):
         )
 
     def _validate_cfdi_payment_xml(self, pago_nodes):
-        """Run all 8 validation rules and return a list of error messages."""
+        """Run the validation rules of one complement and return the errors.
+
+        The amount is checked in :meth:`_process_cfdi_payment_xml`
+        against all the complements of the payment, not one XML alone.
+        """
         from datetime import datetime  # noqa: PLC0415
 
         errors = []
@@ -674,10 +784,12 @@ class AccountMove(models.Model):
                             }
                         )
 
-        # Collect reconciled invoice UUIDs
+        # Collect reconciled invoice UUIDs. UUIDs are compared in uppercase: the
+        # SAT does not distinguish case, and some PACs stamp the invoice in
+        # lowercase while the complement references it in uppercase.
         reconciled_invoices = self._get_cfdi_reconciled_invoices()
         reconciled_uuids = {
-            inv.l10n_mx_edi_cfdi_uuid
+            inv.l10n_mx_edi_cfdi_uuid.upper()
             for inv in reconciled_invoices
             if inv.l10n_mx_edi_cfdi_uuid
         }
@@ -687,31 +799,15 @@ class AccountMove(models.Model):
                 inv_uuid = docto.get("IdDocumento", "")
 
                 # Rule 6: IdDocumento must match a reconciled invoice UUID
-                if inv_uuid not in reconciled_uuids:
+                if inv_uuid.upper() not in reconciled_uuids:
                     errors.append(
                         _("Invoice UUID %(uuid)s not found in reconciled invoices")
                         % {"uuid": inv_uuid}
                     )
 
-                # Rule 7: ImporteSaldoInsoluto must be "0.00"
-                saldo = docto.get("ImporteSaldoInsoluto", "")
-                if saldo and saldo != "0.00":
-                    errors.append(
-                        _(
-                            "Outstanding balance not zero for"
-                            " invoice %(uuid)s: %(saldo)s"
-                        )
-                        % {"uuid": inv_uuid, "saldo": saldo}
-                    )
-
-        # Rule 8: Sum of Monto must match Odoo payment amount (tolerance ±1.00)
-        xml_total = sum(float(pago.get("Monto", 0)) for pago in pago_nodes)
-        odoo_amount = abs(self.amount_total)
-        if abs(xml_total - odoo_amount) > 1.00:
-            errors.append(
-                _("Amount mismatch: XML total %(xml)s vs Odoo %(odoo)s")
-                % {"xml": xml_total, "odoo": odoo_amount}
-            )
+        # The outstanding balance (ImpSaldoInsoluto) is not validated: a PPD
+        # invoice may be paid in installments, so a complement leaving a
+        # balance is valid.
 
         return errors
 

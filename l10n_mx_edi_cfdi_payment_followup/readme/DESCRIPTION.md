@@ -9,7 +9,8 @@ require a complement and surfaces the state on every linked record.
 
 Each payment (the `account.move` of type *entry* behind an `account.payment`
 or an `account.bank.statement.line`) gets a **CFDI Payment State** that moves
-through `Not Required → Pending → Requested → Validated`, with an `Error`
+through `Not Required → Pending → Requested → Validated`, with a `Received`
+step while only part of the payment is covered by complements and an `Error`
 branch when a received XML fails validation.
 
 Main features:
@@ -21,11 +22,13 @@ Main features:
   to each invoice, plus an optional **bank transfer receipt** (PDF) attached
   from a dedicated field. The email is rendered in the partner's language.
 - **Automatic XML processing**: any CFDI payment-complement XML posted in the
-  chatter (or attached to the payment) is parsed and validated against 8 rules
-  (payment form, dates, reconciled UUIDs, outstanding balance, amount…). On
-  success an `l10n_mx_edi.document` is created and the state becomes
-  *Validated*; on failure the state becomes *Error* and a follow-up activity is
-  raised.
+  chatter (or attached to the payment) is parsed and validated (payment form,
+  dates, reconciled UUIDs, amount…). On success an `l10n_mx_edi.document` is
+  created and the state becomes *Validated*; on failure the state becomes
+  *Error* and a follow-up activity is raised. A payment may be covered by
+  **several complements** (e.g. CFE issues more than one for a single
+  transfer): their amounts are added and the state stays *Received* until they
+  cover the payment.
 - The **Request Complement** button is shown only for vendor payments
   (reconciled against a vendor bill/refund); it is hidden for customer
   collections.

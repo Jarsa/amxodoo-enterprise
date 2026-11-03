@@ -157,9 +157,11 @@ class TestCfdiPaymentFollowupCommon(TransactionCase):
             }
         )
         cls.invoice.action_post()
-        # Store a fake UUID on the invoice (simulating a SAT-stamped invoice)
+        # Stamp the invoice with a fake CFDI (simulating a SAT-stamped invoice).
+        # Its UUID is computed from this document, so it is kept when the
+        # complement documents of the payment are linked to the invoice.
         cls.invoice_uuid = "INVOICE-UUID-0000-0000-TEST-0001"
-        cls.invoice.write({"l10n_mx_edi_cfdi_uuid": cls.invoice_uuid})
+        cls._stamp_invoice(cls.invoice, cls.invoice_uuid)
 
         # ---- Inbound payment (customer pays the invoice) --------------------
         cls.payment = cls.env["account.payment"].create(
@@ -207,6 +209,43 @@ class TestCfdiPaymentFollowupCommon(TransactionCase):
     # Helpers
     # -------------------------------------------------------------------------
 
+    @classmethod
+    def _stamp_invoice(cls, invoice, invoice_uuid):
+        """Attach a minimal stamped CFDI 4.0 (``invoice_sent`` document).
+
+        :param invoice: account.move invoice recordset
+        :param invoice_uuid: UUID string for the TimbreFiscalDigital
+        """
+        CFDI = "http://www.sat.gob.mx/cfd/4"
+        TFD = "http://www.sat.gob.mx/TimbreFiscalDigital"
+        root = etree.Element("{%s}Comprobante" % CFDI, nsmap={"cfdi": CFDI, "tfd": TFD})
+        root.set("TipoDeComprobante", "I")
+        root.set("Version", "4.0")
+        complemento = etree.SubElement(root, "{%s}Complemento" % CFDI)
+        tfd = etree.SubElement(complemento, "{%s}TimbreFiscalDigital" % TFD)
+        tfd.set("UUID", invoice_uuid)
+        tfd.set("Version", "1.1")
+
+        attachment = cls.env["ir.attachment"].create(
+            {
+                "name": "invoice_cfdi.xml",
+                "raw": etree.tostring(root, xml_declaration=True, encoding="UTF-8"),
+                "res_model": invoice._name,
+                "res_id": invoice.id,
+                "mimetype": "application/xml",
+            }
+        )
+        cls.env["l10n_mx_edi.document"].create(
+            {
+                "move_id": invoice.id,
+                "invoice_ids": [Command.link(invoice.id)],
+                "attachment_id": attachment.id,
+                "state": "invoice_sent",
+                "sat_state": "not_defined",
+                "datetime": fields.Datetime.now(),
+            }
+        )
+
     def _build_cfdi_xml(
         self,
         payment_uuid,
@@ -223,7 +262,7 @@ class TestCfdiPaymentFollowupCommon(TransactionCase):
         :param amount: float for Monto
         :param invoice_uuids: list of invoice UUID strings for DoctoRelacionado
         :param forma_pago: FormaDePagoP value (default "03" = SPEI)
-        :param saldo_insoluto: ImporteSaldoInsoluto value (default "0.00")
+        :param saldo_insoluto: ImpSaldoInsoluto value (default "0.00")
         :return: XML bytes
         """
         NSMAP = {
@@ -260,7 +299,7 @@ class TestCfdiPaymentFollowupCommon(TransactionCase):
         for inv_uuid in invoice_uuids:
             docto = etree.SubElement(pago, "{%s}DoctoRelacionado" % PAGO20)
             docto.set("IdDocumento", inv_uuid)
-            docto.set("ImporteSaldoInsoluto", saldo_insoluto)
+            docto.set("ImpSaldoInsoluto", saldo_insoluto)
             docto.set("MonedaDR", "MXN")
             docto.set("EquivalenciaDR", "1")
 

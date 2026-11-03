@@ -42,6 +42,7 @@
                     decoration-success="l10n_mx_edi_cfdi_payment_state == 'validated'"
                     decoration-warning="l10n_mx_edi_cfdi_payment_state == 'pending'"
                     decoration-info="l10n_mx_edi_cfdi_payment_state == 'requested'"
+                    decoration-primary="l10n_mx_edi_cfdi_payment_state == 'received'"
                     decoration-danger="l10n_mx_edi_cfdi_payment_state == 'error'"
                 />
                 <field
@@ -99,6 +100,11 @@
                     title="CFDI Requested"
                 >CFDI Requested</span>
                 <span
+                    t-if="record.l10n_mx_edi_cfdi_payment_state.raw_value == 'received'"
+                    class="badge text-bg-primary fw-normal"
+                    title="CFDI Partially Received"
+                >CFDI Partial</span>
+                <span
                     t-if="record.l10n_mx_edi_cfdi_payment_state.raw_value == 'validated'"
                     class="badge text-bg-success fw-normal"
                     title="CFDI Validated"
@@ -154,6 +160,11 @@
                     name="cfdi_requested"
                     string="CFDI Requested"
                     domain="[('l10n_mx_edi_cfdi_payment_state', '=', 'requested')]"
+                />
+                <filter
+                    name="cfdi_received"
+                    string="CFDI Partially Received"
+                    domain="[('l10n_mx_edi_cfdi_payment_state', '=', 'received')]"
                 />
                 <filter
                     name="cfdi_error"
