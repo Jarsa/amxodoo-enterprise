@@ -130,6 +130,20 @@ class TestCfdiStateComputation(TestCfdiPaymentFollowupCommon):
         # Dependency change triggers automatic recompute on next access
         self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
 
+    def test_state_document_wins_over_error(self):
+        """A payment_sent document turns a stored 'error' into 'validated'."""
+        move = self._get_payment_move()
+        move.write({"l10n_mx_edi_cfdi_payment_state": "error"})
+        self.env["l10n_mx_edi.document"].create(
+            {
+                "move_id": move.id,
+                "state": "payment_sent",
+                "sat_state": "not_defined",
+                "datetime": fields.Datetime.now(),
+            }
+        )
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+
     def test_state_preserves_requested(self):
         """Manually set 'requested' is NOT overwritten by recompute."""
         move = self._get_payment_move()

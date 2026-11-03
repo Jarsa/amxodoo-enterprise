@@ -13,7 +13,7 @@
                     string="Request Complement"
                     type="object"
                     class="oe_highlight"
-                    invisible="not l10n_mx_edi_cfdi_is_supplier_payment or l10n_mx_edi_cfdi_payment_state not in ('pending', 'requested', 'error')"
+                    invisible="not l10n_mx_edi_cfdi_is_supplier_payment or l10n_mx_edi_cfdi_payment_state not in ('pending', 'requested', 'received', 'error')"
                 />
                 <field
                     name="l10n_mx_edi_cfdi_payment_state"
@@ -59,6 +59,7 @@
                     decoration-success="l10n_mx_edi_cfdi_payment_state == 'validated'"
                     decoration-warning="l10n_mx_edi_cfdi_payment_state == 'pending'"
                     decoration-info="l10n_mx_edi_cfdi_payment_state == 'requested'"
+                    decoration-primary="l10n_mx_edi_cfdi_payment_state == 'received'"
                     decoration-danger="l10n_mx_edi_cfdi_payment_state == 'error'"
                 />
             </xpath>
