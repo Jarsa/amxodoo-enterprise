@@ -229,6 +229,13 @@ msgid "Amount mismatch: XML total %(xml)s vs Odoo %(odoo)s"
 msgstr "Diferencia de importe: total XML %(xml)s vs Odoo %(odoo)s"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
+#. odoo-python
+#: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
+#, python-format
+msgid "Amount mismatch: complements total %(total)s vs Odoo %(odoo)s"
+msgstr "Diferencia de importe: total de complementos %(total)s vs Odoo %(odoo)s"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
 #: model:ir.model,name:l10n_mx_edi_cfdi_payment_followup.model_ir_attachment
 msgid "Attachment"
 msgstr "Adjunto"
@@ -276,6 +283,17 @@ msgstr "Equipo Responsable del Seguimiento CFDI"
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_tree_cfdi_followup
 msgid "CFDI Not Required"
 msgstr "CFDI No Requerido"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_kanban_cfdi_followup
+msgid "CFDI Partial"
+msgstr "CFDI Parcial"
+
+#. module: l10n_mx_edi_cfdi_payment_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_kanban_cfdi_followup
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_cfdi_payment_followup.view_bank_statement_line_search_cfdi_followup
+msgid "CFDI Partially Received"
+msgstr "CFDI Recibido Parcialmente"
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model:mail.activity.type,name:l10n_mx_edi_cfdi_payment_followup.mail_activity_type_cfdi_complement
@@ -503,8 +521,12 @@ msgstr "No Requerido"
 #. odoo-python
 #: code:addons/l10n_mx_edi_cfdi_payment_followup/models/account_move.py:0
 #, python-format
-msgid "Outstanding balance not zero for invoice %(uuid)s: %(saldo)s"
-msgstr "El saldo insoluto no es cero para la factura %(uuid)s: %(saldo)s"
+msgid ""
+"Partial CFDI payment complement received. UUID: %(uuid)s. The complements "
+"received cover %(covered)s of %(total)s; %(missing)s is still missing."
+msgstr ""
+"Se recibió un complemento de pago CFDI parcial. UUID: %(uuid)s. Los "
+"complementos recibidos cubren %(covered)s de %(total)s; falta %(missing)s."
 
 #. module: l10n_mx_edi_cfdi_payment_followup
 #: model:mail.template,subject:l10n_mx_edi_cfdi_payment_followup.mail_template_cfdi_complement_request

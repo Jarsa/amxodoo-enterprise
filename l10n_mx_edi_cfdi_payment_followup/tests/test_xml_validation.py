@@ -131,8 +131,23 @@ class TestXmlValidation(TestCfdiPaymentFollowupCommon):
         self._attach_xml(self.payment.move_id, xml)
         self.assertEqual(self.payment.move_id.l10n_mx_edi_cfdi_payment_state, "error")
 
-    def test_saldo_insoluto_nonzero(self):
-        """ImporteSaldoInsoluto != '0.00' → 'error'."""
+    def test_invoice_uuid_case_insensitive(self):
+        """Invoice stamped in lowercase, complement in uppercase → 'validated'."""
+        self._stamp_invoice(self.invoice, self.invoice_uuid.lower())
+        self.assertEqual(self.invoice.l10n_mx_edi_cfdi_uuid, self.invoice_uuid.lower())
+        xml = self._build_cfdi_xml(
+            payment_uuid=self.payment_uuid,
+            payment_date=fields.Date.today(),
+            amount=5000.0,
+            invoice_uuids=[self.invoice_uuid.upper()],
+        )
+        self._attach_xml(self.payment.move_id, xml)
+        self.assertEqual(
+            self.payment.move_id.l10n_mx_edi_cfdi_payment_state, "validated"
+        )
+
+    def test_installment_with_balance_validated(self):
+        """ImpSaldoInsoluto != '0.00' (one installment of the invoice) → 'validated'."""
         xml = self._build_cfdi_xml(
             payment_uuid=self.payment_uuid,
             payment_date=fields.Date.today(),
@@ -141,18 +156,192 @@ class TestXmlValidation(TestCfdiPaymentFollowupCommon):
             saldo_insoluto="150.00",
         )
         self._attach_xml(self.payment.move_id, xml)
-        self.assertEqual(self.payment.move_id.l10n_mx_edi_cfdi_payment_state, "error")
+        self.assertEqual(
+            self.payment.move_id.l10n_mx_edi_cfdi_payment_state, "validated"
+        )
 
     def test_amount_mismatch(self):
-        """Monto differs by 5.00 from Odoo amount → 'error'."""
+        """Monto exceeds the Odoo amount by 5.00 → 'error'."""
         xml = self._build_cfdi_xml(
             payment_uuid=self.payment_uuid,
             payment_date=fields.Date.today(),
-            amount=4995.0,  # 5000 - 5 > tolerance of 1
+            amount=5005.0,  # 5000 + 5 > tolerance of 1
             invoice_uuids=[self.invoice_uuid],
         )
         self._attach_xml(self.payment.move_id, xml)
         self.assertEqual(self.payment.move_id.l10n_mx_edi_cfdi_payment_state, "error")
+
+    def test_amount_below_payment_sets_received(self):
+        """Monto below the Odoo amount → 'received', missing amount logged."""
+        move = self.payment.move_id
+        xml = self._build_cfdi_xml(
+            payment_uuid=self.payment_uuid,
+            payment_date=fields.Date.today(),
+            amount=4995.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, xml)
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+        self.assertFalse(move.activity_ids)
+        self.assertTrue(
+            any(
+                "Partial CFDI payment complement" in (message.body or "")
+                for message in move.message_ids
+            )
+        )
+
+    def test_two_complements_cover_payment(self):
+        """Two complements for one payment (CFE case) → 'received', 'validated'."""
+        move = self.payment.move_id
+        first_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0001",
+            payment_date=fields.Date.today(),
+            amount=4800.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, first_xml, filename="first.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+        # The partial state survives a recomputation
+        move._compute_l10n_mx_edi_cfdi_payment_state()
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+
+        second_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0002",
+            payment_date=fields.Date.today(),
+            amount=200.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, second_xml, filename="second.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+        self.assertEqual(len(move._get_cfdi_payment_sent_documents()), 2)
+        self.assertFalse(move.activity_ids)
+
+    def test_same_partial_complement_twice(self):
+        """Reattaching a partial complement → one document, one chatter note."""
+        move = self.payment.move_id
+        xml = self._build_cfdi_xml(
+            payment_uuid=self.payment_uuid,
+            payment_date=fields.Date.today(),
+            amount=4800.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, xml)
+        self._attach_xml(move, xml, filename="complement2.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+        self.assertEqual(len(move._get_cfdi_payment_sent_documents()), 1)
+        partial_notes = move.message_ids.filtered(
+            lambda message: "Partial CFDI payment complement" in (message.body or "")
+        )
+        self.assertEqual(len(partial_notes), 1)
+
+    def test_complements_exceeding_payment(self):
+        """Complements adding up to more than the payment → 'error'."""
+        move = self.payment.move_id
+        first_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0001",
+            payment_date=fields.Date.today(),
+            amount=4800.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, first_xml, filename="first.xml")
+        second_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0002",
+            payment_date=fields.Date.today(),
+            amount=300.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, second_xml, filename="second.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "error")
+        self.assertEqual(len(move._get_cfdi_payment_sent_documents()), 1)
+        self.assertIn("complements total", move.activity_ids[0].note or "")
+
+    def test_replacement_complement(self):
+        """A second complement covering the whole payment is a replacement."""
+        move = self.payment.move_id
+        xml = self._build_cfdi_xml(
+            payment_uuid=self.payment_uuid,
+            payment_date=fields.Date.today(),
+            amount=5000.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, xml)
+        replacement_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-TEST-0002",
+            payment_date=fields.Date.today(),
+            amount=5000.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        self._attach_xml(move, replacement_xml, filename="replacement.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+        self.assertTrue(move.activity_ids)
+        self.assertIn(self.payment_uuid, move.activity_ids[0].note or "")
+
+    def test_emptied_complement_not_counted(self):
+        """Emptied complement XMLs stop counting and can be attached again.
+
+        Same as a server action that clears the content of the XML attachments:
+        the documents stay on the payment but lose their UUID and amount.
+        """
+        move = self.payment.move_id
+        first_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0001",
+            payment_date=fields.Date.today(),
+            amount=4800.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        second_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0002",
+            payment_date=fields.Date.today(),
+            amount=200.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        first = self._attach_xml(move, first_xml, filename="first.xml")
+        second = self._attach_xml(move, second_xml, filename="second.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+
+        second.write({"datas": False})
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+        first.write({"datas": False})
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "pending")
+        self.assertFalse(move._get_cfdi_payment_sent_documents())
+
+        # Attached again, they are not added to the emptied documents
+        self._attach_xml(move, first_xml, filename="first.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+        self._attach_xml(move, second_xml, filename="second.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+        self.assertEqual(len(move._get_cfdi_payment_sent_documents()), 2)
+        self.assertFalse(move.activity_ids)
+
+    def test_xml_on_invoice_ignored(self):
+        """A complement attached to an invoice is not validated."""
+        xml = self._build_cfdi_xml(
+            payment_uuid=self.payment_uuid,
+            payment_date=fields.Date.today(),
+            amount=1.0,
+            invoice_uuids=["UNKNOWN-UUID"],
+        )
+        self._attach_xml(self.invoice, xml)
+        self.assertEqual(self.invoice.l10n_mx_edi_cfdi_payment_state, "not_required")
+        self.assertFalse(self.invoice.activity_ids)
+
+    def test_xml_out_of_scope_journal_ignored(self):
+        """A complement on a journal without follow-up is not validated."""
+        move = self.payment.move_id
+        self.bank_journal.l10n_mx_edi_cfdi_payment_followup = False
+        try:
+            xml = self._build_cfdi_xml(
+                payment_uuid=self.payment_uuid,
+                payment_date=fields.Date.today(),
+                amount=5000.0,
+                invoice_uuids=[self.invoice_uuid],
+                forma_pago="01",
+            )
+            self._attach_xml(move, xml)
+            self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "not_required")
+            self.assertFalse(move.activity_ids)
+        finally:
+            self.bank_journal.l10n_mx_edi_cfdi_payment_followup = True
 
     def test_amount_within_tolerance(self):
         """Monto differs by 0.50 (within ±1.00 tolerance) → 'validated'."""
@@ -168,24 +357,22 @@ class TestXmlValidation(TestCfdiPaymentFollowupCommon):
         )
 
     def test_multiple_errors_reported(self):
-        """Multiple failures (forma_pago + unknown uuid + nonzero saldo) → one error."""
+        """Multiple failures (forma_pago + unknown uuid) → one error."""
         xml = self._build_cfdi_xml(
             payment_uuid=self.payment_uuid,
             payment_date=fields.Date.today(),
             amount=5000.0,
             invoice_uuids=["UNKNOWN-UUID"],
             forma_pago="01",
-            saldo_insoluto="100.00",
         )
         self._attach_xml(self.payment.move_id, xml)
         self.assertEqual(self.payment.move_id.l10n_mx_edi_cfdi_payment_state, "error")
-        # Activity note should contain all 3 error messages
+        # Activity note should contain both error messages
         activities = self.payment.move_id.activity_ids
         self.assertTrue(activities)
         note = activities[0].note or ""
         self.assertIn("SPEI", note)
         self.assertIn("UNKNOWN-UUID", note)
-        self.assertIn("100.00", note)
 
     def test_idempotent_same_uuid(self):
         """Reattaching the same UUID → no reprocessing, state unchanged."""

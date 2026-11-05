@@ -7,8 +7,10 @@ Every payment shows a **CFDI Payment State**:
 - **Pending** — a PPD vendor bill is reconciled and the complement has not been
   requested yet.
 - **Requested** — the request email was sent and the XML is awaited.
-- **Validated** — a valid CFDI payment complement XML was received and the
-  `l10n_mx_edi.document` was created.
+- **Received** — one or more valid complements were received, but they do not
+  cover the whole payment yet (another complement is expected).
+- **Validated** — the valid CFDI payment complement XML(s) received cover the
+  payment and their `l10n_mx_edi.document` were created.
 - **Error** — a received XML failed validation; a follow-up activity is raised.
 
 Whether a vendor bill is **PPD** is read from the `MetodoPago` of its own CFDI
@@ -34,7 +36,9 @@ vendor bill or refund); it is hidden for customer collections.
 ## Receiving and validating the XML
 
 Attach the CFDI payment-complement XML in the payment chatter (or directly on
-the payment). The module parses it automatically and validates:
+the payment). Only payments in scope are processed (see *Payment states*); an
+XML attached to an invoice or to a payment that does not need a complement is
+kept as a plain file. The module parses it automatically and validates:
 
 1.  The document is a payment complement (`TipoDeComprobante = "P"`).
 2.  The Fiscal Stamp (UUID) is present.
@@ -42,14 +46,25 @@ the payment). The module parses it automatically and validates:
 4.  `FechaPago` has a valid format.
 5.  `FechaPago` is not before the payment date and not after it by more than
     the configured tolerance.
-6.  Each `DoctoRelacionado/IdDocumento` matches a reconciled invoice UUID.
-7.  `ImporteSaldoInsoluto` is `"0.00"`.
-8.  The sum of `Monto` matches the Odoo payment amount (±1.00).
+6.  Each `DoctoRelacionado/IdDocumento` matches a reconciled invoice UUID
+    (case-insensitive).
+7.  The sum of `Monto` of all the complements received for the payment does
+    not exceed the Odoo payment amount (±1.00).
 
-On success the state becomes *Validated* and prior error activities are closed.
-On failure the state becomes *Error* and an activity is raised for the
-responsible team. A **replacement** XML (different UUID) is accepted and logged
-in the chatter for review.
+The outstanding balance (`ImpSaldoInsoluto`) is not checked, so a complement
+for one installment of a PPD invoice is valid.
+
+When the complements cover the payment the state becomes *Validated* and prior
+error activities are closed. When they cover only part of it (e.g. CFE issues
+two complements for a single transfer) the state becomes *Received* and the
+missing amount is logged in the chatter; attach the remaining complement(s) to
+complete it. On failure the state becomes *Error* and an activity is raised for
+the responsible team. A **replacement** XML (different UUID that covers the
+payment by itself) is accepted and logged in the chatter for review.
+
+If the XML of a received complement is emptied (e.g. by a server action that
+clears the attachment), it no longer counts: the payment goes back to
+*Received* or *Pending* and the XML can be attached again.
 
 ## Ignoring a payment
 
