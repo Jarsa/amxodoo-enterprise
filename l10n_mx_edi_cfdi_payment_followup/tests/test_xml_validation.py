@@ -276,6 +276,43 @@ class TestXmlValidation(TestCfdiPaymentFollowupCommon):
         self.assertTrue(move.activity_ids)
         self.assertIn(self.payment_uuid, move.activity_ids[0].note or "")
 
+    def test_emptied_complement_not_counted(self):
+        """Emptied complement XMLs stop counting and can be attached again.
+
+        Same as a server action that clears the content of the XML attachments:
+        the documents stay on the payment but lose their UUID and amount.
+        """
+        move = self.payment.move_id
+        first_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0001",
+            payment_date=fields.Date.today(),
+            amount=4800.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        second_xml = self._build_cfdi_xml(
+            payment_uuid="PAY-UUID-0000-0000-CFE0-0002",
+            payment_date=fields.Date.today(),
+            amount=200.0,
+            invoice_uuids=[self.invoice_uuid],
+        )
+        first = self._attach_xml(move, first_xml, filename="first.xml")
+        second = self._attach_xml(move, second_xml, filename="second.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+
+        second.write({"datas": False})
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+        first.write({"datas": False})
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "pending")
+        self.assertFalse(move._get_cfdi_payment_sent_documents())
+
+        # Attached again, they are not added to the emptied documents
+        self._attach_xml(move, first_xml, filename="first.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "received")
+        self._attach_xml(move, second_xml, filename="second.xml")
+        self.assertEqual(move.l10n_mx_edi_cfdi_payment_state, "validated")
+        self.assertEqual(len(move._get_cfdi_payment_sent_documents()), 2)
+        self.assertFalse(move.activity_ids)
+
     def test_xml_on_invoice_ignored(self):
         """A complement attached to an invoice is not validated."""
         xml = self._build_cfdi_xml(

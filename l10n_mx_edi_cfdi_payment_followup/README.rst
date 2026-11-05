@@ -206,6 +206,10 @@ remaining complement(s) to complete it. On failure the state becomes
 **replacement** XML (different UUID that covers the payment by itself)
 is accepted and logged in the chatter for review.
 
+If the XML of a received complement is emptied (e.g. by a server action
+that clears the attachment), it no longer counts: the payment goes back
+to *Received* or *Pending* and the XML can be attached again.
+
 Ignoring a payment
 ------------------
 
