@@ -178,9 +178,17 @@ class AccountMove(models.Model):
         )
 
     def _get_cfdi_payment_sent_documents(self):
-        """Return the complement documents accepted for this payment."""
+        """Return the complement documents accepted for this payment.
+
+        A document whose XML file was emptied (e.g. by a server action that
+        clears the attachment content) is left out: Odoo can no longer read
+        its UUID nor its amount, so it must not count as a complement and the
+        same XML can be attached again. A document without attachment keeps
+        counting as before.
+        """
         return self.l10n_mx_edi_payment_document_ids.filtered(
             lambda doc: doc.state == "payment_sent"
+            and (not doc.attachment_id or doc.attachment_id.file_size)
         )
 
     @api.model
@@ -255,6 +263,8 @@ class AccountMove(models.Model):
         ".l10n_mx_edi_cfdi_attachment_id",
         "l10n_mx_edi_payment_document_ids.state",
         "l10n_mx_edi_payment_document_ids.attachment_id",
+        # Complement XML emptied after it was accepted
+        "l10n_mx_edi_payment_document_ids.attachment_id.file_size",
         "amount_total",
         "l10n_mx_edi_cfdi_payment_manual_ignore",
         "attachment_ids",
