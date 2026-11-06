@@ -1,0 +1,57 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_mx_sat_invoice_enterprise
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-06 18:30+0000\n"
+"PO-Revision-Date: 2026-11-06 18:30+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#. odoo-python
+#: code:addons/l10n_mx_sat_invoice_enterprise/models/l10n_mx_sat_document.py:0
+msgid "%(uuid)s is cancelled in the SAT."
+msgstr "%(uuid)s está cancelado en el SAT."
+
+#. module: l10n_mx_sat_invoice_enterprise
+#. odoo-python
+#: code:addons/l10n_mx_sat_invoice_enterprise/models/l10n_mx_sat_document.py:0
+msgid "%(uuid)s was not found in the SAT."
+msgstr "%(uuid)s no se encontró en el SAT."
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_document__display_name
+msgid "Display Name"
+msgstr "Nombre para mostrar"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_document__id
+msgid "ID"
+msgstr "UUID"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model,name:l10n_mx_sat_invoice_enterprise.model_account_move
+msgid "Journal Entry"
+msgstr "Asiento contable"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model,name:l10n_mx_sat_invoice_enterprise.model_l10n_mx_sat_document
+msgid "SAT Document"
+msgstr "Documento SAT"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#. odoo-python
+#: code:addons/l10n_mx_sat_invoice_enterprise/models/l10n_mx_sat_document.py:0
+msgid "The fiscal folio %(uuid)s is already registered in %(move)s."
+msgstr "El folio fiscal %(uuid)s ya está registrado en %(move)s."
