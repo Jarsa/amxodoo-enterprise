@@ -6,15 +6,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 18:30+0000\n"
-"PO-Revision-Date: 2026-11-06 18:30+0000\n"
+"POT-Creation-Date: 2026-11-10 22:18+0000\n"
+"PO-Revision-Date: 2026-11-10 22:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: \n"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#. odoo-python
+#: code:addons/l10n_mx_sat_invoice_enterprise/models/l10n_mx_sat_document.py:0
+msgid ""
+"%(move)s has the fiscal folio %(move_uuid)s, different from the CFDI "
+"%(uuid)s."
+msgstr ""
+"%(move)s tiene el folio fiscal %(move_uuid)s, distinto al del CFDI %(uuid)s."
 
 #. module: l10n_mx_sat_invoice_enterprise
 #. odoo-python
@@ -29,16 +37,113 @@ msgid "%(uuid)s was not found in the SAT."
 msgstr "%(uuid)s no se encontró en el SAT."
 
 #. module: l10n_mx_sat_invoice_enterprise
-#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_account_move__display_name
-#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_document__display_name
-msgid "Display Name"
-msgstr "Nombre para mostrar"
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__account_id
+msgid "Account"
+msgstr "Cuenta"
 
 #. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,help:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__account_id
+msgid ""
+"Account of the lines whose product has no income/expense account and of the "
+"local taxes."
+msgstr ""
+"Cuenta de las líneas cuyo producto no tiene cuenta de ingresos/gastos y de "
+"los impuestos locales."
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model,name:l10n_mx_sat_invoice_enterprise.model_account_bank_statement_line
+msgid "Bank Statement Line"
+msgstr "Línea de estado de cuenta bancario"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__statement_line_id
+msgid "Bank transaction"
+msgstr "Movimiento bancario"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_mx_sat_invoice_enterprise.l10n_mx_sat_statement_line_wizard_view_form
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__company_id
+msgid "Company"
+msgstr "Empresa"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#. odoo-python
+#: code:addons/l10n_mx_sat_invoice_enterprise/models/account_bank_statement_line.py:0
+msgid "Create Invoices from SAT CFDIs"
+msgstr "Crear facturas desde CFDI del SAT"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_mx_sat_invoice_enterprise.l10n_mx_sat_statement_line_wizard_view_form
+msgid "Create and Match"
+msgstr "Crear y conciliar"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#. odoo-javascript
+#: code:addons/l10n_mx_sat_invoice_enterprise/static/src/bank_reconciliation/button_list.xml:0
+msgid "Create from SAT CFDIs"
+msgstr "Crear desde CFDI del SAT"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model,name:l10n_mx_sat_invoice_enterprise.model_l10n_mx_sat_statement_line_wizard
+msgid "Create the invoices of a bank transaction from SAT CFDIs"
+msgstr "Crear las facturas de un movimiento bancario desde CFDI del SAT"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__currency_id
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__difference
+msgid "Difference"
+msgstr "Diferencia"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__direction
+msgid "Direction"
+msgstr "Dirección"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_account_bank_statement_line__display_name
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_edi_document__display_name
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_document__display_name
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__display_name
+msgid "Display Name"
+msgstr "Nombre en pantalla"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__document_domain
+msgid "Document Domain"
+msgstr "Dominio de documentos"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_account_bank_statement_line__id
 #: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_edi_document__id
 #: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_document__id
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__id
 msgid "ID"
-msgstr "UUID"
+msgstr "Identificación"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__journal_id
+msgid "Journal"
+msgstr "Diario"
 
 #. module: l10n_mx_sat_invoice_enterprise
 #: model:ir.model,name:l10n_mx_sat_invoice_enterprise.model_account_move
@@ -46,12 +151,72 @@ msgid "Journal Entry"
 msgstr "Asiento contable"
 
 #. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__journal_type
+msgid "Journal Type"
+msgstr "Tipo de diario"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model,name:l10n_mx_sat_invoice_enterprise.model_l10n_mx_edi_document
+msgid "Mexican documents that needs to transit outside of Odoo"
+msgstr "Documentos mexicanos que se deben procesar fuera de Odoo"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__only_partner
+msgid "Only CFDIs of the partner"
+msgstr "Solo CFDI del contacto"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__partner_id
+msgid "Partner"
+msgstr "Contacto"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__document_ids
+msgid "SAT CFDIs"
+msgstr "CFDI del SAT"
+
+#. module: l10n_mx_sat_invoice_enterprise
 #: model:ir.model,name:l10n_mx_sat_invoice_enterprise.model_l10n_mx_sat_document
 msgid "SAT Document"
 msgstr "Documento SAT"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__same_currency
+msgid "Same Currency"
+msgstr "Misma moneda"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,help:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__only_partner
+msgid "Show only the CFDIs with the RFC of the partner of the transaction."
+msgstr "Muestra solo los CFDI con el RFC del contacto del movimiento."
 
 #. module: l10n_mx_sat_invoice_enterprise
 #. odoo-python
 #: code:addons/l10n_mx_sat_invoice_enterprise/models/l10n_mx_sat_document.py:0
 msgid "The fiscal folio %(uuid)s is already registered in %(move)s."
 msgstr "El folio fiscal %(uuid)s ya está registrado en %(move)s."
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model_terms:ir.ui.view,arch_db:l10n_mx_sat_invoice_enterprise.l10n_mx_sat_statement_line_wizard_view_form
+msgid "Total"
+msgstr ""
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__selected_total
+msgid "Total of the CFDIs"
+msgstr "Total de los CFDI"
+
+#. module: l10n_mx_sat_invoice_enterprise
+#: model:ir.model.fields,field_description:l10n_mx_sat_invoice_enterprise.field_l10n_mx_sat_statement_line_wizard__amount
+msgid "Transaction amount"
+msgstr "Importe del movimiento"

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="l10n_mx_sat_statement_line_wizard_view_form" model="ir.ui.view">
+        <field name="name">l10n_mx_sat.statement.line.wizard.form</field>
+        <field name="model">l10n_mx_sat.statement.line.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="statement_line_id" />
+                        <field name="partner_id" />
+                        <field name="currency_id" invisible="1" />
+                        <field name="amount" />
+                        <field name="only_partner" />
+                    </group>
+                    <group>
+                        <field name="company_id" invisible="1" />
+                        <field name="journal_type" invisible="1" />
+                        <field name="direction" />
+                        <field name="journal_id" />
+                        <field name="account_id" />
+                    </group>
+                </group>
+                <field name="document_domain" invisible="1" />
+                <field
+                    name="document_ids"
+                    domain="document_domain"
+                    options="{'no_create': True}"
+                >
+                    <list>
+                        <field name="series" />
+                        <field name="folio_number" />
+                        <field name="issue_date" />
+                        <field name="issuer_name" />
+                        <field name="receiver_name" />
+                        <field name="total" sum="Total" />
+                        <field name="currency_code" />
+                        <field name="sat_status" widget="badge" />
+                        <field name="uuid" optional="hide" />
+                    </list>
+                </field>
+                <group class="oe_subtotal_footer">
+                    <field name="same_currency" invisible="1" />
+                    <field name="selected_total" />
+                    <field name="difference" invisible="not same_currency" />
+                </group>
+                <footer>
+                    <button
+                        name="action_create_invoices"
+                        string="Create and Match"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="q"
+                    />
+                    <button
+                        string="Cancel"
+                        class="btn-secondary"
+                        special="cancel"
+                        data-hotkey="x"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
