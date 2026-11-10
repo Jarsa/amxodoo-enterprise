@@ -25,6 +25,8 @@ addon | version | maintainers | summary
 [l10n_mx_edi_invoice_related_folios](l10n_mx_edi_invoice_related_folios/) | 17.0.1.0.0 |  | Add Related Folios to invoices
 [l10n_mx_edi_statement_line_payment_method](l10n_mx_edi_statement_line_payment_method/) | 19.0.1.0.0 |  | Payment method on bank statement lines for the CFDI payment
 [l10n_mx_reports_fix_diot](l10n_mx_reports_fix_diot/) | 17.0.1.0.0 |  | Fix DIOT Report Values
+[l10n_mx_sat_invoice_enterprise](l10n_mx_sat_invoice_enterprise/) | 19.0.1.1.0 |  | Link the EDI document and validate the fiscal folio of the invoices created from SAT CFDIs
+[l10n_mx_sat_payment_enterprise](l10n_mx_sat_payment_enterprise/) | 19.0.1.0.0 | <a href='https://github.com/alan196'><img src='https://github.com/alan196.png' width='32' height='32' style='border-radius:50%;' alt='alan196'/></a> | Register the CFDI of the payments applied from the SAT payment complements
 [l10n_mx_sat_purchase_enterprise](l10n_mx_sat_purchase_enterprise/) | 19.0.1.0.0 |  | Validate the fiscal folio and create the EDI document when a purchase order is billed from a SAT CFDI
 
 [//]: # (end addons)
