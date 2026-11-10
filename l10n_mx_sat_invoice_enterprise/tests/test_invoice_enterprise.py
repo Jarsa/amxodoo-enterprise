@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 from unittest.mock import patch
 
+from odoo import Command, fields
 from odoo.exceptions import UserError
 from odoo.tests import tagged
 from odoo.tools import mute_logger
@@ -141,3 +142,31 @@ class TestInvoiceEnterprise(TestInvoiceWizard):
         wizard.action_link()
         self.assertEqual(document.vendor_bill_id, bill)
         self.assertEqual(len(bill.l10n_mx_edi_document_ids), 1)
+
+    def test_auto_link_by_fiscal_folio(self):
+        """An invoice with fiscal folio needs no manual link."""
+        document = self._create_document()
+        bill = self.env["account.move"].browse(
+            self._create_invoices(document)[1]["res_id"]
+        )
+        # 1. The bill has the folio and its CFDI is downloaded (again)
+        document._sat_write({"vendor_bill_id": False})
+        bill.l10n_mx_sat_document_id = False
+        document.sudo()._l10n_mx_sat_link_invoice_by_fiscal_folio()
+        self.assertEqual(document.vendor_bill_id, bill)
+        self.assertEqual(bill.l10n_mx_sat_document_id, document)
+        # 2. The CFDI is downloaded and the bill gets the folio afterwards
+        document._sat_write({"vendor_bill_id": False})
+        bill.l10n_mx_sat_document_id = False
+        self.env["l10n_mx_edi.document"].create(
+            {
+                "move_id": bill.id,
+                "invoice_ids": [Command.set(bill.ids)],
+                "state": "invoice_received",
+                "sat_state": "valid",
+                "attachment_id": bill.l10n_mx_edi_document_ids.attachment_id.id,
+                "datetime": fields.Datetime.now(),
+            }
+        )
+        self.assertEqual(document.vendor_bill_id, bill)
+        self.assertEqual(bill.l10n_mx_sat_document_id, document)

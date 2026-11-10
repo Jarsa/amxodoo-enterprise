@@ -6,6 +6,42 @@ from odoo import Command, fields, models
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    def _l10n_mx_sat_link_by_fiscal_folio(self):
+        """Link the invoices that have a fiscal folio to the downloaded CFDI
+        of that folio, when it is not linked to another invoice.
+
+        Silent: it runs when the CFDIs are downloaded and when the invoices
+        are stamped, nothing is attached nor posted.
+        """
+        Document = self.env["l10n_mx_sat.document"].sudo()
+        for move in self:
+            uuid = move.l10n_mx_edi_cfdi_uuid
+            if (
+                not uuid
+                or move.l10n_mx_sat_document_id
+                or not move.is_invoice()
+                or move.state == "cancel"
+            ):
+                continue
+            document = Document.search(
+                [
+                    ("company_id", "=", move.company_id.id),
+                    ("document_kind", "=", "cfdi"),
+                    (
+                        "direction",
+                        "=",
+                        "issued" if move.is_sale_document() else "received",
+                    ),
+                    ("uuid", "=ilike", uuid),
+                    ("vendor_bill_id", "=", False),
+                    ("customer_invoice_id", "=", False),
+                ],
+                limit=1,
+            )
+            if document:
+                document._link_invoice(move)
+                move.l10n_mx_sat_document_id = document
+
     def _l10n_mx_sat_link_candidate(self, domain):
         # A stamped or received invoice is linked to the CFDI of its folio
         if self.l10n_mx_edi_cfdi_uuid:
@@ -41,7 +77,10 @@ class AccountMove(models.Model):
         self.write(vals)
         # The EDI document marks the invoice as stamped (issued) or received,
         # gives it the fiscal folio and the SAT status.
-        self.env["l10n_mx_edi.document"].create(
+        # The invoice is linked by the caller, not by its fiscal folio
+        self.env["l10n_mx_edi.document"].with_context(
+            l10n_mx_sat_no_auto_link=True
+        ).create(
             {
                 "move_id": self.id,
                 "invoice_ids": [Command.set(self.ids)],

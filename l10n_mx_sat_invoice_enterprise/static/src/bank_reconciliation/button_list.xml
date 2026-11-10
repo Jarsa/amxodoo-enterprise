@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t
+        t-inherit="account_accountant.BankRecButtonListDropdown"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//BankRecFileUploader" position="after">
+            <DropdownItem
+                class="'btn btn-link'"
+                onSelected.bind="createInvoicesFromSatCfdis"
+            >
+                Create from SAT CFDIs
+            </DropdownItem>
+        </xpath>
+    </t>
+</templates>

@@ -10,6 +10,31 @@ _logger = logging.getLogger(__name__)
 class L10nMxSatDocument(models.Model):
     _inherit = "l10n_mx_sat.document"
 
+    def _upsert_from_xml(self, tree, xml_bytes, company, request):
+        document = super()._upsert_from_xml(tree, xml_bytes, company, request)
+        document._l10n_mx_sat_link_invoice_by_fiscal_folio()
+        return document
+
+    def _l10n_mx_sat_link_invoice_by_fiscal_folio(self):
+        """Link the CFDIs to the invoice that already has their fiscal folio
+        (stamped in Odoo or received with its XML)."""
+        documents = self.filtered(
+            lambda d: d.document_kind == "cfdi"
+            and d.voucher_type in ("I", "E")
+            and not d.invoice_id
+        )
+        if not documents:
+            return
+        # Folios are stored in upper case by the SAT and by the stamping
+        self.env["account.move"].sudo().search(
+            [
+                ("company_id", "in", documents.company_id.ids),
+                ("l10n_mx_edi_cfdi_uuid", "in", documents.mapped("uuid")),
+                ("l10n_mx_sat_document_id", "=", False),
+                ("state", "!=", "cancel"),
+            ]
+        )._l10n_mx_sat_link_by_fiscal_folio()
+
     def _l10n_mx_sat_invoice_rejection(self, move=None):
         rejection = super()._l10n_mx_sat_invoice_rejection(move=move)
         if rejection:

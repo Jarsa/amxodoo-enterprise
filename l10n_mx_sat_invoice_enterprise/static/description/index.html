@@ -392,12 +392,16 @@ the invoice are taken from the CFDI.</li>
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#usage" id="toc-entry-1">Usage</a></li>
-<li><a class="reference internal" href="#bug-tracker" id="toc-entry-2">Bug Tracker</a></li>
-<li><a class="reference internal" href="#credits" id="toc-entry-3">Credits</a><ul>
-<li><a class="reference internal" href="#authors" id="toc-entry-4">Authors</a></li>
-<li><a class="reference internal" href="#contributors" id="toc-entry-5">Contributors</a></li>
-<li><a class="reference internal" href="#maintainers" id="toc-entry-6">Maintainers</a></li>
+<li><a class="reference internal" href="#usage" id="toc-entry-1">Usage</a><ul>
+<li><a class="reference internal" href="#bank-reconciliation" id="toc-entry-2">Bank reconciliation</a></li>
+<li><a class="reference internal" href="#automatic-link-by-fiscal-folio" id="toc-entry-3">Automatic link by fiscal folio</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bug-tracker" id="toc-entry-4">Bug Tracker</a></li>
+<li><a class="reference internal" href="#credits" id="toc-entry-5">Credits</a><ul>
+<li><a class="reference internal" href="#authors" id="toc-entry-6">Authors</a></li>
+<li><a class="reference internal" href="#contributors" id="toc-entry-7">Contributors</a></li>
+<li><a class="reference internal" href="#maintainers" id="toc-entry-8">Maintainers</a></li>
 </ul>
 </li>
 </ul>
@@ -411,9 +415,37 @@ the SAT status in the <strong>MX EDI</strong> section.</p>
 of the chosen CFDI. An invoice that already has a fiscal folio (stamped
 in Odoo or received) can only be linked to the CFDI of that folio, which
 is proposed by the wizard.</p>
+<div class="section" id="bank-reconciliation">
+<h3><a class="toc-backref" href="#toc-entry-2">Bank reconciliation</a></h3>
+<p>In the bank reconciliation, the menu (⋮) of a transaction has the option
+<strong>Create from SAT CFDIs</strong>, next to <strong>Upload Bills</strong>:</p>
+<ol class="arabic simple">
+<li>The wizard takes the direction from the transaction: money out pays
+vendor bills (received CFDIs), money in pays customer invoices
+(issued CFDIs).</li>
+<li>Add the CFDIs paid by the transaction. Only invoices (type I) without
+invoice in Odoo are listed, filtered by the RFC of the partner of the
+transaction; uncheck <strong>Only CFDIs of the partner</strong> to list all of
+them. The total of the selected CFDIs and the difference with the
+transaction are shown below the list.</li>
+<li>Check the journal and the account and click <strong>Create and Match</strong>: the
+invoices are created as with <strong>Create Invoice</strong> and matched with the
+transaction. When the CFDIs add up to more than the transaction, the
+last one is left partially paid.</li>
+</ol>
+</div>
+<div class="section" id="automatic-link-by-fiscal-folio">
+<h3><a class="toc-backref" href="#toc-entry-3">Automatic link by fiscal folio</a></h3>
+<p>An invoice that has a fiscal folio (stamped in Odoo or received with its
+XML) is linked to the downloaded CFDI of that folio without any action:
+when the CFDI is downloaded from the SAT and when the invoice gets its
+folio. The <strong>Link SAT CFDI</strong> button is hidden on those invoices; it is
+meant for the invoices without fiscal folio. Updating the module links
+the existing invoices.</p>
+</div>
 </div>
 <div class="section" id="bug-tracker">
-<h2><a class="toc-backref" href="#toc-entry-2">Bug Tracker</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-4">Bug Tracker</a></h2>
 <p>Bugs are tracked on <a class="reference external" href="https://github.com/amxodoo/enterprise/issues">GitHub Issues</a>.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
@@ -421,16 +453,16 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 <p>Do not contact contributors directly about support or help with technical issues.</p>
 </div>
 <div class="section" id="credits">
-<h2><a class="toc-backref" href="#toc-entry-3">Credits</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-5">Credits</a></h2>
 <div class="section" id="authors">
-<h3><a class="toc-backref" href="#toc-entry-4">Authors</a></h3>
+<h3><a class="toc-backref" href="#toc-entry-6">Authors</a></h3>
 <ul class="simple">
 <li>Jarsa</li>
 <li>Odoo Mexican Association (AMOdoo)</li>
 </ul>
 </div>
 <div class="section" id="contributors">
-<h3><a class="toc-backref" href="#toc-entry-5">Contributors</a></h3>
+<h3><a class="toc-backref" href="#toc-entry-7">Contributors</a></h3>
 <ul class="simple">
 <li><tt class="docutils literal">Jarsa <span class="pre">&lt;https://www.jarsa.com&gt;</span></tt>__:<ul>
 <li>Alan Ramos <a class="reference external" href="mailto:alan.ramos&#64;jarsa.com">alan.ramos&#64;jarsa.com</a></li>
@@ -439,7 +471,7 @@ If you spotted it first, help us to smash it by providing a detailed and welcome
 </ul>
 </div>
 <div class="section" id="maintainers">
-<h3><a class="toc-backref" href="#toc-entry-6">Maintainers</a></h3>
+<h3><a class="toc-backref" href="#toc-entry-8">Maintainers</a></h3>
 <p>This module is part of the <a class="reference external" href="https://github.com/amxodoo/enterprise/tree/19.0/l10n_mx_sat_invoice_enterprise">amxodoo/enterprise</a> project on GitHub.</p>
 <p>You are welcome to contribute.</p>
 </div>
