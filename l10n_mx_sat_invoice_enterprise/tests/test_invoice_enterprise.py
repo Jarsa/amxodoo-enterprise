@@ -107,3 +107,37 @@ class TestInvoiceEnterprise(TestInvoiceWizard):
         document._sat_write({"vendor_bill_id": False})
         with self.assertRaisesRegex(UserError, "already registered"):
             self._create_invoices(document)
+
+    def test_link_registers_the_fiscal_folio(self):
+        document = self._create_document()
+        bill = self._create_bill()
+        self._link_wizard(bill).action_link()
+        self.assertRecordValues(
+            bill,
+            [
+                {
+                    "l10n_mx_edi_cfdi_uuid": document.uuid,
+                    "l10n_mx_edi_cfdi_state": "received",
+                    "l10n_mx_edi_cfdi_sat_state": "valid",
+                }
+            ],
+        )
+
+    def test_link_invoice_with_its_fiscal_folio(self):
+        document = self._create_document()
+        bill = self.env["account.move"].browse(
+            self._create_invoices(document)[1]["res_id"]
+        )
+        # Same situation as a bill that got its folio outside the SAT documents
+        document._sat_write({"vendor_bill_id": False})
+        bill.l10n_mx_sat_document_id = False
+        bill.invoice_line_ids[0].price_unit = 500
+        other = self._create_document()
+        wizard = self._link_wizard(bill)
+        # Proposed by fiscal folio, whatever the total
+        self.assertEqual(wizard.document_id, document)
+        with self.assertRaisesRegex(UserError, "different from the CFDI"):
+            bill._l10n_mx_sat_link_document(other)
+        wizard.action_link()
+        self.assertEqual(document.vendor_bill_id, bill)
+        self.assertEqual(len(bill.l10n_mx_edi_document_ids), 1)

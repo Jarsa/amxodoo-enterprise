@@ -10,18 +10,28 @@ _logger = logging.getLogger(__name__)
 class L10nMxSatDocument(models.Model):
     _inherit = "l10n_mx_sat.document"
 
-    def _l10n_mx_sat_invoice_rejection(self):
-        rejection = super()._l10n_mx_sat_invoice_rejection()
+    def _l10n_mx_sat_invoice_rejection(self, move=None):
+        rejection = super()._l10n_mx_sat_invoice_rejection(move=move)
         if rejection:
             return rejection
-        duplicate = self.env["account.move"].search(
-            [
-                ("company_id", "=", self.company_id.id),
-                ("l10n_mx_edi_cfdi_uuid", "=ilike", self.uuid),
-                ("state", "!=", "cancel"),
-            ],
-            limit=1,
-        )
+        domain = [
+            ("company_id", "=", self.company_id.id),
+            ("l10n_mx_edi_cfdi_uuid", "=ilike", self.uuid),
+            ("state", "!=", "cancel"),
+        ]
+        if move:
+            # Linking an existing invoice: it may already hold this folio
+            move_uuid = move.l10n_mx_edi_cfdi_uuid
+            if move_uuid and move_uuid.upper() != self.uuid.upper():
+                return self.env._(
+                    "%(move)s has the fiscal folio %(move_uuid)s, different "
+                    "from the CFDI %(uuid)s.",
+                    move=move.display_name,
+                    move_uuid=move_uuid,
+                    uuid=self.uuid,
+                )
+            domain.append(("id", "!=", move.id))
+        duplicate = self.env["account.move"].search(domain, limit=1)
         if duplicate:
             return self.env._(
                 "The fiscal folio %(uuid)s is already registered in %(move)s.",
