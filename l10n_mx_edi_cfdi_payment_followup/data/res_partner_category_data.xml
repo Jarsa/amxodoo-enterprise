@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- The follow-up looks this tag up by name (see account_move.py), so a tag
+         created by hand with the same name keeps working. -->
+    <record
+        id="res_partner_category_cfdi_complement_contact"
+        model="res.partner.category"
+    >
+        <field name="name">cfdi_complement_contact</field>
+    </record>
+</odoo>

@@ -1,0 +1,2 @@
+id,name,model_id,group_id/id,operation,domain
+access_cfdi_payment_followup,account.move cfdi followup,account.move,group_cfdi_payment_followup,ru,

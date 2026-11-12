@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t
+        t-name="l10n_mx_edi_cfdi_payment_followup.BankRecStatementLine"
+        t-inherit="account_accountant.BankRecStatementLine"
+        t-inherit-mode="extension"
+    >
+        <xpath
+            expr="//div[hasclass('o_button_line')][hasclass('d-md-flex')]"
+            position="inside"
+        >
+            <t
+                t-set="cfdi_state"
+                t-value="this.recordData.l10n_mx_edi_cfdi_payment_state"
+            />
+            <div
+                t-if="cfdi_state and cfdi_state !== 'not_required'"
+                class="o_cfdi_payment_followup d-flex align-items-start gap-1"
+            >
+                <span
+                    t-if="cfdi_state === 'pending'"
+                    class="badge text-bg-warning fw-normal"
+                    title="CFDI Pending"
+                >CFDI Pending</span>
+                <span
+                    t-if="cfdi_state === 'requested'"
+                    class="badge text-bg-info fw-normal"
+                    title="CFDI Requested"
+                >CFDI Requested</span>
+                <span
+                    t-if="cfdi_state === 'received'"
+                    class="badge text-bg-primary fw-normal"
+                    title="CFDI Partially Received"
+                >CFDI Partial</span>
+                <span
+                    t-if="cfdi_state === 'validated'"
+                    class="badge text-bg-success fw-normal"
+                    title="CFDI Validated"
+                >CFDI <i class="oi" data-icon="check" /></span>
+                <span
+                    t-if="cfdi_state === 'error'"
+                    class="badge text-bg-danger fw-normal"
+                    title="CFDI Error"
+                >CFDI Error</span>
+                <a
+                    t-if="this.recordData.l10n_mx_edi_cfdi_payment_receipt_filename"
+                    class="btn btn-sm btn-secondary"
+                    t-att-href="this.cfdiReceiptUrl"
+                    title="Download Receipt"
+                >
+                    <i class="oi" data-icon="download" />
+                </a>
+                <button
+                    t-if="this.cfdiReceiptNeeded"
+                    class="btn btn-sm btn-secondary"
+                    type="button"
+                    title="Upload/View Receipt"
+                    t-on-click.stop="this.openCfdiReceiptWizard"
+                >
+                    <i class="oi" data-icon="upload" />
+                </button>
+            </div>
+        </xpath>
+    </t>
+</templates>

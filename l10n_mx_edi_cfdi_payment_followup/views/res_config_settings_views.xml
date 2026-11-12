@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form_cfdi_followup" model="ir.ui.view">
+        <field name="name">
+            res.config.settings.view.form.inherit.l10n_mx_edi_cfdi_payment_followup
+        </field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="l10n_mx_edi.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='l10n_mx_edi_settings']" position="after">
+                <block
+                    id="l10n_mx_edi_cfdi_payment_followup_settings"
+                    title="CFDI Payment Complement Follow-up"
+                    invisible="country_code != 'MX'"
+                >
+                    <setting
+                        string="Follow-up Start Date"
+                        help="Only vendor payments dated on or after this date are tracked. Older payments stay as Not Required."
+                    >
+                        <field name="l10n_mx_edi_cfdi_payment_start_date" />
+                    </setting>
+                    <setting
+                        string="Responsible Team"
+                        help="Team whose members receive the follow-up activities when a received XML has errors or is replaced."
+                    >
+                        <field name="l10n_mx_edi_cfdi_responsible_team_id" />
+                    </setting>
+                    <setting
+                        string="Users Receiving Complements by Email"
+                        help="Their email addresses are shown in the request email, so the vendor can send the complement XML and PDF to them instead of replying."
+                    >
+                        <field
+                            name="l10n_mx_edi_cfdi_payment_cc_user_ids"
+                            widget="many2many_tags"
+                        />
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
