@@ -79,6 +79,22 @@ class TestFollowupButton(TestCfdiPaymentFollowupCommon):
         last_mail = self.env["mail.mail"].search([], order="id desc", limit=1)
         self.assertIn(self.customer.email, last_mail.email_to or "")
 
+    def test_request_reply_to_payment_thread(self):
+        """Requests sent by the cron (OdooBot) are answered to the catchall of
+        the payment, not to odoobot@example.com."""
+        alias_domain = (
+            self.env["mail.alias.domain"]
+            .sudo()
+            .create({"name": "cfdi-test.example.mx", "catchall_alias": "erp"})
+        )
+        self.company_mx.sudo().alias_domain_id = alias_domain
+        move = self.payment.move_id
+        move.with_user(self.env.ref("base.user_root")).action_request_cfdi_complement()
+        mail = self.env["mail.mail"].search(
+            [("model", "=", "account.move"), ("res_id", "=", move.id)]
+        )
+        self.assertIn("erp@cfdi-test.example.mx", mail.reply_to)
+
     def test_cron_resends_after_interval(self):
         """action_cfdi_payment_followup re-sends after N days."""
         self.payment.move_id.action_request_cfdi_complement()
