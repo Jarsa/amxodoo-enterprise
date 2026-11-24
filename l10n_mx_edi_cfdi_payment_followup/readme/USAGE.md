@@ -33,6 +33,9 @@ instead.
 The button is only visible for **vendor** payments (those reconciled against a
 vendor bill or refund); it is hidden for customer collections.
 
+Replies to the request go to the payment (catchall alias of the company), so
+the XML attached by the vendor in the reply is validated automatically.
+
 ## Receiving and validating the XML
 
 Attach the CFDI payment-complement XML in the payment chatter (or directly on

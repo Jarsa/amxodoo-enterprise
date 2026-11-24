@@ -420,7 +420,15 @@ class AccountMove(models.Model):
                 raise_if_not_found=False,
             )
             if template:
-                email_values = {"email_to": recipient_email}
+                email_values = {
+                    "email_to": recipient_email,
+                    # The template has no Reply-To, so Odoo would use the
+                    # sender (OdooBot for the cron, odoobot@example.com):
+                    # route the replies to the payment thread (catchall).
+                    "reply_to": record._notify_get_reply_to(
+                        default=self.env.user.email_formatted
+                    )[record.id],
+                }
                 # Attach only the bank transfer receipt (uploaded in the
                 # dedicated field), not arbitrary chatter attachments.
                 if record.l10n_mx_edi_cfdi_payment_receipt:
