@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="account_move_print_payment" model="ir.ui.view">
+        <field
+            name="name"
+        >account.move.form.inherit.l10n_mx_edi_account_move_payment_report</field>
+        <field name="model">account.move</field>
+        <field
+            name="inherit_id"
+            ref="l10n_mx_edi.account_move_form_inherit_l10n_mx_edi"
+        />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//field[@name='l10n_mx_edi_document_ids']/list/button[@name='action_show_document']"
+                position="before"
+            >
+                <button
+                    name="action_send_payment_email"
+                    type="object"
+                    string="Send Payment Receipt"
+                    invisible="state not in ('payment_sent', 'payment_sent_pue')"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record
+        id="l10n_mx_edi.action_report_bank_transaction_receipt"
+        model="ir.actions.report"
+    >
+        <field
+            name="print_report_name"
+        >object._get_payment_receipt_report_filename()</field>
+    </record>
+
+    <!-- Payment receipt of a bank transaction (native in 20.0) -->
+    <template
+        id="report_bank_transaction_receipt_document"
+        inherit_id="l10n_mx_edi.report_bank_transaction_receipt_document"
+    >
+        <xpath expr="//div[@name='l10n_mx_edi_payment_method']" position="before">
+            <div
+                t-if="cfdi and o.company_id.vat != cfdi['supplier_rfc']"
+                class="col-6"
+                name="l10n_mx_edi_supplier_rfc"
+            >
+                <span>XML VAT: </span>
+                <span t-out="o.company_id.vat" />
+                <span t-out="cfdi['supplier_rfc']" />
+            </div>
+        </xpath>
+
+        <xpath expr="//span[@t-field='o.partner_id']/.." position="inside">
+            <!-- With CFDI the native Payment Way is shown instead -->
+            <div
+                t-if="not cfdi and o.l10n_mx_edi_payment_method_id"
+                class="col-6"
+                name="payment_method"
+            >
+                Payment Method: <span
+                t-field="o.l10n_mx_edi_payment_method_id.name"
+            >Credit card</span>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@t-if='o.amount_total']" position="after">
+            <div t-if="o.ref" class="col-6" name="memo">
+                Memo: <span t-field="o.ref">Sample Memo</span>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@t-if='o.amount_total']/.." position="after">
+            <div
+                t-if="cfdi and cfdi['sello_sat'] and cfdi['stamp_date'] and o.partner_id.l10n_mx_edi_fiscal_regime"
+                class="row"
+                name="fiscal_regime"
+            >
+                <div class="col-6">
+                    Fiscal Regime: (<span
+                    t-out="o.partner_id.l10n_mx_edi_fiscal_regime"
+                />) <span t-field="o.partner_id.l10n_mx_edi_fiscal_regime" />
+                </div>
+            </div>
+        </xpath>
+
+        <!-- Same table as l10n_mx_edi.report_payment_document, which is not callable -->
+        <xpath expr="//t[@t-call='l10n_mx_edi.report_payment_cfdi']" position="before">
+            <t t-if="cfdi and len(cfdi['cfdi_node'])">
+                <t t-set="payment_info" t-value="cfdi.get('payment_info')" />
+                <table
+                    t-if="payment_info"
+                    class="table table-sm"
+                    name="table_l10n_mx_edi_payment_info"
+                >
+                    <thead>
+                        <tr>
+                            <th t-if="payment_info['from_account_vat']">
+                                <t
+                                    t-out="o.company_id.account_fiscal_country_id.vat_label or 'VAT'"
+                                />
+                                <span class="ps-1">Emitter Acc. Ord.</span>
+                            </th>
+                            <th
+                                t-if="payment_info['from_account_name']"
+                            >Bank Name Acc. Ord.</th>
+                            <th
+                                t-if="payment_info['from_account_number']"
+                            >Account Ord.</th>
+                            <th t-if="payment_info['to_account_vat']">
+                                <t
+                                    t-out="o.company_id.account_fiscal_country_id.vat_label or 'VAT'"
+                                />
+                                <span class="ps-1">Emitter Acc. Ben.</span>
+                            </th>
+                            <th
+                                t-if="payment_info['to_account_number']"
+                            >Account Ben.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td t-if="payment_info['from_account_vat']">
+                                <span t-out="payment_info['from_account_vat']" />
+                            </td>
+                            <td t-if="payment_info['from_account_name']">
+                                <span t-out="payment_info['from_account_name']" />
+                            </td>
+                            <td t-if="payment_info['from_account_number']">
+                                <span t-out="payment_info['from_account_number']" />
+                            </td>
+                            <td t-if="payment_info['to_account_vat']">
+                                <span t-out="payment_info['to_account_vat']" />
+                            </td>
+                            <td t-if="payment_info['to_account_number']">
+                                <span t-out="payment_info['to_account_number']" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </xpath>
+    </template>
+</odoo>
